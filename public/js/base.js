@@ -1,4 +1,3 @@
-var fps = 60;
 var username;
 var socket;
 var userlist;
@@ -644,7 +643,7 @@ function loop()
 	clockwork();
 	emit_ship_info();
 	background.update();
-	setTimeout(loop, 1000/fps);
+	setTimeout(loop, 1000 / 60);
 }
 
 function clockwork()
