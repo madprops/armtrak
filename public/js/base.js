@@ -364,11 +364,6 @@ function create_enemy_ship(enemy, x, y)
 	}
 }
 
-function introduce_ship()
-{
-	socket.emit('introduce_ship', {});
-}
-
 function emit_ship_info()
 {
 	socket.emit('ship_info', {x:ship.x, y:ship.y, rotation:ship_image.rotation, visible:ship.visible});

@@ -46,18 +46,27 @@ module.exports = function (io)
 	function add_username(username)
 	{
 		var keep_going = true;
+		var matched = false;
 		while(keep_going)
 		{
 			for(var i = 0; i < usernames.length; i++)
 			{
 				if(usernames[i] === username)
 				{
-					username = username + get_random_int(2, 1000);
-					keep_going = true;
+					matched = true;
 					break;
 				}
 			}
-			keep_going = false;
+			if(matched)
+			{
+				username = username + get_random_int(2, 9);
+				keep_going = true;
+				matched = false;
+			}
+			else
+			{
+				keep_going = false;
+			}
 		}
 		usernames.push(username);
 		return username;
