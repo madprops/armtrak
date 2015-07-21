@@ -4,6 +4,7 @@
 		<script src="/js/jquery.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="/js/easel.js"></script>
+    	<script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
 		<script src="/js/base.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/style.css" />
 		<script>
@@ -33,6 +34,9 @@
 
 		</div>
 
+		<iframe id='yt_player' width='200' height='200' src='' frameborder='0' allowfullscreen></iframe>
+
+		<div id='sound_toggle' onclick='toggle_sound();'> turn off sound </div>
 
 	</body>
 </html>

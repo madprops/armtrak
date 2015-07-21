@@ -23,15 +23,17 @@ var last_fired = Date.now();
 var enemy_ships = [];
 var explosion_image;
 var laser_img;
+var label;
+var yt_player;
+var sound = true;
+
+window.onYouTubeIframeAPIReady = function()
+{
+	create_yt_player();
+}
 
 function init(uname)
 {
-/*	song = new Audio('/audio/background_song.ogg'); 
-	song.addEventListener('ended', function() {
-	    this.currentTime = 0;
-	    this.play();
-	}, false);
-	song.play();*/
 	explosion_image = new Image();
 	explosion_image.src = '/img/explosion.png';
 	explosion_image.onload = function()
@@ -79,11 +81,13 @@ function start_socket()
 		if(data.type === 'chat_msg')
 		{
 			update_chat(data.username, data.msg)
+			check_yt(data.msg);
 		}
 		if(data.type === 'username')
 		{
 			username = data.username;
 			chat_announce(data.username + ' has joined');	
+			label.text = space_word(username);
 		}
 		if(data.type === 'chat_announcement')
 		{
@@ -292,6 +296,7 @@ function send_to_chat()
 	$('#chat_input').val('');
 	goto_bottom();
 	socket.emit('sendchat', {msg:msg});
+	check_yt(msg);
 }
 
 function goto_bottom()
@@ -314,6 +319,23 @@ function start_game()
     loop();
 }
 
+function space_word(word)
+{
+	var s = '';
+	for(var i = 0; i < word.length; i++)
+	{
+		s += word[i] + ' ';
+	}
+	return s;
+}
+
+function create_label(username)
+{
+	var label = new createjs.Text(space_word(username), "8px Arial", "#ffffff");
+	label.textAlign = 'center';
+	return label;
+}
+
 function create_ship()
 {
 	var image = new Image();
@@ -328,6 +350,10 @@ function create_ship()
 	ship.health = 100;
 
 	ship.addChild(ship_image);
+
+	label = create_label(username);
+	ship.addChild(label);
+
 	background.addChild(ship);
 
 	image.onload = function() 
@@ -339,6 +365,8 @@ function create_ship()
 		ship_image.regY = ship_height / 2;
 		ship_image.x = ship_width / 2;
 		ship_image.y = ship_height / 2;
+		label.x = ship_width / 2;
+		label.y = ship_height;
 	}
 }
 
@@ -352,6 +380,10 @@ function create_enemy_ship(enemy, x, y)
 	enemy_ship.y = y;
 
 	enemy_ship.addChild(enemy_image);
+
+	var label = create_label(enemy.username)
+	enemy_ship.addChild(label);
+
 	background.addChild(enemy_ship);
 	enemy.container = enemy_ship;
 
@@ -361,6 +393,8 @@ function create_enemy_ship(enemy, x, y)
 		enemy_image.regY = ship_height / 2;
 		enemy_image.x = ship_width / 2;
 		enemy_image.y = ship_height / 2;
+		label.x = ship_width / 2;
+		label.y = ship_height;
 	}
 }
 
@@ -707,7 +741,10 @@ function fire_laser()
 	laser.addChild(laser_image);
 	background.addChild(laser);
 
-	new Audio('/audio/laser.ogg').play();
+	if(sound)
+	{
+		new Audio('/audio/laser.ogg').play();	
+	}
 
 	var velocities = get_vector_velocities(laser, 4);
 	laser.vx = velocities[0];
@@ -857,7 +894,10 @@ function show_explosion(x, y)
 	explosion_animation.y = y - 30;
 	explosion_animation.currentFrame = 0;
 	background.addChild(explosion_animation);
-	new Audio('/audio/explosion.ogg').play();
+	if(sound)
+	{
+		new Audio('/audio/explosion.ogg').play();
+	}
 }
 
 function fire_enemy_laser(data)
@@ -882,7 +922,10 @@ function fire_enemy_laser(data)
 	laser.addChild(laser_image);
 	background.addChild(laser);
 
-	new Audio('/audio/laser.ogg').play();
+	if(sound)
+	{
+		new Audio('/audio/laser.ogg').play();
+	}
 
 	laser.vx = data.vx;
 	laser.vy = data.vy;
@@ -931,3 +974,51 @@ function update_minimap()
 	}
 }
 
+function check_yt(msg)
+{
+	var expr = /(youtu\.be\/|[?&]v=)([^&]+)/;
+	var result = msg.match(expr);
+	if(result)
+	{
+		$('#yt_player').attr('src', 'https://www.youtube.com/embed/' + result[2] + '?&autoplay=1&enablejsapi=1&version=3')
+	}
+}
+
+function create_yt_player()
+{
+	yt_player = new YT.Player('yt_player');
+}
+
+function mute_yt()
+{
+	yt_player.mute();
+}
+
+function unmute_yt()
+{
+	yt_player.unMute();
+}
+
+function toggle_sound()
+{
+	if(sound)
+	{
+		$('#sound_toggle').html('turn on sound');
+		try 
+		{
+			yt_player.mute();
+		}
+		catch(err){}
+		sound = false;
+	}
+	else
+	{
+		$('#sound_toggle').html('turn off sound');
+		try
+		{
+			yt_player.unMute();
+		}
+		catch(err){}
+		sound = true;
+	}
+}

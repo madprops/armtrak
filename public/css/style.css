@@ -102,3 +102,18 @@ a.chat:link, a.chat:visited, a.chat:hover
 {
 	clear: both;
 }
+
+#yt_player
+{
+	display: none;
+}
+
+#sound_toggle
+{
+	position: fixed;
+	top: 1em;
+	left: 1em;
+	color: white;
+	font-size: 1em;
+	cursor: pointer;
+}
