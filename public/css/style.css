@@ -4,7 +4,8 @@ body, html
 	width: 100%;
 	margin: 0px;
 	font-family: sans-serif;
-	background-color: red;
+	background-color: blue;
+	overflow: hidden;
 }
 
 #canvas
@@ -103,7 +104,7 @@ a.chat:link, a.chat:visited, a.chat:hover
 	clear: both;
 }
 
-#yt_player
+iframe
 {
 	display: none;
 }
