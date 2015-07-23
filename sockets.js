@@ -40,9 +40,7 @@ module.exports = function (io)
 
 	function clean_string(s)
 	{
-		s = s.replace(/</g, '');
-		s = s.replace(/>/g, '');
-		return s;
+		return s.replace(/</g, '');
 	}
 
 	function get_random_int(min, max)

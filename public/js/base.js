@@ -273,9 +273,7 @@ function chat_announce(msg)
 
 function clean_string(s)
 {
-	s = s.replace(/</g, '');
-	s = s.replace(/>/g, '');
-	return s;
+	return s.replace(/</g, '');
 }
 
 function format_msg(uname, msg)
