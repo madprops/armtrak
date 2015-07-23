@@ -409,13 +409,6 @@ function emit_ship_info()
 	socket.emit('ship_info', {x:ship.x, y:ship.y, rotation:ship_image.rotation, visible:ship.visible});
 }
 
-function get_center_coords()
-{
-	var x = bg_height / 2;
-	var y = bg_width / 2;
-	return [x, y];
-}
-
 function get_random_int(min, max)
 {
     return Math.floor(Math.random() * (max-min+1) + min);
@@ -423,8 +416,8 @@ function get_random_int(min, max)
 
 function get_random_coords()
 {
-	var x = get_random_int(background.canvas.width, bg_width);
-	var y = get_random_int(background.canvas.height, bg_height);
+	var x = get_random_int(10, bg_width - 10);
+	var y = get_random_int(10, bg_height - 10);
 	return [x, y];
 }
 
