@@ -506,22 +506,6 @@ function move()
 
 function move_background(x, y)
 {
-/*	if(x < 0)
-	{
-		x = 0;
-	}
-	if(x > bg_width - background.canvas.width)
-	{
-		x = bg_width - background.canvas.width;
-	}
-	if(y < 0)
-	{
-		y = 0;
-	}
-	if(y > bg_height - background.canvas.height)
-	{
-		y = bg_height - background.canvas.height;
-	}*/
 	background.regX = x;
 	background.regY = y;
 }
