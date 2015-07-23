@@ -109,12 +109,21 @@ iframe
 	display: none;
 }
 
-#sound_toggle
+#hud
 {
 	position: fixed;
 	top: 1em;
 	left: 1em;
 	color: white;
 	font-size: 1em;
+}
+
+#health
+{
+	padding-right: 40px;
+}
+
+#sound_toggle
+{
 	cursor: pointer;
 }

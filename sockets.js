@@ -23,7 +23,7 @@ module.exports = function (io)
 
 	    socket.on('laser', function (data) 
 	    {
-    		socket.broadcast.emit('update', {type:'laser', username:socket.username, x:data.x, y:data.y, rotation:data.rotation, vx:data.vx, vy:data.vy});
+    		socket.broadcast.emit('update', {type:'laser', laser:data});
     	});
 
 	    socket.on('destroyed', function (data) 

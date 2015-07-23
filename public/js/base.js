@@ -344,7 +344,8 @@ function create_ship()
 	ship.y = coords[1];
 	move_background(coords[0] - background.canvas.width / 2, coords[1] - background.canvas.height / 2);
 	ship.speed = 0;
-	ship.health = 3;
+	ship.health = 100;
+	ship.laser_level = 1;
 
 	ship.addChild(ship_image);
 
@@ -707,6 +708,36 @@ function increase_ship_speed()
 	}
 }
 
+function create_laser(x, y, rotation)
+{
+	var laser_image = new createjs.Bitmap(laser_img);
+
+	var laser = new createjs.Container();
+	laser.x = x;
+	laser.y = y;
+	laser.distance = 0;
+
+	var laser_width = laser_img.width;
+	var laser_height = laser_img.height;
+
+	laser_image.regX = laser_width / 2;
+	laser_image.regY = laser_height / 2;
+	laser_image.x = laser_width / 2;
+	laser_image.y = laser_height / 2;
+	laser_image.rotation = rotation;
+
+	laser.addChild(laser_image);
+	background.addChild(laser);
+
+
+	var velocities = get_vector_velocities(laser, 4);
+	laser.vx = velocities[0];
+	laser.vy = velocities[1];
+
+	lasers.push(laser);
+	return laser;
+}
+
 function fire_laser()
 {
 	if(!ship.visible)
@@ -719,12 +750,54 @@ function fire_laser()
 		return false;
 	}
 
+	var lasers_to_fire = [];
+
+	if(ship.laser_level === 1)
+	{
+		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation));
+	}
+
+	if(ship.laser_level === 2)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation));
+	}
+
+	if(sound)
+	{
+		new Audio('/audio/laser.ogg').play();	
+	}
+
+	last_fired = Date.now();
+
+	emit_laser(lasers_to_fire);
+
+}
+
+function emit_laser(lasers)
+{
+	var laser = [];
+	for(var i = 0; i < lasers.length; i++)
+	{
+		laser.push({username:username, x:lasers[i].x, y:lasers[i].y, rotation:lasers[i].children[0].rotation, vx:lasers[i].vx, vy:lasers[i].vy})
+	}
+	socket.emit('laser', {laser:laser});
+}
+
+function create_enemy_laser(enemy_laser)
+{
 	var laser_image = new createjs.Bitmap(laser_img);
 
 	var laser = new createjs.Container();
-	laser.x = ship.x;
-	laser.y = ship.y;
+	laser.x = enemy_laser.x;
+	laser.y = enemy_laser.y;
 	laser.distance = 0;
+	laser.username = enemy_laser.username;
 
 	var laser_width = laser_img.width;
 	var laser_height = laser_img.height;
@@ -733,31 +806,29 @@ function fire_laser()
 	laser_image.regY = laser_height / 2;
 	laser_image.x = laser_width / 2;
 	laser_image.y = laser_height / 2;
-	laser_image.rotation = ship_image.rotation;
+	laser_image.rotation = enemy_laser.rotation;
 
 	laser.addChild(laser_image);
 	background.addChild(laser);
 
-	if(sound)
-	{
-		new Audio('/audio/laser.ogg').play();	
-	}
+	laser.vx = enemy_laser.vx;
+	laser.vy = enemy_laser.vy;
 
-	var velocities = get_vector_velocities(laser, 4);
-	laser.vx = velocities[0];
-	laser.vy = velocities[1];
-
-	lasers.push(laser);
-
-	last_fired = Date.now();
-
-	emit_laser(laser);
-
+	enemy_lasers.push(laser);
 }
 
-function emit_laser(laser)
+function fire_enemy_laser(data)
 {
-	socket.emit('laser', {x:laser.x, y:laser.y, rotation:laser.children[0].rotation, vx:laser.vx, vy:laser.vy});
+	for(var i = 0; i < data.laser.laser.length; i++)
+	{
+		create_enemy_laser(data.laser.laser[i]);
+	}
+
+	if(sound)
+	{
+		new Audio('/audio/laser.ogg').play();
+	}
+
 }
 
 function move_lasers()
@@ -810,6 +881,14 @@ function move_lasers()
 	}
 }
 
+function increase_laser_level()
+{
+	if(ship.laser_level < 2)
+	{
+		ship.laser_level += 1;
+	}
+}
+
 function check_enemy_collision(laser)
 {
 	for(var i = 0; i < enemy_ships.length; i++)
@@ -844,7 +923,8 @@ function ship_hit(laser)
 {
 	if(ship.visible)
 	{
-		ship.health -= 1;
+		ship.health -= 25;
+		update_health();
 		if(ship.health <= 0)
 		{
 			destroyed(laser);
@@ -869,15 +949,23 @@ function respawn()
 		var coords = get_random_coords();
 		ship.x = coords[0];
 		ship.y = coords[1];
-		ship.health = 3;
+		ship.health = 100;
+		ship.laser_level = 1;
 		move_background(coords[0] - background.canvas.width / 2, coords[1] - background.canvas.height / 2);
 		ship.visible = true;
+		update_health();
 
 	}, 5000)
 }
 
 function enemy_destroyed(data)
 {
+	if(data.destroyed_by === username)
+	{
+		ship.health = 100;
+		update_health();
+		increase_laser_level();
+	}
 	var enemy = get_enemy_ship(data.username);
 	show_explosion(enemy.container.x, enemy.container.y);
 }
@@ -895,39 +983,6 @@ function show_explosion(x, y)
 	{
 		new Audio('/audio/explosion.ogg').play();
 	}
-}
-
-function fire_enemy_laser(data)
-{
-	var laser_image = new createjs.Bitmap(laser_img);
-
-	var laser = new createjs.Container();
-	laser.x = data.x;
-	laser.y = data.y;
-	laser.distance = 0;
-	laser.username = data.username;
-
-	var laser_width = laser_img.width;
-	var laser_height = laser_img.height;
-
-	laser_image.regX = laser_width / 2;
-	laser_image.regY = laser_height / 2;
-	laser_image.x = laser_width / 2;
-	laser_image.y = laser_height / 2;
-	laser_image.rotation = data.rotation;
-
-	laser.addChild(laser_image);
-	background.addChild(laser);
-
-	if(sound)
-	{
-		new Audio('/audio/laser.ogg').play();
-	}
-
-	laser.vx = data.vx;
-	laser.vy = data.vy;
-
-	enemy_lasers.push(laser);
 }
 
 function update_minimap()
@@ -981,7 +1036,6 @@ function check_yt(msg)
 	if(msg.lastIndexOf('.yt ', 0) === 0)
 	{
 		var q = msg.substring(4);
-		console.log(q);
 		if(q !== '')
 		{
 			yt_search(q);
@@ -1065,4 +1119,9 @@ googleApiClientReady = function()
 function onYouTubeApiLoad() 
 {
     gapi.client.setApiKey('AIzaSyA-a83G6NwZS_ZXpQoLeo8viScd_TfOcFk');
+}
+
+function update_health()
+{
+	$('#health').html('health: ' + ship.health + '%');
 }
