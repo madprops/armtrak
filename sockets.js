@@ -6,14 +6,14 @@ module.exports = function (io)
 	{
 	    socket.on('adduser', function(data)
 	    {
-	    	socket.username = add_username(data.username.toLowerCase());
+	    	socket.username = add_username(clean_string(data.username.toLowerCase()));
 	    	socket.emit('update', {type:'username', username:socket.username})
 	    	socket.broadcast.emit('update', {type:'chat_announcement', msg:socket.username + ' has joined'});
 	    });
 
 	    socket.on('sendchat', function (data) 
 	    {
-    		socket.broadcast.emit('update', {type:'chat_msg', username:socket.username, msg:data.msg});
+    		socket.broadcast.emit('update', {type:'chat_msg', username:socket.username, msg:clean_string(data.msg)});
     	});
 
 	    socket.on('ship_info', function (data) 
@@ -37,6 +37,13 @@ module.exports = function (io)
 	   		socket.broadcast.emit('update', {type:'disconnection', username:socket.username}); 
     	});
 	});
+
+	function clean_string(s)
+	{
+		s = s.replace(/</g, '');
+		s = s.replace(/>/g, '');
+		return s;
+	}
 
 	function get_random_int(min, max)
 	{

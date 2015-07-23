@@ -56,7 +56,7 @@ function init(uname)
 	while(keep_naming)
 	{
 		username = prompt('pick your name');
-		if(username === null || username.length < 1 || username.length > 12)
+		if(username === null || username.length < 1 || username.length > 12 || username.indexOf('<') !== -1 || username.indexOf('>') !== -1)
 		{
 			keep_naming = true;
 		}
@@ -271,10 +271,17 @@ function chat_announce(msg)
 	goto_bottom();
 }
 
+function clean_string(s)
+{
+	s = s.replace(/</g, '');
+	s = s.replace(/>/g, '');
+	return s;
+}
+
 function format_msg(uname, msg)
 {
 	return "<div class='chat_message'><b>" + uname + ':</b>&nbsp;&nbsp;'
-			+ chat_urlize(msg) + "</div><div>&nbsp;</div>";
+			+ chat_urlize(clean_string(msg)) + "</div><div>&nbsp;</div>";
 }
 
 function format_announcement_msg(msg)
