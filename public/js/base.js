@@ -13,7 +13,8 @@ var left_arrow = false;
 var right_arrow = false;
 var up_arrow = false;
 var down_arrow = false;
-var offset;
+var x_offset;
+var y_offset;
 var ship_width;
 var ship_height;
 var clock;
@@ -56,7 +57,7 @@ function init(uname)
 	while(keep_naming)
 	{
 		username = prompt('pick your name');
-		if(username === null || username.length < 1 || username.length > 12 || username.indexOf('<') !== -1 || username.indexOf('>') !== -1)
+		if(username === null || username.length < 1 || username.length > 12 || username.indexOf('<') !== -1)
 		{
 			keep_naming = true;
 		}
@@ -347,7 +348,6 @@ function create_ship()
 	var coords = get_random_coords();
 	ship.x = coords[0];
 	ship.y = coords[1];
-	move_background(coords[0] - background.canvas.width / 2, coords[1] - background.canvas.height / 2);
 	ship.speed = 0;
 	ship.health = 100;
 	ship.laser_level = 1;
@@ -364,10 +364,13 @@ function create_ship()
 		ship_width = image.width;
 		ship_height = image.height;
 
+		move_background(coords[0] - (background.canvas.width / 2) + (ship_width / 2), coords[1] - (background.canvas.height / 2) + (ship_height / 2));
+
 		ship_image.regX = ship_width / 2;
 		ship_image.regY = ship_height / 2;
 		ship_image.x = ship_width / 2;
 		ship_image.y = ship_height / 2;
+
 		label.x = ship_width / 2;
 		label.y = ship_height;
 	}
@@ -420,8 +423,8 @@ function get_random_int(min, max)
 
 function get_random_coords()
 {
-	var x = get_random_int(10, bg_width);
-	var y = get_random_int(10, bg_height);
+	var x = get_random_int(background.canvas.width, bg_width);
+	var y = get_random_int(background.canvas.height, bg_height);
 	return [x, y];
 }
 
@@ -503,7 +506,7 @@ function move()
 
 function move_background(x, y)
 {
-	if(x < 0)
+/*	if(x < 0)
 	{
 		x = 0;
 	}
@@ -518,7 +521,7 @@ function move_background(x, y)
 	if(y > bg_height - background.canvas.height)
 	{
 		y = bg_height - background.canvas.height;
-	}
+	}*/
 	background.regX = x;
 	background.regY = y;
 }
@@ -614,48 +617,33 @@ function move_ship()
 	var velocities = get_vector_velocities(ship, ship.speed);
 	var vx = velocities[0];
 	var vy = velocities[1];
+
 	ship.x += vx;
 	ship.y += vy;
+
 	if(ship.x <= 0)
 	{
 		ship.x = bg_width;
-		move_background(bg_width, background.regY);
+		move_background(ship.x - (background.canvas.width / 2) + (ship_width / 2), background.regY);
 	}
 	else if(ship.x >= bg_width)
 	{
 		ship.x = 0;
-		move_background(0, background.regY);
+		move_background(ship.x - (background.canvas.width / 2) + (ship_width / 2), background.regY);
 	}
 	else if(ship.y <= 0)
 	{
 		ship.y = bg_height;
-		move_background(background.regX, bg_height)
+		move_background(background.regX, ship.y - (background.canvas.height / 2) + (ship_height / 2));
 	}
 	else if(ship.y >= bg_height)
 	{
 		ship.y = 0;
-		move_background(background.regX, 0)
+		move_background(background.regX, ship.y - (background.canvas.height / 2) + (ship_height / 2));
 	}
-	check_boundaries();
-}
-
-function check_boundaries()
-{
-	if(ship.y > (background.regY + background.canvas.height) - (y_offset))
+	else
 	{
-		move_background(background.regX, background.regY + ship.speed);
-	}
-	if(ship.y < (background.regY) + (y_offset - ship_height))
-	{
-		move_background(background.regX, background.regY - ship.speed);
-	}
-	if(ship.x > (background.regX + background.canvas.width) - (x_offset))
-	{
-		move_background(background.regX + ship.speed, background.regY);
-	}
-	if(ship.x < (background.regX + (x_offset - ship_width)))
-	{
-		move_background(background.regX - ship.speed, background.regY);
+		move_background(background.regX + vx, background.regY + vy);
 	}
 }
 
