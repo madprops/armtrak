@@ -74,7 +74,7 @@ function init(uname)
 
 function start_socket()
 {
-	socket = io('http://localhost:3000');
+	socket = io('http://armtrak.net:3000');
 
 	socket.on('update', function(data) 
 	{
@@ -344,7 +344,7 @@ function create_ship()
 	ship.y = coords[1];
 	move_background(coords[0] - background.canvas.width / 2, coords[1] - background.canvas.height / 2);
 	ship.speed = 0;
-	ship.health = 100;
+	ship.health = 3;
 
 	ship.addChild(ship_image);
 
@@ -844,7 +844,7 @@ function ship_hit(laser)
 {
 	if(ship.visible)
 	{
-		ship.health -= 10;
+		ship.health -= 1;
 		if(ship.health <= 0)
 		{
 			destroyed(laser);
@@ -869,7 +869,7 @@ function respawn()
 		var coords = get_random_coords();
 		ship.x = coords[0];
 		ship.y = coords[1];
-		ship.health = 100;
+		ship.health = 3;
 		move_background(coords[0] - background.canvas.width / 2, coords[1] - background.canvas.height / 2);
 		ship.visible = true;
 
