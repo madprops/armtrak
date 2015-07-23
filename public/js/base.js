@@ -773,6 +773,19 @@ function fire_laser()
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation));
 	}
 
+	if(ship.laser_level === 3)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15));
+	}
+
 	if(sound)
 	{
 		new Audio('/audio/laser.ogg').play();	
@@ -888,7 +901,7 @@ function move_lasers()
 
 function increase_laser_level()
 {
-	if(ship.laser_level < 2)
+	if(ship.laser_level < 3)
 	{
 		ship.laser_level += 1;
 	}
