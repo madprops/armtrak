@@ -13,28 +13,43 @@ module.exports = function (io)
 
 	    socket.on('sendchat', function (data) 
 	    {
-    		socket.broadcast.emit('update', {type:'chat_msg', username:socket.username, msg:clean_string(data.msg)});
+	    	if(socket.username !== undefined)
+	    	{
+    			socket.broadcast.emit('update', {type:'chat_msg', username:socket.username, msg:clean_string(data.msg)});
+	    	}
     	});
 
 	    socket.on('ship_info', function (data) 
 	    {
-    		socket.broadcast.emit('update', {type:'ship_info', username:socket.username, x:data.x, y:data.y, rotation:data.rotation, visible:data.visible});
+	    	if(socket.username !== undefined)
+	    	{
+    			socket.broadcast.emit('update', {type:'ship_info', username:socket.username, x:data.x, y:data.y, rotation:data.rotation, visible:data.visible});
+	    	}
     	});
 
 	    socket.on('laser', function (data) 
 	    {
-    		socket.broadcast.emit('update', {type:'laser', laser:data});
+	    	if(socket.username !== undefined)
+	    	{
+    			socket.broadcast.emit('update', {type:'laser', laser:data});
+	    	}
     	});
 
 	    socket.on('destroyed', function (data) 
 	    {
-    		socket.broadcast.emit('update', {type:'destroyed', username:socket.username, destroyed_by:data.destroyed_by});
+	    	if(socket.username !== undefined)
+	    	{
+    			socket.broadcast.emit('update', {type:'destroyed', username:socket.username, destroyed_by:data.destroyed_by});
+	    	}
     	});
 
     	socket.on('disconnect', function()
     	{
-    		remove_username(socket.username);
-	   		socket.broadcast.emit('update', {type:'disconnection', username:socket.username}); 
+    		if(socket.username !== undefined)
+    		{
+	    		remove_username(socket.username);
+		   		socket.broadcast.emit('update', {type:'disconnection', username:socket.username}); 
+    		}
     	});
 	});
 
