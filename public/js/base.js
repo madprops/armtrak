@@ -3,8 +3,6 @@ var socket;
 var userlist;
 var canvas;
 var context;
-var canvas_height;
-var canvas_width;
 var background;
 var nave;
 var bg_height = 2000;
@@ -315,7 +313,6 @@ function start_chat()
 
 function start_game()
 {
-	start_canvas();
     create_background();
     create_ship();
     clock = Date.now();
@@ -421,14 +418,6 @@ function get_random_coords()
 	return [x, y];
 }
 
-function start_canvas()
-{
-	canvas = document.getElementById('canvas');
-	context = canvas.getContext('2d');
-	canvas_width = $('#canvas').width();
-	canvas_height = $('#canvas').height();
-}
-
 function create_background()
 {
 	background = new createjs.Stage('canvas');
@@ -463,6 +452,9 @@ function create_background()
 	        Math.random() * 360 // rotation of the star
 	    );
 	}
+
+	background.canvas.width = 400;
+	background.canvas.height = 300;
 
 	x_offset = background.canvas.width * 0.2;
 	y_offset = background.canvas.height * 0.2;
@@ -821,7 +813,7 @@ function move_lasers()
 		var laser;
 		laser = lasers[i];
 
-		if(laser.distance < 80)
+		if(laser.distance < 100)
 		{
 			laser.x += laser.vx;
 			laser.y += laser.vy;
