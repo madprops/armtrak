@@ -86,6 +86,9 @@ function start_socket()
 		{
 			username = data.username;
 			chat_announce(data.username + ' has joined');	
+			chat_announce('you move with the arrow keys and shoot with spacebar');	
+			chat_announce('you can place an image on the map (visible to everyone) by pasting an image url');	
+			chat_announce('you can play a youtube song (for everyone) by searching it with ".yt name of song"');	
 			label.text = space_word(username);
 		}
 		if(data.type === 'chat_announcement')
