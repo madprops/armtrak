@@ -25,6 +25,7 @@ var laser_img;
 var label;
 var yt_player;
 var sound = true;
+var images = [];
 
 window.onYouTubeIframeAPIReady = function()
 {
@@ -103,6 +104,10 @@ function start_socket()
 		{
 			enemy_destroyed(data);
 			chat_announce(data.username + ' was destroyed by ' + data.destroyed_by);
+		}
+		if(data.type === 'images')
+		{
+			place_images(data.images);
 		}
 		if(data.type === 'disconnection')
 		{
@@ -295,7 +300,8 @@ function chat_urlize(msg)
 function send_to_chat()
 {
 	msg = $('#chat_input').val();
-	update_chat(username, msg)
+	update_chat(username, msg);
+	check_image(msg);
 	$('#chat_input').val('');
 	socket.emit('sendchat', {msg:msg});
 }
@@ -333,6 +339,7 @@ function create_label(username)
 {
 	var label = new createjs.Text(space_word(username), "8px Arial", "#ffffff");
 	label.textAlign = 'center';
+	label.shadow = new createjs.Shadow("#000000", 0, 0, 5);
 	return label;
 }
 
@@ -370,6 +377,8 @@ function create_ship()
 
 		label.x = ship_width / 2;
 		label.y = ship_height;
+
+		socket.emit('get_images', {});
 	}
 }
 
@@ -828,6 +837,8 @@ function move_lasers()
 		}
 		else
 		{
+			lasers.splice(i, 1);
+			i -= 1;
 			background.removeChild(laser);
 		}
 	}
@@ -851,6 +862,8 @@ function move_lasers()
 		}
 		else
 		{
+			enemy_lasers.splice(i, 1);
+			i -= 1;
 			background.removeChild(enemy_laser);
 		}
 	}
@@ -1099,4 +1112,66 @@ function onYouTubeApiLoad()
 function update_health()
 {
 	$('#health').html('health: ' + ship.health + '%');
+}
+
+function check_image(msg)
+{
+	if(msg.indexOf(' ') === -1)
+	{
+		if(msg.indexOf('.jpg') !== -1 || msg.indexOf('.png') !== -1)
+		{
+			var img = new Image();
+			img.src = msg;
+
+			img.onload = function() 
+			{
+				var image = new createjs.Bitmap(img);
+				image.x = ship.x - ((img.width / 3) / 2) + (ship_width / 2);
+				image.y = ship.y - ((img.height / 3) / 2) + (ship_height / 2);
+				image.scaleX = 0.333;
+				image.scaleY = 0.333;
+				background.addChild(image);
+				put_ships_on_top();
+				push_image(image);
+				socket.emit('image', {url:msg, x:image.x, y:image.y});
+			}
+		}
+	}
+}
+
+function place_images(imgs)
+{
+	for(var i = 0; i < imgs.length; i++)
+	{
+		var img = new Image();
+		img.src = imgs[i].url;
+		var image = new createjs.Bitmap(img);
+		image.x = imgs[i].x;
+		image.y = imgs[i].y;
+		image.scaleX = 0.333;
+		image.scaleY = 0.333;
+		background.addChild(image);
+		put_ships_on_top();
+		push_image(image);
+	}
+}
+
+function push_image(image)
+{
+	images.push(image);
+	if(images.length > 10)
+	{
+		background.removeChild(images[0]);
+		images.splice(0, 1);
+	}
+}
+
+function put_ships_on_top()
+{
+	for(var i = 0; i < enemy_ships.length; i++)
+	{
+		background.setChildIndex(enemy_ships[i].container, background.getNumChildren() - 1);
+	}
+
+	background.setChildIndex(ship, background.getNumChildren() - 1);
 }

@@ -1,6 +1,7 @@
 module.exports = function (io) 
 {
 	var usernames = [];
+	var images = [];
 
 	io.on("connection", function(socket)
 	{
@@ -40,6 +41,23 @@ module.exports = function (io)
 	    	if(socket.username !== undefined)
 	    	{
     			socket.broadcast.emit('update', {type:'destroyed', username:socket.username, destroyed_by:data.destroyed_by});
+	    	}
+    	});
+
+	    socket.on('image', function (data) 
+	    {
+	    	if(socket.username !== undefined)
+	    	{
+	    		add_image(data);
+    			socket.broadcast.emit('update', {type:'images', images:[{url:data.url, x:data.x, y:data.y}]});
+	    	}
+    	});
+
+	    socket.on('get_images', function (data) 
+	    {
+	    	if(socket.username !== undefined)
+	    	{
+    			socket.emit('update', {type:'images', images:images});
 	    	}
     	});
 
@@ -100,6 +118,15 @@ module.exports = function (io)
 			{
 				usernames.splice(i, 1);
 			}
+		}
+	}
+
+	function add_image(data)
+	{
+		images.push(data);
+		if(images.length > 10)
+		{
+			images.splice(0, 1);
 		}
 	}
 
