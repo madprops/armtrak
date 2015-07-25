@@ -831,6 +831,23 @@ function move_lasers()
 			laser.y += laser.vy;
 			laser.distance += 1;
 
+			if(laser.x <= 0)
+			{
+				laser.x = bg_width;
+			}
+			else if(laser.x >= bg_width)
+			{
+				laser.x = 0;
+			}
+			else if(laser.y <= 0)
+			{
+				laser.y = bg_height;
+			}
+			else if(laser.y >= bg_height)
+			{
+				laser.y = 0;
+			}
+
 			var enemy = check_enemy_collision(laser);
 			if(enemy)
 			{
