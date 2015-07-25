@@ -118,6 +118,7 @@ iframe
 	left: 1em;
 	color: white;
 	font-size: 1em;
+	text-shadow: 1px 1px black;
 }
 
 #health
