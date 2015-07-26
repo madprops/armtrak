@@ -200,6 +200,7 @@ function remove_enemy(uname)
 		{
 			background.removeChild(enemy_ships[i].container);
 			enemy_ships.splice(i, 1);
+
 		}
 	}
 }
@@ -736,7 +737,7 @@ function clockwork()
 
 function reduce_ship_speed()
 {
-	ship.speed -= 0.1;
+	ship.speed -= 0.2;
 
 	if(ship.speed < 0)
 	{
