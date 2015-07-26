@@ -1221,7 +1221,7 @@ function check_image(msg)
 {
 	if(msg.indexOf(' ') === -1)
 	{
-		if(msg.indexOf('.jpg') !== -1 || msg.indexOf('.png') !== -1)
+		if(msg.indexOf('.jpg') !== -1 || msg.indexOf('.png') !== -1 || msg.indexOf('.jpeg') !== -1 || msg.indexOf('.JPG') !== -1 || msg.indexOf('.PNG') !== -1 || msg.indexOf('.JPEG') !== -1)
 		{
 			var img = new Image();
 			img.src = msg;
