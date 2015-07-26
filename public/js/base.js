@@ -200,7 +200,6 @@ function remove_enemy(uname)
 		{
 			background.removeChild(enemy_ships[i].container);
 			enemy_ships.splice(i, 1);
-
 		}
 	}
 }
