@@ -55,8 +55,7 @@ function init(uname)
 	var keep_naming = true;
 	while(keep_naming)
 	{
-		username = prompt('pick your name');
-		username = clean_string(username);
+		username = clean_string(prompt('pick your name'));
 		if(username === null || username.length < 1 || username.length > 12 || username.indexOf('<') !== -1)
 		{
 			keep_naming = true;
