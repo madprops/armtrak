@@ -442,6 +442,7 @@ function create_enemy_ship(enemy, x, y)
 
 	background.addChild(enemy_ship);
 	enemy.container = enemy_ship;
+	z_order();
 
 	image.onload = function() 
 	{
