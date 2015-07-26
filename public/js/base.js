@@ -986,13 +986,16 @@ function check_enemy_collision(laser)
 	for(var i = 0; i < enemy_ships.length; i++)
 	{
 		var enemy = enemy_ships[i];
-		var x1 = enemy.container.x - ship_width / 4;
-		var x2 = enemy.container.x + ship_width / 4;
-		var y1 = enemy.container.y - ship_height / 4;
-		var y2 = enemy.container.y + ship_height / 4;
-		if( (laser.x >= x1 && laser.x <= x2) && (laser.y >= y1 && laser.y <= y2) )
+		if(enemy.container.visible)
 		{
-			return enemy;
+			var x1 = enemy.container.x - ship_width / 4;
+			var x2 = enemy.container.x + ship_width / 4;
+			var y1 = enemy.container.y - ship_height / 4;
+			var y2 = enemy.container.y + ship_height / 4;
+			if( (laser.x >= x1 && laser.x <= x2) && (laser.y >= y1 && laser.y <= y2) )
+			{
+				return enemy;
+			}
 		}
 	}
 	return false;
@@ -1000,13 +1003,16 @@ function check_enemy_collision(laser)
 
 function check_ship_collision(laser)
 {
-	var x1 = ship.x - ship_width / 4;
-	var x2 = ship.x + ship_width / 4;
-	var y1 = ship.y - ship_height / 4;
-	var y2 = ship.y + ship_height / 4;
-	if( (laser.x >= x1 && laser.x <= x2) && (laser.y >= y1 && laser.y <= y2) )
+	if(ship.visible)
 	{
-		return true;
+		var x1 = ship.x - ship_width / 4;
+		var x2 = ship.x + ship_width / 4;
+		var y1 = ship.y - ship_height / 4;
+		var y2 = ship.y + ship_height / 4;
+		if( (laser.x >= x1 && laser.x <= x2) && (laser.y >= y1 && laser.y <= y2) )
+		{
+			return true;
+		}
 	}
 	return false;
 }
