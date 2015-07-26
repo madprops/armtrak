@@ -56,6 +56,7 @@ function init(uname)
 	while(keep_naming)
 	{
 		username = prompt('pick your name');
+		username = clean_string(username);
 		if(username === null || username.length < 1 || username.length > 12 || username.indexOf('<') !== -1)
 		{
 			keep_naming = true;
@@ -105,8 +106,19 @@ function start_socket()
 		}
 		if(data.type === 'destroyed')
 		{
-			enemy_destroyed(data);
-			chat_announce(data.username + ' was destroyed by ' + data.destroyed_by);
+			if(data.username !== username)
+			{
+				enemy_destroyed(data);
+			}
+
+			var kills = '';
+			console.log(data.kills);
+			if(data.kills > 1)
+			{
+				kills = '<br>(' + data.kills + ' kills in a row)';
+			}
+
+			chat_announce(data.username + ' was destroyed by ' + data.destroyed_by + kills);
 		}
 		if(data.type === 'images')
 		{
@@ -195,6 +207,8 @@ function activate_key_detection()
 	{
 		code = (e.keyCode ? e.keyCode : e.which);
 
+		$('#chat_input').focus();
+
 		if(code == 13)
 		{
 			send_to_chat();
@@ -222,11 +236,12 @@ function activate_key_detection()
 			down_arrow = true;
 		}
 
-		if(code === 32 || code === 17)
+		if(code === 32)
 		{
-			if(!$('#chat_input').is(':focus'))
+			if($('#chat_input').val() === '')
 			{
 				fire_laser();
+				e.preventDefault();
 			}
 		}
 
@@ -280,7 +295,7 @@ function chat_announce(msg)
 
 function clean_string(s)
 {
-	return s.replace(/</g, '');
+	return s.replace(/</g, '').trim().replace(/\s+/g, ' ');
 }
 
 function format_msg(uname, msg)
@@ -300,13 +315,28 @@ function chat_urlize(msg)
 	return msg.replace(/[^\s"\\]+\.\w{2,}[^\s"\\]*/g, '<a class="chat" target="_blank" href="$&"> $& </a>');
 }
 
+function msg_is_ok(msg)
+{
+	if(msg.length > 0 && msg.length < 444)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 function send_to_chat()
 {
-	msg = $('#chat_input').val();
-	update_chat(username, msg);
-	check_image(msg);
+	msg = clean_string($('#chat_input').val());
+	if(msg_is_ok(msg))
+	{
+		update_chat(username, msg);
+		check_image(msg);
+		socket.emit('sendchat', {msg:msg});
+	}
 	$('#chat_input').val('');
-	socket.emit('sendchat', {msg:msg});
 }
 
 function goto_bottom()
@@ -317,6 +347,7 @@ function goto_bottom()
 function start_chat()
 {
 	$('#chat_area').append('<div class="clear">&nbsp;</div>');
+	$('#chat_input').focus();
 	goto_bottom();
 }
 
@@ -945,7 +976,6 @@ function destroyed(laser)
 	ship.visible = false;
 	show_explosion(ship.x, ship.y);
 	socket.emit('destroyed', {destroyed_by:laser.username});
-	chat_announce(username + ' was destroyed by ' + laser.username);
 	respawn();
 }
 

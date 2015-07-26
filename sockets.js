@@ -3,6 +3,14 @@ module.exports = function (io)
 	var usernames = [];
 	var images = [];
 
+	function Score()
+	{
+		var username;
+		var kills;
+	}
+
+	var scores = [];
+
 	io.on("connection", function(socket)
 	{
 	    socket.on('adduser', function(data)
@@ -40,7 +48,9 @@ module.exports = function (io)
 	    {
 	    	if(socket.username !== undefined)
 	    	{
-    			socket.broadcast.emit('update', {type:'destroyed', username:socket.username, destroyed_by:data.destroyed_by});
+	    		var kills = add_kill(data.destroyed_by);
+	    		reset_kills(socket.username);
+    			io.sockets.emit('update', {type:'destroyed', username:socket.username, destroyed_by:data.destroyed_by, kills:kills});
 	    	}
     	});
 
@@ -66,6 +76,7 @@ module.exports = function (io)
     		if(socket.username !== undefined)
     		{
 	    		remove_username(socket.username);
+	    		remove_score(socket.username);
 		   		socket.broadcast.emit('update', {type:'disconnection', username:socket.username}); 
     		}
     	});
@@ -73,7 +84,7 @@ module.exports = function (io)
 
 	function clean_string(s)
 	{
-		return s.replace(/</g, '');
+		return s.replace(/</g, '').trim().replace(/\s+/g, ' ');
 	}
 
 	function get_random_int(min, max)
@@ -128,6 +139,52 @@ module.exports = function (io)
 		{
 			images.splice(0, 1);
 		}
+	}
+
+	function create_score(username)
+	{
+		var score = new Score();
+		score.username = username;
+		score.kills = 0;
+		scores.push(score);
+		return score;
+	}
+
+	function remove_score(username)
+	{
+		for(var i = 0; i < scores.length; i++)
+		{
+			if(username === scores[i].username)
+			{
+				scores.splice(i, 1);
+				return true;
+			}
+		}
+	}
+
+	function get_score(username)
+	{
+		for(var i = 0; i < scores.length; i++)
+		{
+			if(username === scores[i].username)
+			{
+				return scores[i];
+			}
+		}
+		return create_score(username);
+	}
+
+	function add_kill(username)
+	{
+		var score = get_score(username);
+		score.kills += 1;
+		return score.kills;
+	}
+
+	function reset_kills(username)
+	{
+		var score = get_score(username);
+		score.kills = 0;
 	}
 
 }
