@@ -951,7 +951,7 @@ function move_lasers()
 
 			if((Math.pow(((enemy_laser.x + (laser_width / 2)) - bg_width / 2), 2) + Math.pow(((enemy_laser.y + (laser_height / 2)) - bg_height / 2), 2)) < Math.pow(safe_zone_radius, 2))
 			{
-				lasers.splice(i, 1);
+				enemy_lasers.splice(i, 1);
 				i -= 1;
 				background.removeChild(enemy_laser);
 			}
