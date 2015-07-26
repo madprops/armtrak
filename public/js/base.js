@@ -117,7 +117,7 @@ function start_socket()
 				kills = '<br>(' + data.kills + ' kills in a row)';
 			}
 
-			chat_announce(data.username + ' was destroyed by ' + data.destroyed_by + kills);
+			chat_announce(data.destroyed_by + ' destroyed ' + data.username + kills);
 		}
 		if(data.type === 'images')
 		{
