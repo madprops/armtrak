@@ -1268,7 +1268,7 @@ function place_images(imgs)
 function push_image(image)
 {
 	images.push(image);
-	if(images.length > 10)
+	if(images.length > 20)
 	{
 		background.removeChild(images[0]);
 		images.splice(0, 1);

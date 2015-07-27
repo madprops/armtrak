@@ -135,7 +135,7 @@ module.exports = function (io)
 	function add_image(data)
 	{
 		images.push(data);
-		if(images.length > 10)
+		if(images.length > 20)
 		{
 			images.splice(0, 1);
 		}
