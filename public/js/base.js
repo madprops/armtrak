@@ -99,6 +99,7 @@ function start_socket()
 			chat_announce('you can place an image on the map (visible to everyone) by pasting an image url');	
 			chat_announce('you can play a youtube song (for everyone) by searching it with ".yt name of song"');	
 			label.text = space_word(username);
+			start_heartbeat();
 		}
 		if(data.type === 'chat_announcement')
 		{
@@ -131,6 +132,10 @@ function start_socket()
 		if(data.type === 'images')
 		{
 			place_images(data.images);
+		}
+		if(data.type === 'connection_lost')
+		{
+			window.location = '/';
 		}
 		if(data.type === 'disconnection')
 		{
@@ -1285,4 +1290,13 @@ function z_order()
 	}
 
 	background.setChildIndex(ship, background.getNumChildren() - 1);
+}
+
+function start_heartbeat()
+{
+	setInterval(function()
+	{
+		socket.emit('heartbeat', {});
+
+	}, 10000);
 }

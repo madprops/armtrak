@@ -71,6 +71,14 @@ module.exports = function (io)
 	    	}
     	});
 
+	    socket.on('heartbeat', function (data) 
+	    {
+	    	if(socket.username === undefined)
+	    	{
+    			socket.emit('update', {type:'connection_lost'});
+	    	}
+    	});
+
     	socket.on('disconnect', function()
     	{
     		if(socket.username !== undefined)
