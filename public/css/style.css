@@ -126,6 +126,16 @@ iframe
 	padding-right: 40px;
 }
 
+#max_speed
+{
+	padding-right: 40px;
+}
+
+#laser_level
+{
+	padding-right: 40px;
+}
+
 #sound_toggle
 {
 	cursor: pointer;

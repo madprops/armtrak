@@ -32,7 +32,7 @@ module.exports = function (io)
 	    {
 	    	if(socket.username !== undefined)
 	    	{
-    			socket.broadcast.emit('update', {type:'ship_info', username:socket.username, x:data.x, y:data.y, rotation:data.rotation, visible:data.visible});
+    			socket.broadcast.emit('update', {type:'ship_info', username:socket.username, x:data.x, y:data.y, rotation:data.rotation, visible:data.visible, model:data.model});
 	    	}
     	});
 

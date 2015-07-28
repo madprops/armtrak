@@ -30,6 +30,12 @@ var sound = true;
 var images = [];
 var in_safe_zone;
 var safe_zone_radius;
+var min_max_health = 100;
+var min_max_speed = 1;
+var min_laser_level = 1;
+var max_max_health = 400;
+var max_max_speed = 4;
+var max_laser_level = 12;
 
 window.onYouTubeIframeAPIReady = function()
 {
@@ -98,6 +104,7 @@ function start_socket()
 			chat_announce('you move with the arrow keys and shoot with spacebar');	
 			chat_announce('you can place an image on the map (visible to everyone) by pasting an image url');	
 			chat_announce('you can play a youtube song (for everyone) by searching it with ".yt name of song"');	
+			chat_announce('you upgrade your ship by destroying other players');	
 			label.text = space_word(username);
 			start_heartbeat();
 		}
@@ -121,7 +128,6 @@ function start_socket()
 			}
 
 			var kills = '';
-			console.log(data.kills);
 			if(data.kills > 1)
 			{
 				kills = '<br>(' + data.kills + ' kills in a row)';
@@ -150,11 +156,7 @@ function start_socket()
 function EnemyShip()
 {
     this.username;
-    this.x;
-    this.y;
-    this.rotation;
     this.container;
-    this.visible;
 }
 
 function update_enemy_ship(data)
@@ -165,6 +167,7 @@ function update_enemy_ship(data)
 		enemy.container.x = data.x;
 		enemy.container.y = data.y;
 		enemy.container.visible = data.visible;
+		enemy.container.model = data.model;
 		enemy.container.children[0].rotation = data.rotation;
 	}
 }
@@ -178,7 +181,7 @@ function get_enemy_ship_or_create(data)
 		enemy = new EnemyShip();
 		enemy.username = data.username;
 		enemy_ships.push(enemy);
-		create_enemy_ship(enemy, data.x, data.y);
+		create_enemy_ship(enemy, data.x, data.y, data.model);
 	}
 
 	return enemy;
@@ -385,7 +388,7 @@ function space_word(word)
 
 function create_label(username)
 {
-	var label = new createjs.Text(space_word(username), "8px Arial", "#ffffff");
+	var label = new createjs.Text(space_word(username), '8px Arial', '#ffffff');
 	label.textAlign = 'center';
 	label.shadow = new createjs.Shadow("#000000", 0, 0, 5);
 	return label;
@@ -394,15 +397,19 @@ function create_label(username)
 function create_ship()
 {
 	var image = new Image();
-	image.src = "img/nave1.png";
+	var num = get_random_int(1, 15);
+	image.src = 'img/nave' + num + '.png';
 	ship_image = new createjs.Bitmap(image);
 	ship = new createjs.Container();
 	var coords = get_random_coords();
 	ship.x = coords[0];
 	ship.y = coords[1];
 	ship.speed = 0;
-	ship.health = 100;
-	ship.laser_level = 1;
+	ship.max_health = min_max_health;
+	ship.health = ship.max_health;
+	ship.max_speed = min_max_speed;
+	ship.laser_level = min_laser_level;
+	ship.model = num;
 
 	ship.addChild(ship_image);
 
@@ -431,10 +438,10 @@ function create_ship()
 	}
 }
 
-function create_enemy_ship(enemy, x, y)
+function create_enemy_ship(enemy, x, y, model)
 {
 	var image = new Image();
-	image.src = "img/nave1.png";
+	image.src = 'img/nave' + model + '.png';
 	var enemy_image = new createjs.Bitmap(image);
 	var enemy_ship = new createjs.Container();
 	enemy_ship.x = x;
@@ -462,7 +469,7 @@ function create_enemy_ship(enemy, x, y)
 
 function emit_ship_info()
 {
-	socket.emit('ship_info', {x:ship.x, y:ship.y, rotation:ship_image.rotation, visible:ship.visible});
+	socket.emit('ship_info', {x:ship.x, y:ship.y, rotation:ship_image.rotation, visible:ship.visible, model:ship.model});
 }
 
 function get_random_int(min, max)
@@ -751,13 +758,13 @@ function reduce_ship_speed()
 
 function increase_ship_speed()
 {
-	if(ship.speed < 2)
+	if(ship.speed < ship.max_speed)
 	{
-		ship.speed += 0.1;
+		ship.speed += ship.max_speed * 0.10;
 	}
 }
 
-function create_laser(x, y, rotation)
+function create_laser(x, y, rotation, speed, max_distance)
 {
 	var laser_image = new createjs.Bitmap(laser_img);
 
@@ -779,9 +786,11 @@ function create_laser(x, y, rotation)
 	background.addChild(laser);
 
 
-	var velocities = get_vector_velocities(laser, 4);
+	var velocities = get_vector_velocities(laser, speed);
 	laser.vx = velocities[0];
 	laser.vy = velocities[1];
+
+	laser.max_distance = max_distance;
 
 	lasers.push(laser);
 	return laser;
@@ -803,31 +812,134 @@ function fire_laser()
 
 	if(ship.laser_level === 1)
 	{
-		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation));
+		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 3, 80));
 	}
 
 	if(ship.laser_level === 2)
 	{
-		var d = get_direction(ship);
-		d = to_radians(d);
-		var x = (ship_width / 2 * 0.6) * Math.cos(d);
-		var y = (ship_width / 2 * 0.6) * Math.sin(d);
-
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation));
+		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 3.2, 90));
 	}
 
 	if(ship.laser_level === 3)
+	{
+		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 3.4, 100));
+	}
+
+	if(ship.laser_level === 4)
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
 		var x = (ship_width / 2 * 0.6) * Math.cos(d);
 		var y = (ship_width / 2 * 0.6) * Math.sin(d);
 
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation));
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 3.4, 100));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 3.4, 100));
+	}
+
+	if(ship.laser_level === 5)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4, 110));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4, 110));
+	}
+
+	if(ship.laser_level === 6)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.2, 120));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.2, 120));
+	}
+
+	if(ship.laser_level === 7)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.2, 120));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.2, 120));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 4.2, 120));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.2, 120));
+	}
+
+	if(ship.laser_level === 8)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.6, 130));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.6, 130));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 4.6, 130));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.6, 130));
+	}
+
+	if(ship.laser_level === 9)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.8, 140));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.8, 140));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 4.8, 140));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.8, 140));
+	}
+
+	if(ship.laser_level === 10)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.8, 140));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.8, 140));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 4.8, 140));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.8, 140));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 30, 4.8, 140));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 30, 4.8, 140));
+	}
+
+	if(ship.laser_level === 11)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 5.4, 150));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 5.4, 150));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 5.4, 150));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 5.4, 150));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 30, 5.4, 150));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 30, 5.4, 150));
+	}
+
+	if(ship.laser_level === 12)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 6, 160));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 6, 160));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 6, 160));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 6, 160));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 30, 6, 160));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 30, 6, 160));
 	}
 
 	if(sound)
@@ -846,7 +958,7 @@ function emit_laser(lasers)
 	var laser = [];
 	for(var i = 0; i < lasers.length; i++)
 	{
-		laser.push({username:username, x:lasers[i].x, y:lasers[i].y, rotation:lasers[i].children[0].rotation, vx:lasers[i].vx, vy:lasers[i].vy})
+		laser.push({username:username, x:lasers[i].x, y:lasers[i].y, rotation:lasers[i].children[0].rotation, vx:lasers[i].vx, vy:lasers[i].vy, max_distance:lasers[i].max_distance})
 	}
 	socket.emit('laser', {laser:laser});
 }
@@ -859,6 +971,7 @@ function create_enemy_laser(enemy_laser)
 	laser.x = enemy_laser.x;
 	laser.y = enemy_laser.y;
 	laser.distance = 0;
+	laser.max_distance = enemy_laser.max_distance;
 	laser.username = enemy_laser.username;
 
 	var laser_width = laser_img.width;
@@ -900,7 +1013,7 @@ function move_lasers()
 		var laser;
 		laser = lasers[i];
 
-		if(laser.distance < 100)
+		if(laser.distance < laser.max_distance)
 		{
 			laser.x += laser.vx;
 			laser.y += laser.vy;
@@ -949,7 +1062,7 @@ function move_lasers()
 	{
 		var enemy_laser = enemy_lasers[i];
 
-		if(enemy_laser.distance < 100)
+		if(enemy_laser.distance < enemy_laser.max_distance)
 		{
 			enemy_laser.x += enemy_laser.vx;
 			enemy_laser.y += enemy_laser.vy;
@@ -975,14 +1088,6 @@ function move_lasers()
 			i -= 1;
 			background.removeChild(enemy_laser);
 		}
-	}
-}
-
-function increase_laser_level()
-{
-	if(ship.laser_level < 3)
-	{
-		ship.laser_level += 1;
 	}
 }
 
@@ -1027,7 +1132,7 @@ function ship_hit(laser)
 	if(ship.visible)
 	{
 		ship.health -= 25;
-		update_health();
+		update_hud();
 		if(ship.health <= 0)
 		{
 			destroyed(laser);
@@ -1043,6 +1148,22 @@ function destroyed(laser)
 	respawn();
 }
 
+function enemy_destroyed(data)
+{
+	if(data.destroyed_by === username)
+	{
+		upgrade();
+		ship.health += 25;
+		if(ship.health > ship.max_health)
+		{
+			ship.health = ship.max_health;
+		}
+		update_hud();
+	}
+	var enemy = get_enemy_ship(data.username);
+	show_explosion(enemy.container.x, enemy.container.y);
+}
+
 function respawn()
 {
 	window.setTimeout(function()
@@ -1051,25 +1172,15 @@ function respawn()
 		var coords = get_random_coords();
 		ship.x = coords[0];
 		ship.y = coords[1];
-		ship.health = 100;
-		ship.laser_level = 1;
+		ship.max_health = min_max_health;
+		ship.health = ship.max_health;
+		ship.max_speed = min_max_speed;
+		ship.laser_level = min_laser_level;
 		move_background(coords[0] - background.canvas.width / 2, coords[1] - background.canvas.height / 2);
 		ship.visible = true;
-		update_health();
+		update_hud();
 
 	}, 5000)
-}
-
-function enemy_destroyed(data)
-{
-	if(data.destroyed_by === username)
-	{
-		ship.health = 100;
-		update_health();
-		increase_laser_level();
-	}
-	var enemy = get_enemy_ship(data.username);
-	show_explosion(enemy.container.x, enemy.container.y);
 }
 
 function show_explosion(x, y)
@@ -1223,11 +1334,6 @@ function onYouTubeApiLoad()
     gapi.client.setApiKey('AIzaSyA-a83G6NwZS_ZXpQoLeo8viScd_TfOcFk');
 }
 
-function update_health()
-{
-	$('#health').html('health: ' + ship.health + '%');
-}
-
 function check_image(msg)
 {
 	if(msg.indexOf(' ') === -1)
@@ -1299,4 +1405,71 @@ function start_heartbeat()
 		socket.emit('heartbeat', {});
 
 	}, 10000);
+}
+
+function upgrade()
+{
+	var nums = [];
+
+	if(ship.laser_level < max_laser_level)
+	{
+		nums.push(1);
+	}
+
+	if(ship.max_health < max_max_health)
+	{
+		nums.push(2);
+	}
+
+	if(ship.max_speed < max_max_speed)
+	{
+		nums.push(3);
+	}
+
+	if(nums.length === 0)
+	{
+		return false;
+	}
+
+	var num = nums.sort(function(){return 0.5 - Math.random()})[0];
+
+	if(num === 1)
+	{
+		increase_laser_level();
+		return true;
+	}
+
+	if(num === 2)
+	{
+		increase_max_health();
+		return true;
+	}
+
+	if(num === 3)
+	{
+		increase_max_speed();
+		return true;
+	}
+}
+
+function increase_laser_level()
+{
+	ship.laser_level += 1;
+}
+
+function increase_max_health()
+{
+	ship.max_health += 25;
+}
+
+function increase_max_speed()
+{
+	ship.max_speed += 0.25;
+}
+
+function update_hud()
+{
+	$('#health').html('health: ' + ship.health + '/' + ship.max_health);
+	$('#max_speed').html('max speed: ' + ship.max_speed);
+	$('#laser_level').html('laser level: ' + ship.laser_level);
 }
