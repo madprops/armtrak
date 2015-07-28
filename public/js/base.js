@@ -167,6 +167,13 @@ function update_enemy_ship(data)
 		enemy.container.x = data.x;
 		enemy.container.y = data.y;
 		enemy.container.visible = data.visible;
+		if(enemy.container.model !== data.model)
+		{
+			var image = new Image();
+			image.src = 'img/nave' + data.model + '.png';
+			enemy.container.children[0].image = image;
+		}
+		enemy.container.model = data.model;
 		enemy.container.model = data.model;
 		enemy.container.children[0].rotation = data.rotation;
 	}
@@ -446,6 +453,7 @@ function create_enemy_ship(enemy, x, y, model)
 	var enemy_ship = new createjs.Container();
 	enemy_ship.x = x;
 	enemy_ship.y = y;
+	enemy_ship.model = model;
 
 	enemy_ship.addChild(enemy_image);
 
@@ -1145,6 +1153,11 @@ function destroyed(laser)
 	ship.visible = false;
 	show_explosion(ship.x, ship.y);
 	socket.emit('destroyed', {destroyed_by:laser.username});
+	var image = new Image();
+	var num = get_random_int(1, 15);
+	image.src = 'img/nave' + num + '.png';
+	ship_image.image = image;
+	ship.model = num;
 	respawn();
 }
 
