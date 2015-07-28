@@ -31,10 +31,10 @@ var images = [];
 var in_safe_zone;
 var safe_zone_radius;
 var min_max_health = 100;
-var min_max_speed = 1;
+var min_max_speed = 2;
 var min_laser_level = 1;
 var max_max_health = 400;
-var max_max_speed = 4;
+var max_max_speed = 3;
 var max_laser_level = 12;
 
 window.onYouTubeIframeAPIReady = function()
@@ -1464,12 +1464,12 @@ function increase_max_health()
 
 function increase_max_speed()
 {
-	ship.max_speed += 0.25;
+	ship.max_speed += 0.10;
 }
 
 function update_hud()
 {
 	$('#health').html('health: ' + ship.health + '/' + ship.max_health);
-	$('#max_speed').html('max speed: ' + ship.max_speed);
+	$('#max_speed').html('max speed: ' + (Math.round((ship.max_speed - 1) * 10) / 10));
 	$('#laser_level').html('laser level: ' + ship.laser_level);
 }
