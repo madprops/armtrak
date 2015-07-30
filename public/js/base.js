@@ -958,7 +958,6 @@ function fire_laser()
 	last_fired = Date.now();
 
 	emit_laser(lasers_to_fire);
-
 }
 
 function emit_laser(lasers)
