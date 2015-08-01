@@ -828,8 +828,8 @@ function fire_laser()
 		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 3.2, 90));
 	}
 
-	if(ship.laser_level === 3
-)	{
+	if(ship.laser_level === 3)	
+	{
 		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 3.4, 100));
 	}
 
