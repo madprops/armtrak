@@ -828,8 +828,8 @@ function fire_laser()
 		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 3.2, 90));
 	}
 
-	if(ship.laser_level === 3)
-	{
+	if(ship.laser_level === 3
+)	{
 		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 3.4, 100));
 	}
 
@@ -1260,7 +1260,7 @@ function check_yt(msg)
 {
 	if(msg.lastIndexOf('yt ', 0) === 0)
 	{
-		var q = msg.substring(4);
+		var q = msg.substring(3);
 		if(q !== '')
 		{
 			yt_search(q);
@@ -1352,6 +1352,13 @@ function check_image(msg)
 	{
 		if(msg.indexOf('.jpg') !== -1 || msg.indexOf('.png') !== -1 || msg.indexOf('.jpeg') !== -1 || msg.indexOf('.JPG') !== -1 || msg.indexOf('.PNG') !== -1 || msg.indexOf('.JPEG') !== -1)
 		{
+			for(var i = 0; i < images.length; i++)
+			{
+				if(images[i].image.src === msg)
+				{
+					return false;
+				}
+			}
 			var img = new Image();
 			img.src = msg;
 
