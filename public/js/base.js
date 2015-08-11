@@ -820,17 +820,17 @@ function fire_laser()
 
 	if(ship.laser_level === 1)
 	{
-		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 3, 80));
+		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 4, 100));
 	}
 
 	if(ship.laser_level === 2)
 	{
-		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 3.2, 90));
+		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 4.1, 105));
 	}
 
 	if(ship.laser_level === 3)	
 	{
-		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 3.4, 100));
+		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 4.2, 110));
 	}
 
 	if(ship.laser_level === 4)
@@ -840,8 +840,8 @@ function fire_laser()
 		var x = (ship_width / 2 * 0.6) * Math.cos(d);
 		var y = (ship_width / 2 * 0.6) * Math.sin(d);
 
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 3.4, 100));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 3.4, 100));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.2, 110));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.2, 110));
 	}
 
 	if(ship.laser_level === 5)
@@ -851,8 +851,8 @@ function fire_laser()
 		var x = (ship_width / 2 * 0.6) * Math.cos(d);
 		var y = (ship_width / 2 * 0.6) * Math.sin(d);
 
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4, 110));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4, 110));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.3, 115));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.3, 115));
 	}
 
 	if(ship.laser_level === 6)
@@ -862,8 +862,8 @@ function fire_laser()
 		var x = (ship_width / 2 * 0.6) * Math.cos(d);
 		var y = (ship_width / 2 * 0.6) * Math.sin(d);
 
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.2, 120));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.2, 120));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.4, 120));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.4, 120));
 	}
 
 	if(ship.laser_level === 7)
@@ -873,13 +873,26 @@ function fire_laser()
 		var x = (ship_width / 2 * 0.6) * Math.cos(d);
 		var y = (ship_width / 2 * 0.6) * Math.sin(d);
 
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.2, 120));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.2, 120));
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 4.2, 120));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.2, 120));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.4, 120));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.4, 120));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 4.4, 120));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.4, 120));
 	}
 
 	if(ship.laser_level === 8)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.5, 125));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.5, 125));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 4.5, 125));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.5, 125));
+	}
+
+	if(ship.laser_level === 9)
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
@@ -892,20 +905,37 @@ function fire_laser()
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.6, 130));
 	}
 
-	if(ship.laser_level === 9)
+	if(ship.laser_level === 10)
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
 		var x = (ship_width / 2 * 0.6) * Math.cos(d);
 		var y = (ship_width / 2 * 0.6) * Math.sin(d);
 
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.8, 140));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.8, 140));
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 4.8, 140));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.8, 140));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.6, 130));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.6, 130));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 4.6, 130));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.6, 130));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 30, 4.6, 130));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 30, 4.6, 130));
 	}
 
-	if(ship.laser_level === 10)
+	if(ship.laser_level === 11)
+	{
+		var d = get_direction(ship);
+		d = to_radians(d);
+		var x = (ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.7, 135));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.7, 135));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 4.7, 135));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.7, 135));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 30, 4.7, 135));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 30, 4.7, 135));
+	}
+
+	if(ship.laser_level === 12)
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
@@ -918,36 +948,6 @@ function fire_laser()
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.8, 140));
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 30, 4.8, 140));
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 30, 4.8, 140));
-	}
-
-	if(ship.laser_level === 11)
-	{
-		var d = get_direction(ship);
-		d = to_radians(d);
-		var x = (ship_width / 2 * 0.6) * Math.cos(d);
-		var y = (ship_width / 2 * 0.6) * Math.sin(d);
-
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 5.4, 150));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 5.4, 150));
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 5.4, 150));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 5.4, 150));
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 30, 5.4, 150));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 30, 5.4, 150));
-	}
-
-	if(ship.laser_level === 12)
-	{
-		var d = get_direction(ship);
-		d = to_radians(d);
-		var x = (ship_width / 2 * 0.6) * Math.cos(d);
-		var y = (ship_width / 2 * 0.6) * Math.sin(d);
-
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 6, 160));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 6, 160));
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 6, 160));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 6, 160));
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 30, 6, 160));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 30, 6, 160));
 	}
 
 	if(sound)
