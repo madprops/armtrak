@@ -1253,14 +1253,6 @@ function check_yt(msg)
 
 function toggle_sound()
 {
-	try
-	{
-		create_yt_player();
-	}
-	catch(err)
-	{
-	}
-
 	if(sound)
 	{
 		$('#sound_toggle').html('turn on sound');
