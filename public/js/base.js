@@ -38,11 +38,6 @@ var max_max_speed = 3;
 var max_laser_level = 10;
 var laser_hit = 20;
 
-window.onYouTubeIframeAPIReady = function()
-{
-	create_yt_player();
-}
-
 function init(uname)
 {
 	explosion_image = new Image();
@@ -869,8 +864,10 @@ function fire_laser()
 		var x = (ship_width / 2 * 0.6) * Math.cos(d);
 		var y = (ship_width / 2 * 0.6) * Math.sin(d);
 
-		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.5, 120));
-		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.5, 120));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.4, 115));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.4, 115));
+		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation + 15, 4.4, 115));
+		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 15, 4.4, 115));
 	}
 
 	if(ship.laser_level === 7)
@@ -1254,41 +1251,25 @@ function check_yt(msg)
 	}
 }
 
-function create_yt_player()
-{
-	yt_player = new YT.Player('yt_player');
-}
-
-function mute_yt()
-{
-	yt_player.mute();
-}
-
-function unmute_yt()
-{
-	yt_player.unMute();
-}
-
 function toggle_sound()
 {
+	try
+	{
+		create_yt_player();
+	}
+	catch(err)
+	{
+	}
+
 	if(sound)
 	{
 		$('#sound_toggle').html('turn on sound');
-		try 
-		{
-			yt_player.mute();
-		}
-		catch(err){}
+		$('#yt_player').attr('src', '');
 		sound = false;
 	}
 	else
 	{
 		$('#sound_toggle').html('turn off sound');
-		try
-		{
-			yt_player.unMute();
-		}
-		catch(err){}
 		sound = true;
 	}
 }
