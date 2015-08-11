@@ -1283,7 +1283,6 @@ function yt_search(q)
 	    	play_yt(id);
 	    }
     }); 
-
 }
 
 googleApiClientReady = function() 
