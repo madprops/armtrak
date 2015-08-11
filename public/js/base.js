@@ -1227,7 +1227,10 @@ function update_minimap()
 
 function play_yt(id)
 {
-	$('#yt_player').attr('src', 'https://www.youtube.com/embed/' + id + '?&autoplay=1&enablejsapi=1&version=3')
+	if(sound)
+	{
+		$('#yt_player').attr('src', 'https://www.youtube.com/embed/' + id + '?&autoplay=1&enablejsapi=1&version=3')
+	}
 }
 
 function check_yt(msg)
