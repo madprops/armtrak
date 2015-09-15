@@ -27,6 +27,7 @@ var laser_height;
 var label;
 var yt_player;
 var sound = true;
+var music = true;
 var images = [];
 var in_safe_zone;
 var safe_zone_radius;
@@ -1244,7 +1245,7 @@ function update_minimap()
 
 function play_yt(id)
 {
-	if(sound)
+	if(music)
 	{
 		$('#yt_player').attr('src', 'https://www.youtube.com/embed/' + id + '?&autoplay=1&enablejsapi=1&version=3')
 	}
@@ -1276,13 +1277,27 @@ function toggle_sound()
 	if(sound)
 	{
 		$('#sound_toggle').html('turn on sound');
-		$('#yt_player').attr('src', '');
 		sound = false;
 	}
 	else
 	{
 		$('#sound_toggle').html('turn off sound');
 		sound = true;
+	}
+}
+
+function toggle_music()
+{
+	if(music)
+	{
+		$('#music_toggle').html('turn on music');
+		$('#yt_player').attr('src', '');
+		music = false;
+	}
+	else
+	{
+		$('#music_toggle').html('turn off music');
+		music = true;
 	}
 }
 

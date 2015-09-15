@@ -139,4 +139,10 @@ iframe
 #sound_toggle
 {
 	cursor: pointer;
+	padding-right: 40px;
+}
+
+#music_toggle
+{
+	cursor: pointer;
 }
