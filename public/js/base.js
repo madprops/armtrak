@@ -1049,6 +1049,23 @@ function move_lasers()
 			enemy_laser.y += enemy_laser.vy;
 			enemy_laser.distance += 1;
 
+			if(enemy_laser.x <= 0)
+			{
+				enemy_laser.x = bg_width;
+			}
+			else if(enemy_laser.x >= bg_width)
+			{
+				enemy_laser.x = 0;
+			}
+			else if(enemy_laser.y <= 0)
+			{
+				enemy_laser.y = bg_height;
+			}
+			else if(enemy_laser.y >= bg_height)
+			{
+				enemy_laser.y = 0;
+			}
+
 			if((Math.pow(((enemy_laser.x + (laser_width / 2)) - bg_width / 2), 2) + Math.pow(((enemy_laser.y + (laser_height / 2)) - bg_height / 2), 2)) < Math.pow(safe_zone_radius, 2))
 			{
 				enemy_lasers.splice(i, 1);
