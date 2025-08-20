@@ -119,7 +119,7 @@ module.exports = function (io)
 	    		performYouTubeSearch(data.query, socket.username, function(result) {
 	    			if(result.success) {
 	    				// Broadcast to all users
-	    				io.sockets.emit('update', {
+	    				socket.emit('update', {
 	    					type:'youtube_result',
 	    					videoId: result.videoId,
 	    					title: result.title,
@@ -142,8 +142,7 @@ module.exports = function (io)
 	    	{
 	    		performImageSearch(data.query, socket.username, function(result) {
 	    			if(result.success) {
-	    				// Broadcast to all users
-	    				io.sockets.emit('update', {
+	    				socket.emit('update', {
 	    					type:'image_result',
 	    					imageUrl: result.imageUrl,
 	    					title: result.title,
