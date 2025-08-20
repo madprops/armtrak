@@ -6,6 +6,8 @@ module.exports = function (io)
 	var usernames = [];
 	var images = [];
 	var youtubeApiKey = '';
+	var imageInstance = '';
+	var imageScraper = '';
 
 	// Read YouTube API key at startup
 	try {
@@ -14,6 +16,24 @@ module.exports = function (io)
 	} catch (error) {
 		console.error('Failed to load YouTube API key from youtube_key.txt:', error.message);
 		console.log('YouTube search functionality will be disabled');
+	}
+
+	// Read image instance at startup
+	try {
+		imageInstance = fs.readFileSync(path.join(__dirname, 'image_instance.txt'), 'utf8').trim();
+		console.log('Image instance loaded successfully');
+	} catch (error) {
+		console.error('Failed to load image instance from image_instance.txt:', error.message);
+		console.log('Image search functionality will be disabled');
+	}
+
+	// Read image scraper at startup
+	try {
+		imageScraper = fs.readFileSync(path.join(__dirname, 'image_scraper.txt'), 'utf8').trim();
+		console.log('Image scraper loaded successfully');
+	} catch (error) {
+		console.error('Failed to load image scraper from image_scraper.txt:', error.message);
+		console.log('Image search functionality will be disabled');
 	}
 
 	function Score()
@@ -109,6 +129,30 @@ module.exports = function (io)
 	    				// Send error only to requesting user
 	    				socket.emit('update', {
 	    					type:'youtube_error',
+	    					message: result.message
+	    				});
+	    			}
+	    		});
+	    	}
+    	});
+
+	    socket.on('image_search', function (data)
+	    {
+	    	if(socket.username !== undefined && data.query)
+	    	{
+	    		performImageSearch(data.query, socket.username, function(result) {
+	    			if(result.success) {
+	    				// Broadcast to all users
+	    				io.sockets.emit('update', {
+	    					type:'image_result',
+	    					imageUrl: result.imageUrl,
+	    					title: result.title,
+	    					requestedBy: socket.username
+	    				});
+	    			} else {
+	    				// Send error only to requesting user
+	    				socket.emit('update', {
+	    					type:'image_error',
 	    					message: result.message
 	    				});
 	    			}
@@ -298,6 +342,69 @@ module.exports = function (io)
 			callback({
 				success: false,
 				message: 'YouTube search request failed'
+			});
+		});
+	}
+
+	function performImageSearch(query, username, callback) {
+		if (!imageInstance || !imageScraper) {
+			callback({
+				success: false,
+				message: 'Image search configuration not properly set'
+			});
+			return;
+		}
+
+		const https = require('https');
+		const querystring = require('querystring');
+
+		const encodedQuery = encodeURIComponent(query);
+		const url = `${imageInstance}/api/v1/images?s=${encodedQuery}&scraper=${imageScraper}`;
+
+		https.get(url, (res) => {
+			let data = '';
+
+			res.on('data', (chunk) => {
+				data += chunk;
+			});
+
+			res.on('end', () => {
+				try {
+					const response = JSON.parse(data);
+
+					if (response && response.image && response.image.length > 0) {
+						const firstImage = response.image[0];
+						if (firstImage.source && firstImage.source.length > 0 && firstImage.source[0].url) {
+							callback({
+								success: true,
+								imageUrl: firstImage.source[0].url,
+								title: firstImage.title || 'Image'
+							});
+						} else {
+							callback({
+								success: false,
+								message: 'No valid image URL found'
+							});
+						}
+					} else {
+						callback({
+							success: false,
+							message: 'No image results found'
+						});
+					}
+				} catch (error) {
+					console.error('Image search response parsing error:', error);
+					callback({
+						success: false,
+						message: 'Failed to parse image search response'
+					});
+				}
+			});
+		}).on('error', (error) => {
+			console.error('Image search request error:', error);
+			callback({
+				success: false,
+				message: 'Image search request failed'
 			});
 		});
 	}

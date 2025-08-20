@@ -116,6 +116,15 @@ function start_socket()
 		{
 			chat_announce('YouTube search failed: ' + data.message);
 		}
+		if(data.type === 'image_result')
+		{
+			place_search_image(data.imageUrl, data.title);
+			chat_announce('Image found: ' + data.title + ' (requested by ' + data.requestedBy + ')');
+		}
+		if(data.type === 'image_error')
+		{
+			chat_announce('Image search failed: ' + data.message);
+		}
 		if(data.type === 'chat_announcement')
 		{
 			chat_announce(data.msg);
@@ -315,6 +324,7 @@ function update_chat(uname, msg)
 	$('#chat_area').append(fmt);
 	goto_bottom();
 	check_yt(msg);
+	check_img(msg);
 }
 
 function chat_announce(msg)
@@ -1283,6 +1293,51 @@ function check_yt(msg)
 	}
 }
 
+function check_img(msg)
+{
+	if(msg.lastIndexOf('img ', 0) === 0)
+	{
+		var q = msg.substring(4);
+		if(q !== '')
+		{
+			img_search(q);
+		}
+	}
+}
+
+function place_search_image(url, title)
+{
+	// Check if image already exists
+	for(var i = 0; i < images.length; i++)
+	{
+		if(images[i].image && images[i].image.src === url)
+		{
+			return false;
+		}
+	}
+
+	var img = new Image();
+	img.src = url;
+
+	img.onload = function()
+	{
+		var image = new createjs.Bitmap(img);
+		image.x = ship.x - ((img.width / 3) / 2) + (ship_width / 2);
+		image.y = ship.y - ((img.height / 3) / 2) + (ship_height / 2);
+		image.scaleX = 0.333;
+		image.scaleY = 0.333;
+		background.addChild(image);
+		z_order();
+		push_image(image);
+		socket.emit('image', {url:url, x:image.x, y:image.y});
+	}
+
+	img.onerror = function()
+	{
+		chat_announce('Failed to load image: ' + url);
+	}
+}
+
 function toggle_sound()
 {
 	if(sound)
@@ -1316,6 +1371,12 @@ function yt_search(q)
 {
     // Send YouTube search request to server to keep API key private
     socket.emit('youtube_search', {query: q});
+}
+
+function img_search(q)
+{
+    // Send image search request to server
+    socket.emit('image_search', {query: q});
 }// YouTube API functions - using direct fetch instead of gapi client
 // googleApiClientReady = function()
 // {
