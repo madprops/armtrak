@@ -29,7 +29,20 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-var io = require('socket.io').listen(server);
+const { Server } = require('socket.io');
+
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? ['https://armtrak.net', 'https://www.armtrak.net'] // Add your actual domains
+  : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://armtrak.net:3000'];
+
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: false // Set to true if you need authentication
+  }
+});
+
 require('../sockets')(io);
 
 /**
@@ -89,5 +102,18 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
+
+  // Console colors
+  const colors = {
+    reset: '\x1b[0m',
+    bright: '\x1b[1m',
+    green: '\x1b[32m',
+    blue: '\x1b[34m',
+    yellow: '\x1b[33m'
+  };
+
+  console.log(`${colors.bright}${colors.green}✈ Server has started${colors.reset}`);
+  console.log(`${colors.bright}${colors.blue}⚓ Port ${colors.yellow}${addr.port}${colors.reset}`);
+
   debug('Listening on ' + bind);
 }

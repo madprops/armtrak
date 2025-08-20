@@ -3,14 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "dev": "PORT=3000 node ./bin/www",
+    "prod": "PORT=80 node ./bin/www"
   },
   "dependencies": {
-    "socket.io": "latest",
-    "ejs": "latest",
+    "socket.io": "^4.7.5",
     "body-parser": "^1.10.2",
+    "debug": "~2.2.0",
+    "ejs": "latest",
     "express": "^4.11.1",
-    "express-session": "^1.10.1",
-    "debug": "~2.2.0"
+    "express-session": "^1.10.1"
   }
 }

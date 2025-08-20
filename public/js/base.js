@@ -47,10 +47,10 @@ function init(uname)
 	{
 		explosion_sheet = new createjs.SpriteSheet(
 		{
-		    images: [explosion_image], 
-		    frames: {width: 96, height: 96, regX: 0, regY: 0}, 
-		    animations: 
-		    {    
+		    images: [explosion_image],
+		    frames: {width: 96, height: 96, regX: 0, regY: 0},
+		    animations:
+		    {
 		        explode: [0, 71, false]
 		    }
 		});
@@ -77,7 +77,7 @@ function init(uname)
 			keep_naming = false;
 		}
 	}
-	
+
 	start_chat();
 	start_socket();
 	activate_key_detection();
@@ -86,9 +86,11 @@ function init(uname)
 
 function start_socket()
 {
-	socket = io('http://armtrak.net:3000');
+	socket = io(); // Connects to same origin by default
+	// Or if you need to specify the server:
+	// socket = io('http://armtrak.net:3000');
 
-	socket.on('update', function(data) 
+	socket.on('update', function(data)
 	{
 		if(data.type === 'chat_msg')
 		{
@@ -97,13 +99,22 @@ function start_socket()
 		if(data.type === 'username')
 		{
 			username = data.username;
-			chat_announce(data.username + ' has joined');	
-			chat_announce('you move with the arrow keys and shoot with spacebar');	
-			chat_announce('you can place an image on the map (visible to everyone) by pasting an image url');	
-			chat_announce('you can play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url');	
-			chat_announce('you upgrade your ship by destroying other players');	
+			chat_announce(data.username + ' has joined');
+			chat_announce('you move with the arrow keys and shoot with spacebar');
+			chat_announce('you can place an image on the map (visible to everyone) by pasting an image url');
+			chat_announce('you can play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url');
+			chat_announce('you upgrade your ship by destroying other players');
 			label.text = space_word(username);
 			start_heartbeat();
+		}
+		if(data.type === 'youtube_result')
+		{
+			play_yt(data.videoId);
+			chat_announce('Now playing: ' + data.title + ' (requested by ' + data.requestedBy + ')');
+		}
+		if(data.type === 'youtube_error')
+		{
+			chat_announce('YouTube search failed: ' + data.message);
 		}
 		if(data.type === 'chat_announcement')
 		{
@@ -326,7 +337,7 @@ function format_msg(uname, msg)
 
 function format_announcement_msg(msg)
 {
-	return "<div class='chat_announcement'>" + msg 
+	return "<div class='chat_announcement'>" + msg
 	       + "</div> <div>&nbsp;</div>";
 }
 
@@ -423,7 +434,7 @@ function create_ship()
 	background.addChild(ship);
 	z_order();
 
-	image.onload = function() 
+	image.onload = function()
 	{
 		ship_width = image.width;
 		ship_height = image.height;
@@ -461,7 +472,7 @@ function create_enemy_ship(enemy, x, y, model)
 	enemy.container = enemy_ship;
 	z_order();
 
-	image.onload = function() 
+	image.onload = function()
 	{
 		enemy_image.regX = ship_width / 2;
 		enemy_image.regY = ship_height / 2;
@@ -502,17 +513,17 @@ function create_background()
 	for (var i = 0; i < stars; i++) {
 	    var mX = Math.floor(Math.random() * bg_width);
 	    var mY = Math.floor(Math.random() * bg_height);
-	    
+
 	    var radius;
-	    
+
 	    radius = starSmallRadiusMin + (Math.random() * starSmallRadiusVarience);
-	    
+
 	    var colour, colourType = Math.round(Math.random() * 2);
 	    switch (colourType) {
 	        case 0: colour = "white"; break;
 	        case 1: colour = "grey"; break;
 	    }
-	    
+
 	    starField.graphics.beginFill(colour)
 	    .drawPolyStar(
 	        Math.random() * bg_width,
@@ -542,7 +553,7 @@ function show_safe_zone()
 	image.src = "img/safe_zone.png";
 	safe_zone = new createjs.Bitmap(image);
 	background.addChild(safe_zone);
-	image.onload = function() 
+	image.onload = function()
 	{
 		safe_zone.x = (bg_width / 2) - (image.width / 2);
 		safe_zone.y = (bg_height / 2) - (image.height / 2);
@@ -724,7 +735,7 @@ function turn_right()
 {
 	ship_image.rotation += 3;
 }
-	
+
 function loop()
 {
 	move();
@@ -825,7 +836,7 @@ function fire_laser()
 		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 4.1, 105));
 	}
 
-	if(ship.laser_level === 3)	
+	if(ship.laser_level === 3)
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
@@ -927,7 +938,7 @@ function fire_laser()
 
 	if(sound)
 	{
-		new Audio('/audio/laser.ogg').play();	
+		new Audio('/audio/laser.ogg').play();
 	}
 
 	last_fired = Date.now();
@@ -1172,7 +1183,7 @@ function respawn()
 {
 	window.setTimeout(function()
 	{
-		
+
 		var coords = get_random_coords();
 		ship.x = coords[0];
 		ship.y = coords[1];
@@ -1303,32 +1314,18 @@ function toggle_music()
 
 function yt_search(q)
 {
-    var request = gapi.client.youtube.search.list(
-    {
-        part: 'snippet',
-        type: 'video',
-        q: q
-    });
-
-    request.execute(function(response) 
-    {
-    	var id = response.items[0].id.videoId;
-	    if(id)
-	    {
-	    	play_yt(id);
-	    }
-    }); 
-}
-
-googleApiClientReady = function() 
-{
-	gapi.client.load('youtube', 'v3', onYouTubeApiLoad);
-}
-
-function onYouTubeApiLoad() 
-{
-    gapi.client.setApiKey('AIzaSyA-a83G6NwZS_ZXpQoLeo8viScd_TfOcFk');
-}
+    // Send YouTube search request to server to keep API key private
+    socket.emit('youtube_search', {query: q});
+}// YouTube API functions - using direct fetch instead of gapi client
+// googleApiClientReady = function()
+// {
+// 	gapi.client.load('youtube', 'v3', onYouTubeApiLoad);
+// }
+//
+// function onYouTubeApiLoad()
+// {
+//     gapi.client.setApiKey('AIzaSyA-a83G6NwZS_ZXpQoLeo8viScd_TfOcFk');
+// }
 
 function check_image(msg)
 {
@@ -1346,7 +1343,7 @@ function check_image(msg)
 			var img = new Image();
 			img.src = msg;
 
-			img.onload = function() 
+			img.onload = function()
 			{
 				var image = new createjs.Bitmap(img);
 				image.x = ship.x - ((img.width / 3) / 2) + (ship_width / 2);
@@ -1392,7 +1389,7 @@ function push_image(image)
 function z_order()
 {
 	background.setChildIndex(safe_zone, background.getNumChildren() - 1);
-	
+
 	for(var i = 0; i < enemy_ships.length; i++)
 	{
 		background.setChildIndex(enemy_ships[i].container, background.getNumChildren() - 1);
