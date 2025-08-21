@@ -59,8 +59,8 @@ App.init = () => {
     App.username = App.clean_string(prompt(`Pick Your Name`))
 
     if ((App.username === null) || (App.username.length < 1) ||
-		(App.username.length > App.max_username_length) ||
-		(App.username.indexOf(`<`) !== -1)) {
+    (App.username.length > App.max_username_length) ||
+    (App.username.indexOf(`<`) !== -1)) {
       keep_naming = true
     }
     else {
@@ -461,37 +461,35 @@ App.get_random_coords = () => {
 
 App.create_background = () => {
   App.background = new createjs.Stage(`canvas`)
-
   let stars = 3000
   let star_field = new createjs.Shape()
-
   let star_small_radius_min = 1
   let star_small_radius_var = 2
 
   for (let i = 0; i < stars; i++) {
-	    let radius
-	    radius = star_small_radius_min + (Math.random() * star_small_radius_var)
-	    let color, color_type = Math.round(Math.random() * 2)
+      let radius
+      radius = star_small_radius_min + (Math.random() * star_small_radius_var)
+      let color, color_type = Math.round(Math.random() * 2)
 
-	    switch (color_type) {
-    case 0:
-      color = `white`
-      break
-    case 1:
-      color = `grey`
-      break
-	    }
+      switch (color_type) {
+        case 0:
+          color = `white`
+          break
+        case 1:
+          color = `grey`
+          break
+      }
 
-	    star_field.graphics.beginFill(color)
+      star_field.graphics.beginFill(color)
 
-	    .drawPolyStar(
-	        Math.random() * App.bg_width,
-	        Math.random() * App.bg_height,
-	        radius,
-	        5 + Math.round(Math.random() * 2), // number of sides
-	        0.9, // pointyness
-	        Math.random() * 360, // rotation of the star
-	    )
+      .drawPolyStar(
+        Math.random() * App.bg_width,
+        Math.random() * App.bg_height,
+        radius,
+        5 + Math.round(Math.random() * 2), // number of sides
+        0.9, // pointyness
+        Math.random() * 360, // rotation of the star
+      )
   }
 
   App.background.canvas.width = 400
@@ -1111,7 +1109,7 @@ App.update_minimap = () => {
 
     context.beginPath()
     context.arc(x, y, radius, 0, 2 * Math.PI, false)
-    context.fillStyle = `blue`
+    context.fillStyle = `#3399FF`
     context.fill()
     context.lineWidth = 1
     context.strokeStyle = `#003300`
@@ -1128,12 +1126,31 @@ App.update_minimap = () => {
 
       context.beginPath()
       context.arc(x, y, radius, 0, 2 * Math.PI, false)
-      context.fillStyle = `red`
+      context.fillStyle = `#FF6666`
       context.fill()
       context.lineWidth = 1
       context.strokeStyle = `#003300`
       context.stroke()
     }
+  }
+
+  // Show green dots for placed images
+  for (let image of App.images) {
+    let imgWidth = image.image?.width || 0
+    let imgHeight = image.image?.height || 0
+    let scaleX = image.scaleX || 1
+    let scaleY = image.scaleY || 1
+    let x = (image.x + (imgWidth * scaleX / 2)) * 0.2
+    let y = (image.y + (imgHeight * scaleY / 2)) * 0.2
+    let radius = App.dot_radius * 0.6 // Smaller radius for image markers
+
+    context.beginPath()
+    context.arc(x, y, radius, 0, 2 * Math.PI, false)
+    context.fillStyle = `#66FF66`
+    context.fill()
+    context.lineWidth = 1
+    context.strokeStyle = `#003300`
+    context.stroke()
   }
 }
 
