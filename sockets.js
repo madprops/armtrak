@@ -50,14 +50,14 @@ module.exports = (io) => {
 
 	io.on(`connection`, (socket) => {
 	    socket.on(`adduser`, (data) => {
-	    	socket.username = add_username(clean_string(data.username.toLowerCase()))
+	    	socket.username = App.add_username(App.clean_string(data.username.toLowerCase()))
 	    	socket.emit(`update`, {type:`username`, username:socket.username})
 	    	socket.broadcast.emit(`update`, {type:`chat_announcement`, msg:socket.username + ` has joined`})
 	    })
 
 	    socket.on(`sendchat`, (data) => {
 	    	if (socket.username !== undefined) {
-    			socket.broadcast.emit(`update`, {type:`chat_msg`, username:socket.username, msg:clean_string(data.msg)})
+    			socket.broadcast.emit(`update`, {type:`chat_msg`, username:socket.username, msg:App.clean_string(data.msg)})
 	    	}
     	})
 
@@ -75,8 +75,8 @@ module.exports = (io) => {
 
 	    socket.on(`destroyed`, (data) => {
 	    	if (socket.username !== undefined) {
-	    		let kills = add_kill(data.destroyed_by)
-	    		reset_kills(socket.username)
+	    		let kills = App.add_kill(data.destroyed_by)
+	    		App.reset_kills(socket.username)
 
     			io.sockets.emit(`update`, {
 						type: `destroyed`,
@@ -89,7 +89,7 @@ module.exports = (io) => {
 
 	    socket.on(`image`, (data) => {
 	    	if (socket.username !== undefined) {
-	    		add_image(data)
+	    		App.add_image(data)
 
     			socket.broadcast.emit(`update`, {
 						type: `images`,
@@ -112,7 +112,7 @@ module.exports = (io) => {
 
 	    socket.on(`youtube_search`, (data) => {
 	    	if (socket.username !== undefined && data.query) {
-	    		perform_youtube_search(data.query, socket.username, (result) => {
+	    		App.perform_youtube_search(data.query, socket.username, (result) => {
 	    			if (result.success) {
 	    				io.sockets.emit(`update`, {
 	    					type:`youtube_result`,
@@ -134,7 +134,7 @@ module.exports = (io) => {
 
 	    socket.on(`image_search`, (data) => {
 	    	if ((socket.username !== undefined) && data.query) {
-	    		perform_image_search(data.query, socket.username, (result) => {
+	    		App.perform_image_search(data.query, socket.username, (result) => {
 	    			if (result.success) {
 	    				// Broadcast to all users
 	    				socket.emit(`update`, {
@@ -157,8 +157,8 @@ module.exports = (io) => {
 
     	socket.on(`disconnect`, () => {
     		if (socket.username !== undefined) {
-	    		remove_username(socket.username)
-	    		remove_score(socket.username)
+	    		App.remove_username(socket.username)
+	    		App.remove_score(socket.username)
 
 		   		socket.broadcast.emit(`update`, {
 						type:`disconnection`,
@@ -168,15 +168,15 @@ module.exports = (io) => {
     	})
 	})
 
-	function clean_string(s) {
+	App.clean_string = (s) => {
 		return s.replace(/</g, ``).trim().replace(/\s+/g, ` `)
 	}
 
-	function get_random_int(min, max) {
+	App.get_random_int = (min, max) => {
 	  return Math.floor(Math.random() * (max-min+1) + min)
 	}
 
-	function add_username(username) {
+	App.add_username = (username) => {
 		let keep_going = true
 		let matched = false
 
@@ -189,7 +189,7 @@ module.exports = (io) => {
 			}
 
 			if (matched) {
-				username = username + get_random_int(2, 9)
+				username = username + App.get_random_int(2, 9)
 				keep_going = true
 				matched = false
 			}
@@ -202,7 +202,7 @@ module.exports = (io) => {
 		return username
 	}
 
-	function remove_username(username) {
+	App.remove_username = (username) => {
 		for (let uname of App.usernames) {
 			if (uname === username) {
 				App.usernames.splice(i, 1)
@@ -210,7 +210,7 @@ module.exports = (io) => {
 		}
 	}
 
-	function add_image(data) {
+	App.add_image = (data) => {
 		images.push(data)
 
 		if (images.length > 20) {
@@ -218,13 +218,13 @@ module.exports = (io) => {
 		}
 	}
 
-	function create_score(username) {
+	App.create_score = (username) => {
 		let score = new Score(username, 0)
 		scores.push(score)
 		return score
 	}
 
-	function remove_score(username) {
+	App.remove_score = (username) => {
 		for (let score of scores) {
 			if (username === score.username) {
 				scores.splice(i, 1)
@@ -233,28 +233,28 @@ module.exports = (io) => {
 		}
 	}
 
-	function get_score(username) {
+	App.get_score = (username) => {
 		for (let score of scores) {
 			if (username === score.username) {
 				return score
 			}
 		}
 
-		return create_score(username)
+		return App.create_score(username)
 	}
 
-	function add_kill(username) {
-		let score = get_score(username)
+	App.add_kill = (username) => {
+		let score = App.get_score(username)
 		score.kills += 1
 		return score.kills
 	}
 
-	function reset_kills(username) {
-		let score = get_score(username)
+	App.reset_kills = (username) => {
+		let score = App.get_score(username)
 		score.kills = 0
 	}
 
-	function perform_youtube_search(query, username, callback) {
+	App.perform_youtube_search = (query, username, callback) => {
 		if (!App.youtube_key) {
 			callback({
 				success: false,
@@ -320,7 +320,8 @@ module.exports = (io) => {
 					})
 				}
 			})
-		}).on(`error`, (error) => {
+		})
+		.on(`error`, (error) => {
 			console.error(`YouTube API request error:`, error)
 			callback({
 				success: false,
@@ -329,7 +330,7 @@ module.exports = (io) => {
 		})
 	}
 
-	function perform_image_search(query, username, callback) {
+	App.perform_image_search = (query, username, callback) => {
 		if (!App.image_instance || !App.image_scraper) {
 			callback({
 				success: false,
@@ -386,7 +387,8 @@ module.exports = (io) => {
 					})
 				}
 			})
-		}).on(`error`, (error) => {
+		})
+		.on(`error`, (error) => {
 			console.error(`Image search request error:`, error)
 			callback({
 				success: false,
