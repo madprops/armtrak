@@ -282,6 +282,10 @@ App.chat_announce = (msg) => {
 }
 
 App.clean_string = (s) => {
+  if (!s) {
+    return ``
+  }
+
   return s.replace(/</g, ``).trim().replace(/\s+/g, ` `)
 }
 
@@ -1119,6 +1123,11 @@ App.update_minimap = () => {
 
 App.play_yt = (id) => {
   if (App.music) {
+    if (App.loaded_youtube === id) {
+      return
+    }
+
+    App.loaded_youtube = id
     $(`#yt_player`).attr(`src`, `https://www.youtube.com/embed/` + id + `?&autoplay=1&enablejsapi=1&version=3`)
   }
 }
