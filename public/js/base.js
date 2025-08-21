@@ -21,6 +21,8 @@ App.max_max_speed = 3
 App.max_laser_level = 10
 App.laser_hit = 20
 App.max_username_length = 28
+App.dot_radius = 8
+App.label_size = 8
 
 class EnemyShip {
   constructor(username) {
@@ -220,33 +222,28 @@ App.activate_key_detection = () => {
   })
 
   $(document).keydown(function(e) {
-    let code = e.keyCode ? e.keyCode : e.which
     $(`#chat_input`).focus()
 
-    if (code === 13) {
+    if (e.key === `Enter`) {
       App.send_to_chat()
       e.preventDefault()
       return false
     }
-
-    if (code === 37) {
+    else if (e.key === `ArrowLeft`) {
       App.left_arrow = true
     }
-
-    if (code === 38) {
+    else if (e.key === `ArrowUp`) {
       App.up_arrow = true
     }
-
-    if (code === 39) {
+    else if (e.key === `ArrowRight`) {
       App.right_arrow = true
     }
-
-    if (code === 40) {
+    else if (e.key === `ArrowDown`) {
       App.down_arrow = true
     }
-
-    if (code === 32) {
-      if ($(`#chat_input`).val() === ``) {
+    else if (e.key === ` `) {
+      if ($(`#chat_input`).val().trim() === ``) {
+        $(`#chat_input`).val(``)
         App.fire_laser()
         e.preventDefault()
       }
@@ -372,7 +369,7 @@ App.space_word = (word) => {
 }
 
 App.create_label = (username) => {
-  let label = new createjs.Text(App.space_word(username), `8px Arial`, `#ffffff`)
+  let label = new createjs.Text(App.space_word(username), `${App.label_size}px Arial`, `#ffffff`)
   label.textAlign = `center`
   label.shadow = new createjs.Shadow(`#000000`, 0, 0, 5)
   return label
@@ -477,10 +474,10 @@ App.create_background = () => {
 	    let color, color_type = Math.round(Math.random() * 2)
 
 	    switch (color_type) {
-	        case 0:
+    case 0:
       color = `white`
       break
-	        case 1:
+    case 1:
       color = `grey`
       break
 	    }
@@ -1104,16 +1101,19 @@ App.update_minimap = () => {
   minimap.setAttribute(`height`, App.bg_height * 0.2)
   minimap.setAttribute(`width`, App.bg_width * 0.2)
 
+  // Clear the canvas first
+  context.clearRect(0, 0, minimap.width, minimap.height)
+
   if ((App.ship !== undefined) && App.ship.visible) {
-    let x = App.ship.x
-    let y = App.ship.y
-    let radius = 50
+    let x = App.ship.x * 0.2 // Scale coordinates to minimap size
+    let y = App.ship.y * 0.2
+    let radius = App.dot_radius // Bigger radius for better visibility
 
     context.beginPath()
     context.arc(x, y, radius, 0, 2 * Math.PI, false)
     context.fillStyle = `blue`
     context.fill()
-    context.lineWidth = 10
+    context.lineWidth = 1
     context.strokeStyle = `#003300`
     context.stroke()
   }
@@ -1122,15 +1122,15 @@ App.update_minimap = () => {
     let enemy = ship.container
 
     if (enemy.visible) {
-      let x = enemy.x
-      let y = enemy.y
-      let radius = 50
+      let x = enemy.x * 0.2 // Scale coordinates to minimap size
+      let y = enemy.y * 0.2
+      let radius = App.dot_radius // Smaller radius for minimap
 
       context.beginPath()
       context.arc(x, y, radius, 0, 2 * Math.PI, false)
       context.fillStyle = `red`
       context.fill()
-      context.lineWidth = 10
+      context.lineWidth = 1
       context.strokeStyle = `#003300`
       context.stroke()
     }
