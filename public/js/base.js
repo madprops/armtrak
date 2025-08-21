@@ -44,7 +44,8 @@ App.init = () => {
 		App.laser_height = App.laser_img.height
 	}
 
-	var keep_naming = true
+	let keep_naming = true
+
 	while(keep_naming)
 	{
 		App.username = clean_string(prompt(`pick your name`))
@@ -70,14 +71,13 @@ function start_socket()
 	// Or if you need to specify the server:
 	// socket = io(`http://armtrak.net:3000`)
 
-	App.socket.on(`update`, function(data)
-	{
+	App.socket.on(`update`, (data) => {
 		if(data.type === `chat_msg`)
 		{
 			update_chat(data.username, data.msg)
 		}
-		if(data.type === `username`)
-		{
+
+		if(data.type === `username`) {
 			App.username = data.username
 			chat_announce(data.username + ` has joined`)
 			chat_announce(`you move with the arrow keys and shoot with spacebar`)
@@ -87,61 +87,60 @@ function start_socket()
 			label.text = space_word(App.username)
 			start_heartbeat()
 		}
-		if(data.type === `youtube_result`)
-		{
+
+		if(data.type === `youtube_result`) {
 			play_yt(data.videoId)
 			chat_announce(`Now playing: ` + data.title + ` (requested by ` + data.requestedBy + `)`)
 		}
-		if(data.type === `youtube_error`)
-		{
+
+		if(data.type === `youtube_error`) {
 			chat_announce(`YouTube search failed: ` + data.message)
 		}
-		if(data.type === `image_result`)
-		{
+
+		if(data.type === `image_result`) {
 			place_search_image(data.imageUrl, data.title)
 			chat_announce(`Image found: ` + data.title + ` (requested by ` + data.requestedBy + `)`)
 		}
-		if(data.type === `image_error`)
-		{
+
+		if(data.type === `image_error`) {
 			chat_announce(`Image search failed: ` + data.message)
 		}
-		if(data.type === `chat_announcement`)
-		{
+
+		if(data.type === `chat_announcement`) {
 			chat_announce(data.msg)
 		}
-		if(data.type === `ship_info`)
-		{
+
+		if(data.type === `ship_info`) {
 			update_enemy_ship(data)
 		}
-		if(data.type === `laser`)
-		{
+
+		if(data.type === `laser`) {
 			fire_enemy_laser(data)
 		}
-		if(data.type === `destroyed`)
-		{
-			if(data.username !== App.username)
-			{
+
+		if(data.type === `destroyed`) {
+			if(data.username !== App.username) {
 				enemy_destroyed(data)
 			}
 
-			var kills = ``
-			if(data.kills > 1)
-			{
+			let kills = ``
+
+			if(data.kills > 1) {
 				kills = `<br>(` + data.kills + ` kills in a row)`
 			}
 
 			chat_announce(data.destroyed_by + ` destroyed ` + data.username + kills)
 		}
-		if(data.type === `images`)
-		{
+
+		if(data.type === `images`) {
 			place_images(data.images)
 		}
-		if(data.type === `connection_lost`)
-		{
+
+		if(data.type === `connection_lost`) {
 			window.location = `/`
 		}
-		if(data.type === `disconnection`)
-		{
+
+		if(data.type === `disconnection`) {
 			chat_announce(data.username + ` has left`)
 			remove_enemy(data.username)
 		}
@@ -150,8 +149,7 @@ function start_socket()
 	App.socket.emit(`adduser`, {username:App.username})
 }
 
-function EnemyShip()
-{
+function EnemyShip() {
     this.username
     this.container
 }
