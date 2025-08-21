@@ -15,6 +15,7 @@ module.exports = (io) => {
 	App.youtube_key = ``
 	App.image_instance = ``
 	App.image_scraper = ``
+	App.scores = []
 
 	// Read YouTube API key at startup
 	try {
@@ -45,8 +46,6 @@ module.exports = (io) => {
 		console.error(`Failed to load image scraper from image_scraper.txt:`, error.message)
 		console.log(`Image search functionality will be disabled`)
 	}
-
-	let scores = []
 
 	io.on(`connection`, (socket) => {
 	    socket.on(`adduser`, (data) => {
@@ -220,21 +219,21 @@ module.exports = (io) => {
 
 	App.create_score = (username) => {
 		let score = new Score(username, 0)
-		scores.push(score)
+		App.scores.push(score)
 		return score
 	}
 
 	App.remove_score = (username) => {
-		for (let score of scores) {
+		for (let score of App.scores) {
 			if (username === score.username) {
-				scores.splice(i, 1)
+				App.scores.splice(i, 1)
 				return true
 			}
 		}
 	}
 
 	App.get_score = (username) => {
-		for (let score of scores) {
+		for (let score of App.scores) {
 			if (username === score.username) {
 				return score
 			}
