@@ -202,7 +202,7 @@ module.exports = (io) => {
 	}
 
 	App.remove_username = (username) => {
-		for (let uname of App.usernames) {
+		for (let [i, uname] of App.usernames.entries()) {
 			if (uname === username) {
 				App.usernames.splice(i, 1)
 			}

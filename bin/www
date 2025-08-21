@@ -38,7 +38,7 @@ const allowedOrigins = process.env.NODE_ENV === `production`
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
-    methods: ["GET", "POST"],
+    methods: [`GET`, `POST`],
     credentials: false // Set to true if you need authentication
   }
 })
@@ -66,7 +66,7 @@ function normalizePort(val) {
 }
 
 /**
- * Event listener for HTTP server "error" event.
+ * Event listener for HTTP server `error` event.
  */
 
 function onError(error) {
@@ -92,7 +92,7 @@ function onError(error) {
 }
 
 /**
- * Event listener for HTTP server "listening" event.
+ * Event listener for HTTP server `listening` event.
  */
 
 function onListening() {

@@ -71,7 +71,7 @@ App.start_socket = () => {
 
 	App.socket.on(`update`, (data) => {
 		if (data.type === `chat_msg`) {
-			update_chat(data.username, data.msg)
+			App.update_chat(data.username, data.msg)
 		}
 
 		if (data.type === `username`) {
@@ -103,7 +103,7 @@ App.start_socket = () => {
 			App.chat_announce(`Image search failed: ` + data.message)
 		}
 
-		if (data.type === `App.chat_announcement`) {
+		if (data.type === `chat_announcement`) {
 			App.chat_announce(data.msg)
 		}
 
@@ -290,7 +290,7 @@ App.format_msg = (uname, msg) => {
 }
 
 App.format_announcement_msg = (msg) => {
-	return `<div class="App.chat_announcement">${msg}</div> <div>&nbsp;</div>`
+	return `<div class="chat_announcement">${msg}</div> <div>&nbsp;</div>`
 }
 
 App.chat_urlize = (msg) => {
@@ -309,7 +309,7 @@ App.msg_is_ok = (msg) => {
 App.send_to_chat = () => {
 	msg = App.clean_string($(`#chat_input`).val())
 
-	if (check_yt(msg)) {
+	if (App.check_yt(msg)) {
 		return
 	}
 
@@ -318,7 +318,7 @@ App.send_to_chat = () => {
 	}
 
 	if (App.msg_is_ok(msg)) {
-		update_chat(App.username, msg)
+		App.update_chat(App.username, msg)
 		App.check_image(msg)
 		App.socket.emit(`sendchat`, {msg:msg})
 	}
@@ -571,28 +571,28 @@ App.get_vector_velocities = (container, speed) => {
 		return [x, y]
 	}
 
-	if (direction > 0 && direction < 90) {
+	if ((direction > 0) && (direction < 90)) {
 		angle = App.to_radians(90 - direction)
 		x = Math.cos(angle) * speed
 		y = - Math.sin(angle) * speed
 		return [x, y]
 	}
 
-	if (direction > 90 && direction < 180) {
+	if ((direction > 90) && (direction < 180)) {
 		angle = App.to_radians(direction - 90)
 		x = Math.cos(angle) * speed
 		y = Math.sin(angle) * speed
 		return [x, y]
 	}
 
-	if (direction >= 181 && direction <= 269) {
+	if ((direction >= 181) && (direction <= 269)) {
 		angle = App.to_radians(270 - direction)
 		x = - Math.cos(angle) * speed
 		y = Math.sin(angle) * speed
 		return [x, y]
 	}
 
-	if (direction > 270 && direction < 360) {
+	if ((direction > 270) && (direction < 360)) {
 		angle = App.to_radians(direction - 270)
 		x = - Math.cos(angle) * speed
 		y = - Math.sin(angle) * speed
