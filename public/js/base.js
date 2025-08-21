@@ -45,7 +45,7 @@ App.init = () => {
 
 	let keep_naming = true
 
-	while(keep_naming) {
+	while (keep_naming) {
 		App.username = App.clean_string(prompt(`pick your name`))
 
 		if ((App.username === null) || (App.username.length < 1) ||
@@ -185,9 +185,9 @@ App.get_enemy_ship_or_create = (data) => {
 }
 
 App.get_enemy_ship = (uname) => {
-	for(let i = 0; i < App.enemy_ships.length; i++) {
-		if (App.enemy_ships[i].username === uname) {
-			return App.enemy_ships[i]
+	for (let ship of App.enemy_ships) {
+		if (ship.username === uname) {
+			return ship
 		}
 	}
 
@@ -195,9 +195,9 @@ App.get_enemy_ship = (uname) => {
 }
 
 App.remove_enemy = (uname) => {
-	for(let i = 0; i < App.enemy_ships.length; i++) {
-		if (App.enemy_ships[i].username === uname) {
-			App.background.removeChild(App.enemy_ships[i].container)
+	for (let [i, ship] of App.enemy_ships.entries()) {
+		if (ship.username === uname) {
+			App.background.removeChild(ship.container)
 			App.enemy_ships.splice(i, 1)
 		}
 	}
@@ -345,13 +345,7 @@ App.start_game = () => {
 }
 
 App.space_word = (word) => {
-	let s = ``
-
-	for(let i = 0; i < word.length; i++) {
-		s += word[i] + ` `
-	}
-
-	return s
+	return Array.from(word).join(' ')
 }
 
 App.create_label = (username) => {
@@ -449,26 +443,26 @@ App.create_background = () => {
 	App.background = new createjs.Stage(`canvas`)
 
 	let stars = 3000
-	let starField = new createjs.Shape()
+	let star_field = new createjs.Shape()
 
-	let starSmallRadiusMin = 1
-	let starSmallRadiusVarience = 2
+	let star_small_radius_min = 1
+	let star_small_radius_var = 2
 
 	for (let i = 0; i < stars; i++) {
 	    let radius
-	    radius = starSmallRadiusMin + (Math.random() * starSmallRadiusVarience)
-	    let colour, colourType = Math.round(Math.random() * 2)
+	    radius = star_small_radius_min + (Math.random() * star_small_radius_var)
+	    let color, color_type = Math.round(Math.random() * 2)
 
-	    switch (colourType) {
+	    switch (color_type) {
 	        case 0:
-						colour = `white`
+						color = `white`
 						break
 	        case 1:
-						colour = `grey`
+						color = `grey`
 						break
 	    }
 
-	    starField.graphics.beginFill(colour)
+	    star_field.graphics.beginFill(color)
 
 	    .drawPolyStar(
 	        Math.random() * App.bg_width,
@@ -489,7 +483,7 @@ App.create_background = () => {
 	App.background.regX = 0
 	App.background.regY = 0
 
-	App.background.addChild(starField)
+	App.background.addChild(star_field)
 }
 
 App.show_safe_zone = () => {
@@ -842,15 +836,15 @@ App.fire_laser = () => {
 App.emit_laser = (lasers) => {
 	let laser = []
 
-	for(let i = 0; i < lasers.length; i++) {
+	for (let laser of lasers) {
 		laser.push({
 			username:App.username,
-			x:lasers[i].x,
-			y:lasers[i].y,
-			rotation:lasers[i].children[0].rotation,
-			vx:lasers[i].vx,
-			vy:lasers[i].vy,
-			max_distance:lasers[i].max_distance,
+			x:laser.x,
+			y:laser.y,
+			rotation:laser.children[0].rotation,
+			vx:laser.vx,
+			vy:laser.vy,
+			max_distance:laser.max_distance,
 		})
 	}
 
@@ -886,8 +880,8 @@ App.create_enemy_laser = (enemy_laser) => {
 }
 
 App.fire_enemy_laser = (data) => {
-	for(let i = 0; i < data.laser.laser.length; i++) {
-		App.create_enemy_laser(data.laser.laser[i])
+	for (let laser of data.laser.laser) {
+		App.create_enemy_laser(laser)
 	}
 
 	if (App.sound) {
@@ -897,10 +891,7 @@ App.fire_enemy_laser = (data) => {
 }
 
 App.move_lasers = () => {
-	for(let i = 0; i < App.lasers.length; i++) {
-		let laser
-		laser = App.lasers[i]
-
+	for (let laser of App.lasers) {
 		if (laser.distance < laser.max_distance) {
 			laser.x += laser.vx
 			laser.y += laser.vy
@@ -921,12 +912,19 @@ App.move_lasers = () => {
 
 			let enemy = App.check_enemy_collision(laser)
 
+			function check_col () {
+				let x1 = Math.pow(((laser.x + (App.laser_width / 2)) - (App.bg_width / 2)), 2)
+				let x2 = Math.pow(((laser.y + (App.laser_height / 2)) - (App.bg_height / 2)), 2)
+				let x3 = Math.pow(App.safe_zone_radius, 2)
+				return x1 + x2 < x3
+			}
+
 			if (enemy) {
 				App.lasers.splice(i, 1)
 				i -= 1
 				App.background.removeChild(laser)
 			}
-			else if ((Math.pow(((laser.x + (App.laser_width / 2)) - App.bg_width / 2), 2) + Math.pow(((laser.y + (App.laser_height / 2)) - App.bg_height / 2), 2)) < Math.pow(App.safe_zone_radius, 2)) {
+			else if (check_col()) {
 				App.lasers.splice(i, 1)
 				i -= 1
 				App.background.removeChild(laser)
@@ -939,7 +937,7 @@ App.move_lasers = () => {
 		}
 	}
 
-	for(let i = 0; i < App.enemy_lasers.length; i++) {
+	for (let i = 0; i < App.enemy_lasers.length; i++) {
 		let enemy_laser = App.enemy_lasers[i]
 
 		if (enemy_laser.distance < enemy_laser.max_distance) {
@@ -981,7 +979,7 @@ App.move_lasers = () => {
 }
 
 App.check_enemy_collision = (laser) => {
-	for(let i = 0; i < App.enemy_ships.length; i++) {
+	for (let i = 0; i < App.enemy_ships.length; i++) {
 		let enemy = App.enemy_ships[i]
 
 		if (enemy.container.visible) {
@@ -1100,7 +1098,7 @@ App.update_minimap = () => {
 		context.stroke()
 	}
 
-	for(let i = 0; i < App.enemy_ships.length; i++) {
+	for (let i = 0; i < App.enemy_ships.length; i++) {
 		let enemy = App.enemy_ships[i].container
 
 		if (enemy.visible) {
@@ -1155,7 +1153,7 @@ App.check_img = (msg) => {
 
 App.place_search_image = (url, title) => {
 	// Check if image already exists
-	for(let i = 0; i < App.images.length; i++) {
+	for (let i = 0; i < App.images.length; i++) {
 		if (App.images[i].image && App.images[i].image.src === url) {
 			return false
 		}
@@ -1217,7 +1215,7 @@ App.img_search = (q) => {
 App.check_image = (msg) => {
 	if (msg.indexOf(` `) === -1) {
 		if (msg.indexOf(`.jpg`) !== -1 || msg.indexOf(`.png`) !== -1 || msg.indexOf(`.jpeg`) !== -1 || msg.indexOf(`.JPG`) !== -1 || msg.indexOf(`.PNG`) !== -1 || msg.indexOf(`.JPEG`) !== -1) {
-			for(let i = 0; i < App.images.length; i++) {
+			for (let i = 0; i < App.images.length; i++) {
 				if (App.images[i].image.src === msg) {
 					return false
 				}
@@ -1242,7 +1240,7 @@ App.check_image = (msg) => {
 }
 
 App.place_images = (imgs) => {
-	for(let i = 0; i < imgs.length; i++) {
+	for (let i = 0; i < imgs.length; i++) {
 		let img = new Image()
 		img.src = imgs[i].url
 		let image = new createjs.Bitmap(img)
@@ -1268,7 +1266,7 @@ App.push_image = (image) => {
 App.z_order = () => {
 	App.background.setChildIndex(safe_zone, App.background.getNumChildren() - 1)
 
-	for(let i = 0; i < App.enemy_ships.length; i++) {
+	for (let i = 0; i < App.enemy_ships.length; i++) {
 		App.background.setChildIndex(App.enemy_ships[i].container, App.background.getNumChildren() - 1)
 	}
 
