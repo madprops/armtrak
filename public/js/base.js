@@ -1,53 +1,35 @@
-var username;
-var socket;
-var userlist;
-var canvas;
-var context;
-var background;
-var nave;
-var bg_height = 2000;
-var bg_width = 2000;
-var left_arrow = false;
-var right_arrow = false;
-var up_arrow = false;
-var down_arrow = false;
-var x_offset;
-var y_offset;
-var ship_width;
-var ship_height;
-var clock;
-var lasers = [];
-var enemy_lasers = [];
-var last_fired = Date.now();
-var enemy_ships = [];
-var explosion_image;
-var laser_img;
-var laser_width;
-var laser_height;
-var label;
-var yt_player;
-var sound = true;
-var music = true;
-var images = [];
-var in_safe_zone;
-var safe_zone_radius;
-var min_max_health = 100;
-var min_max_speed = 2;
-var min_laser_level = 1;
-var max_max_health = 200;
-var max_max_speed = 3;
-var max_laser_level = 10;
-var laser_hit = 20;
+const App = {}
 
-function init(uname)
+App.bg_height = 2000
+App.bg_width = 2000
+App.left_arrow = false
+App.right_arrow = false
+App.up_arrow = false
+App.down_arrow = false
+App.lasers = []
+App.enemy_lasers = []
+App.last_fired = Date.now()
+App.enemy_ships = []
+App.sound = true
+App.music = true
+App.images = []
+App.min_max_health = 100
+App.min_max_speed = 2
+App.min_laser_level = 1
+App.max_max_health = 200
+App.max_max_speed = 3
+App.App.max_laser_level = 10
+App.laser_hit = 20
+
+function init()
 {
-	explosion_image = new Image();
-	explosion_image.src = '/img/explosion.png';
-	explosion_image.onload = function()
+	App.explosion_image = new Image();
+	App.explosion_image.src = '/img/explosion.png';
+	App.explosion_image.onload = function()
 	{
 		explosion_sheet = new createjs.SpriteSheet(
 		{
-		    images: [explosion_image],
+		    images: [App.explosion_image],
 		    frames: {width: 96, height: 96, regX: 0, regY: 0},
 		    animations:
 		    {
@@ -56,19 +38,19 @@ function init(uname)
 		});
 	}
 
-	laser_img = new Image();
-	laser_img.src = "img/laser.png";
-	laser_img.onload = function()
+	App.laser_img = new Image();
+	App.laser_img.src = "img/laser.png";
+	App.laser_img.onload = function()
 	{
-		laser_width = laser_img.width;
-		laser_height = laser_img.height;
+		App.laser_width = App.laser_img.width;
+		App.laser_height = App.laser_img.height;
 	}
 
 	var keep_naming = true;
 	while(keep_naming)
 	{
-		username = clean_string(prompt('pick your name'));
-		if(username === null || username.length < 1 || username.length > 12 || username.indexOf('<') !== -1)
+		App.username = clean_string(prompt('pick your name'));
+		if(App.username === null || App.username.length < 1 || App.username.length > 12 || App.username.indexOf('<') !== -1)
 		{
 			keep_naming = true;
 		}
@@ -86,11 +68,11 @@ function init(uname)
 
 function start_socket()
 {
-	socket = io(); // Connects to same origin by default
+	App.socket = io(); // Connects to same origin by default
 	// Or if you need to specify the server:
 	// socket = io('http://armtrak.net:3000');
 
-	socket.on('update', function(data)
+	App.socket.on('update', function(data)
 	{
 		if(data.type === 'chat_msg')
 		{
@@ -98,13 +80,13 @@ function start_socket()
 		}
 		if(data.type === 'username')
 		{
-			username = data.username;
+			App.username = data.username;
 			chat_announce(data.username + ' has joined');
 			chat_announce('you move with the arrow keys and shoot with spacebar');
 			chat_announce('you can place an image on the map (visible to everyone) by pasting an image url or with "img something"');
 			chat_announce('you can play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url');
 			chat_announce('you upgrade your ship by destroying other players');
-			label.text = space_word(username);
+			label.text = space_word(App.username);
 			start_heartbeat();
 		}
 		if(data.type === 'youtube_result')
@@ -139,7 +121,7 @@ function start_socket()
 		}
 		if(data.type === 'destroyed')
 		{
-			if(data.username !== username)
+			if(data.username !== App.username)
 			{
 				enemy_destroyed(data);
 			}
@@ -167,7 +149,7 @@ function start_socket()
 		}
 	});
 
-	socket.emit('adduser', {username:username});
+	App.socket.emit('adduser', {username:App.username});
 }
 
 function EnemyShip()
@@ -204,7 +186,7 @@ function get_enemy_ship_or_create(data)
 	{
 		enemy = new EnemyShip();
 		enemy.username = data.username;
-		enemy_ships.push(enemy);
+		App.enemy_ships.push(enemy);
 		create_enemy_ship(enemy, data.x, data.y, data.model);
 	}
 
@@ -213,11 +195,11 @@ function get_enemy_ship_or_create(data)
 
 function get_enemy_ship(uname)
 {
-	for(var i = 0; i < enemy_ships.length; i++)
+	for(var i = 0; i < App.enemy_ships.length; i++)
 	{
-		if(enemy_ships[i].username === uname)
+		if(App.enemy_ships[i].username === uname)
 		{
-			return enemy_ships[i];
+			return App.enemy_ships[i];
 		}
 	}
 
@@ -226,12 +208,12 @@ function get_enemy_ship(uname)
 
 function remove_enemy(uname)
 {
-	for(var i = 0; i < enemy_ships.length; i++)
+	for(var i = 0; i < App.enemy_ships.length; i++)
 	{
-		if(enemy_ships[i].username === uname)
+		if(App.enemy_ships[i].username === uname)
 		{
-			background.removeChild(enemy_ships[i].container);
-			enemy_ships.splice(i, 1);
+			App.background.removeChild(App.enemy_ships[i].container);
+			App.enemy_ships.splice(i, 1);
 		}
 	}
 }
@@ -258,22 +240,22 @@ function activate_key_detection()
 
 		if(code === 37)
 		{
-			left_arrow = true;
+			App.left_arrow = true;
 		}
 
 		if(code === 38)
 		{
-			up_arrow = true;
+			App.up_arrow = true;
 		}
 
 		if(code === 39)
 		{
-			right_arrow = true;
+			App.right_arrow = true;
 		}
 
 		if(code === 40)
 		{
-			down_arrow = true;
+			App.down_arrow = true;
 		}
 
 		if(code === 32)
@@ -293,29 +275,29 @@ function activate_key_detection()
 
 		if(code === 37)
 		{
-			left_arrow = false;
+			App.left_arrow = false;
 		}
 
 		if(code === 38)
 		{
-			up_arrow = false;
+			App.up_arrow = false;
 		}
 
 		if(code === 39)
 		{
-			right_arrow = false;
+			App.right_arrow = false;
 		}
 
 		if(code === 40)
 		{
-			down_arrow = false;
+			App.down_arrow = false;
 		}
 	});
 }
 
 function clear_arrows()
 {
-	left_arrow, right_arrow, up_arrow, down_arrow = false;
+	App.left_arrow, App.right_arrow, App.up_arrow, App.down_arrow = false;
 }
 
 function update_chat(uname, msg)
@@ -380,9 +362,9 @@ function send_to_chat()
 
 	if(msg_is_ok(msg))
 	{
-		update_chat(username, msg);
+		update_chat(App.username, msg);
 		check_image(msg);
-		socket.emit('sendchat', {msg:msg});
+		App.socket.emit('sendchat', {msg:msg});
 	}
 
 	$('#chat_input').val('');
@@ -405,7 +387,7 @@ function start_game()
     create_background();
     show_safe_zone();
     create_ship();
-    clock = Date.now();
+    App.clock = Date.now();
     loop();
 }
 
@@ -438,36 +420,36 @@ function create_ship()
 	ship.x = coords[0];
 	ship.y = coords[1];
 	ship.speed = 0;
-	ship.max_health = min_max_health;
+	ship.max_health = App.min_max_health;
 	ship.health = ship.max_health;
-	ship.max_speed = min_max_speed;
-	ship.laser_level = min_laser_level;
+	ship.max_speed = App.min_max_speed;
+	ship.laser_level = App.min_laser_level;
 	ship.model = num;
 
 	ship.addChild(ship_image);
 
-	label = create_label(username);
+	var label = create_label(App.username);
 	ship.addChild(label);
 
-	background.addChild(ship);
+	App.background.addChild(ship);
 	z_order();
 
 	image.onload = function()
 	{
-		ship_width = image.width;
-		ship_height = image.height;
+		App.ship_width = image.width;
+		App.ship_height = image.height;
 
-		move_background(coords[0] - (background.canvas.width / 2) + (ship_width / 2), coords[1] - (background.canvas.height / 2) + (ship_height / 2));
+		move_background(coords[0] - (App.background.canvas.width / 2) + (App.ship_width / 2), coords[1] - (App.background.canvas.height / 2) + (App.ship_height / 2));
 
-		ship_image.regX = ship_width / 2;
-		ship_image.regY = ship_height / 2;
-		ship_image.x = ship_width / 2;
-		ship_image.y = ship_height / 2;
+		ship_image.regX = App.ship_width / 2;
+		ship_image.regY = App.ship_height / 2;
+		ship_image.x = App.ship_width / 2;
+		ship_image.y = App.ship_height / 2;
 
-		label.x = ship_width / 2;
-		label.y = ship_height;
+		label.x = App.ship_width / 2;
+		label.y = App.ship_height;
 
-		socket.emit('get_images', {});
+		App.socket.emit('get_images', {});
 	}
 }
 
@@ -486,24 +468,24 @@ function create_enemy_ship(enemy, x, y, model)
 	var label = create_label(enemy.username)
 	enemy_ship.addChild(label);
 
-	background.addChild(enemy_ship);
+	App.background.addChild(enemy_ship);
 	enemy.container = enemy_ship;
 	z_order();
 
 	image.onload = function()
 	{
-		enemy_image.regX = ship_width / 2;
-		enemy_image.regY = ship_height / 2;
-		enemy_image.x = ship_width / 2;
-		enemy_image.y = ship_height / 2;
-		label.x = ship_width / 2;
-		label.y = ship_height;
+		enemy_image.regX = App.ship_width / 2;
+		enemy_image.regY = App.ship_height / 2;
+		enemy_image.x = App.ship_width / 2;
+		enemy_image.y = App.ship_height / 2;
+		label.x = App.ship_width / 2;
+		label.y = App.ship_height;
 	}
 }
 
 function emit_ship_info()
 {
-	socket.emit('ship_info', {x:ship.x, y:ship.y, rotation:ship_image.rotation, visible:ship.visible, model:ship.model});
+	App.socket.emit('ship_info', {x:ship.x, y:ship.y, rotation:ship_image.rotation, visible:ship.visible, model:ship.model});
 }
 
 function get_random_int(min, max)
@@ -513,14 +495,14 @@ function get_random_int(min, max)
 
 function get_random_coords()
 {
-	var x = get_random_int(10, bg_width - 10);
-	var y = get_random_int(10, bg_height - 10);
+	var x = get_random_int(10, App.bg_width - 10);
+	var y = get_random_int(10, App.bg_height - 10);
 	return [x, y];
 }
 
 function create_background()
 {
-	background = new createjs.Stage('canvas');
+	App.background = new createjs.Stage('canvas');
 
 	var stars = 3000;
 	var starField = new createjs.Shape();
@@ -529,8 +511,8 @@ function create_background()
 	var starSmallRadiusVarience = 2;
 
 	for (var i = 0; i < stars; i++) {
-	    var mX = Math.floor(Math.random() * bg_width);
-	    var mY = Math.floor(Math.random() * bg_height);
+	    var mX = Math.floor(Math.random() * App.bg_width);
+	    var mY = Math.floor(Math.random() * App.bg_height);
 
 	    var radius;
 
@@ -544,8 +526,8 @@ function create_background()
 
 	    starField.graphics.beginFill(colour)
 	    .drawPolyStar(
-	        Math.random() * bg_width,
-	        Math.random() * bg_height,
+	        Math.random() * App.bg_width,
+	        Math.random() * App.bg_height,
 	        radius,
 	        5 + Math.round(Math.random() * 2), // number of sides
 	        0.9, // pointyness
@@ -553,16 +535,16 @@ function create_background()
 	    );
 	}
 
-	background.canvas.width = 400;
-	background.canvas.height = 300;
+	App.background.canvas.width = 400;
+	App.background.canvas.height = 300;
 
-	x_offset = background.canvas.width * 0.2;
-	y_offset = background.canvas.height * 0.2;
+	App.x_offset = App.background.canvas.width * 0.2;
+	App.y_offset = App.background.canvas.height * 0.2;
 
-	background.regX = 0;
-	background.regY = 0;
+	App.background.regX = 0;
+	App.background.regY = 0;
 
-	background.addChild(starField);
+	App.background.addChild(starField);
 }
 
 function show_safe_zone()
@@ -570,12 +552,13 @@ function show_safe_zone()
 	var image = new Image();
 	image.src = "img/safe_zone.png";
 	safe_zone = new createjs.Bitmap(image);
-	background.addChild(safe_zone);
+	App.background.addChild(safe_zone);
+
 	image.onload = function()
 	{
-		safe_zone.x = (bg_width / 2) - (image.width / 2);
-		safe_zone.y = (bg_height / 2) - (image.height / 2);
-		safe_zone_radius = image.height / 2;
+		safe_zone.x = (App.bg_width / 2) - (image.width / 2);
+		safe_zone.y = (App.bg_height / 2) - (image.height / 2);
+		App.safe_zone_radius = image.height / 2;
 	}
 }
 
@@ -588,13 +571,13 @@ function move()
 
 	move_lasers();
 
-	if(left_arrow)
+	if(App.left_arrow)
 	{
 		turn_left();
 		return true;
 	}
 
-	if(right_arrow)
+	if(App.right_arrow)
 	{
 		turn_right();
 		return true;
@@ -605,8 +588,8 @@ function move()
 
 function move_background(x, y)
 {
-	background.regX = x;
-	background.regY = y;
+	App.background.regX = x;
+	App.background.regY = y;
 }
 
 function get_direction(container)
@@ -706,27 +689,27 @@ function move_ship()
 
 	if(ship.x <= 0)
 	{
-		ship.x = bg_width;
-		move_background(ship.x - (background.canvas.width / 2) + (ship_width / 2), background.regY);
+		ship.x = App.bg_width;
+		move_background(ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY);
 	}
-	else if(ship.x >= bg_width)
+	else if(ship.x >= App.bg_width)
 	{
 		ship.x = 0;
-		move_background(ship.x - (background.canvas.width / 2) + (ship_width / 2), background.regY);
+		move_background(ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY);
 	}
 	else if(ship.y <= 0)
 	{
-		ship.y = bg_height;
-		move_background(background.regX, ship.y - (background.canvas.height / 2) + (ship_height / 2));
+		ship.y = App.bg_height;
+		move_background(App.background.regX, ship.y - (App.background.canvas.height / 2) + (App.ship_height / 2));
 	}
-	else if(ship.y >= bg_height)
+	else if(ship.y >= App.bg_height)
 	{
 		ship.y = 0;
-		move_background(background.regX, ship.y - (background.canvas.height / 2) + (ship_height / 2));
+		move_background(App.background.regX, ship.y - (App.background.canvas.height / 2) + (App.ship_height / 2));
 	}
 	else
 	{
-		move_background(background.regX + vx, background.regY + vy);
+		move_background(App.background.regX + vx, App.background.regY + vy);
 	}
 
 	check_safe_zone();
@@ -734,13 +717,13 @@ function move_ship()
 
 function check_safe_zone()
 {
-	if((Math.pow(((ship.x + (ship_width / 2)) - bg_width / 2), 2) + Math.pow(((ship.y + (ship_height / 2)) - bg_height / 2), 2)) < Math.pow(safe_zone_radius, 2))
+	if((Math.pow(((ship.x + (App.ship_width / 2)) - App.bg_width / 2), 2) + Math.pow(((ship.y + (App.ship_height / 2)) - App.bg_height / 2), 2)) < Math.pow(App.safe_zone_radius, 2))
 	{
-		in_safe_zone = true;
+		App.in_safe_zone = true;
 	}
 	else
 	{
-		in_safe_zone = false;
+		App.in_safe_zone = false;
 	}
 }
 
@@ -759,15 +742,15 @@ function loop()
 	move();
 	clockwork();
 	emit_ship_info();
-	background.update();
+	App.background.update();
 	setTimeout(loop, 1000 / 60);
 }
 
 function clockwork()
 {
-	if(Date.now() - clock >= 200)
+	if(Date.now() - App.clock >= 200)
 	{
-		if(up_arrow)
+		if(App.up_arrow)
 		{
 			increase_ship_speed();
 		}
@@ -776,7 +759,7 @@ function clockwork()
 			reduce_ship_speed();
 		}
 		update_minimap();
-		clock = Date.now();
+		App.clock = Date.now();
 	}
 }
 
@@ -800,25 +783,24 @@ function increase_ship_speed()
 
 function create_laser(x, y, rotation, speed, max_distance)
 {
-	var laser_image = new createjs.Bitmap(laser_img);
+	var laser_image = new createjs.Bitmap(App.laser_img);
 
 	var laser = new createjs.Container();
 	laser.x = x;
 	laser.y = y;
 	laser.distance = 0;
 
-	var laser_width = laser_img.width;
-	var laser_height = laser_img.height;
+	var App.laser_width = App.laser_img.width;
+	var App.laser_height = App.laser_img.height;
 
-	laser_image.regX = laser_width / 2;
-	laser_image.regY = laser_height / 2;
-	laser_image.x = laser_width / 2;
-	laser_image.y = laser_height / 2;
+	laser_image.regX = App.laser_width / 2;
+	laser_image.regY = App.laser_height / 2;
+	laser_image.x = App.laser_width / 2;
+	laser_image.y = App.laser_height / 2;
 	laser_image.rotation = rotation;
 
 	laser.addChild(laser_image);
-	background.addChild(laser);
-
+	App.background.addChild(laser);
 
 	var velocities = get_vector_velocities(laser, speed);
 	laser.vx = velocities[0];
@@ -826,18 +808,18 @@ function create_laser(x, y, rotation, speed, max_distance)
 
 	laser.max_distance = max_distance;
 
-	lasers.push(laser);
+	App.lasers.push(laser);
 	return laser;
 }
 
 function fire_laser()
 {
-	if(!ship.visible || in_safe_zone)
+	if(!ship.visible || App.in_safe_zone)
 	{
 		return false;
 	}
 
-	if(Date.now() - last_fired < 300)
+	if(Date.now() - App.last_fired < 300)
 	{
 		return false;
 	}
@@ -858,8 +840,8 @@ function fire_laser()
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
-		var x = (ship_width / 2 * 0.6) * Math.cos(d);
-		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+		var x = (App.ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (App.ship_width / 2 * 0.6) * Math.sin(d);
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.2, 110));
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.2, 110));
@@ -869,8 +851,8 @@ function fire_laser()
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
-		var x = (ship_width / 2 * 0.6) * Math.cos(d);
-		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+		var x = (App.ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (App.ship_width / 2 * 0.6) * Math.sin(d);
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.2, 110));
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.2, 110));
@@ -880,8 +862,8 @@ function fire_laser()
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
-		var x = (ship_width / 2 * 0.6) * Math.cos(d);
-		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+		var x = (App.ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (App.ship_width / 2 * 0.6) * Math.sin(d);
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.4, 115));
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.4, 115));
@@ -891,8 +873,8 @@ function fire_laser()
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
-		var x = (ship_width / 2 * 0.6) * Math.cos(d);
-		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+		var x = (App.ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (App.ship_width / 2 * 0.6) * Math.sin(d);
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.4, 115));
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.4, 115));
@@ -904,8 +886,8 @@ function fire_laser()
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
-		var x = (ship_width / 2 * 0.6) * Math.cos(d);
-		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+		var x = (App.ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (App.ship_width / 2 * 0.6) * Math.sin(d);
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.5, 120));
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.5, 120));
@@ -917,8 +899,8 @@ function fire_laser()
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
-		var x = (ship_width / 2 * 0.6) * Math.cos(d);
-		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+		var x = (App.ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (App.ship_width / 2 * 0.6) * Math.sin(d);
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.7, 125));
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.7, 125));
@@ -930,8 +912,8 @@ function fire_laser()
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
-		var x = (ship_width / 2 * 0.6) * Math.cos(d);
-		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+		var x = (App.ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (App.ship_width / 2 * 0.6) * Math.sin(d);
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.8, 130));
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.8, 130));
@@ -943,8 +925,8 @@ function fire_laser()
 	{
 		var d = get_direction(ship);
 		d = to_radians(d);
-		var x = (ship_width / 2 * 0.6) * Math.cos(d);
-		var y = (ship_width / 2 * 0.6) * Math.sin(d);
+		var x = (App.ship_width / 2 * 0.6) * Math.cos(d);
+		var y = (App.ship_width / 2 * 0.6) * Math.sin(d);
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 5, 140));
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 5, 140));
@@ -954,12 +936,12 @@ function fire_laser()
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation - 30, 5, 140));
 	}
 
-	if(sound)
+	if(App.sound)
 	{
 		new Audio('/audio/laser.ogg').play();
 	}
 
-	last_fired = Date.now();
+	App.last_fired = Date.now();
 
 	emit_laser(lasers_to_fire);
 }
@@ -967,16 +949,18 @@ function fire_laser()
 function emit_laser(lasers)
 {
 	var laser = [];
+
 	for(var i = 0; i < lasers.length; i++)
 	{
-		laser.push({username:username, x:lasers[i].x, y:lasers[i].y, rotation:lasers[i].children[0].rotation, vx:lasers[i].vx, vy:lasers[i].vy, max_distance:lasers[i].max_distance})
+		laser.push({username:App.username, x:lasers[i].x, y:lasers[i].y, rotation:lasers[i].children[0].rotation, vx:lasers[i].vx, vy:lasers[i].vy, max_distance:lasers[i].max_distance})
 	}
-	socket.emit('laser', {laser:laser});
+
+	App.socket.emit('laser', {laser:laser});
 }
 
 function create_enemy_laser(enemy_laser)
 {
-	var laser_image = new createjs.Bitmap(laser_img);
+	var laser_image = new createjs.Bitmap(App.laser_img);
 
 	var laser = new createjs.Container();
 	laser.x = enemy_laser.x;
@@ -985,22 +969,22 @@ function create_enemy_laser(enemy_laser)
 	laser.max_distance = enemy_laser.max_distance;
 	laser.username = enemy_laser.username;
 
-	var laser_width = laser_img.width;
-	var laser_height = laser_img.height;
+	var App.laser_width = App.laser_img.width;
+	var App.laser_height = App.laser_img.height;
 
-	laser_image.regX = laser_width / 2;
-	laser_image.regY = laser_height / 2;
-	laser_image.x = laser_width / 2;
-	laser_image.y = laser_height / 2;
+	laser_image.regX = App.laser_width / 2;
+	laser_image.regY = App.laser_height / 2;
+	laser_image.x = App.laser_width / 2;
+	laser_image.y = App.laser_height / 2;
 	laser_image.rotation = enemy_laser.rotation;
 
 	laser.addChild(laser_image);
-	background.addChild(laser);
+	App.background.addChild(laser);
 
 	laser.vx = enemy_laser.vx;
 	laser.vy = enemy_laser.vy;
 
-	enemy_lasers.push(laser);
+	App.enemy_lasers.push(laser);
 }
 
 function fire_enemy_laser(data)
@@ -1010,7 +994,7 @@ function fire_enemy_laser(data)
 		create_enemy_laser(data.laser.laser[i]);
 	}
 
-	if(sound)
+	if(App.sound)
 	{
 		new Audio('/audio/laser.ogg').play();
 	}
@@ -1019,10 +1003,10 @@ function fire_enemy_laser(data)
 
 function move_lasers()
 {
-	for(var i = 0; i < lasers.length; i++)
+	for(var i = 0; i < App.lasers.length; i++)
 	{
 		var laser;
-		laser = lasers[i];
+		laser = App.lasers[i];
 
 		if(laser.distance < laser.max_distance)
 		{
@@ -1032,17 +1016,17 @@ function move_lasers()
 
 			if(laser.x <= 0)
 			{
-				laser.x = bg_width;
+				laser.x = App.bg_width;
 			}
-			else if(laser.x >= bg_width)
+			else if(laser.x >= App.bg_width)
 			{
 				laser.x = 0;
 			}
 			else if(laser.y <= 0)
 			{
-				laser.y = bg_height;
+				laser.y = App.bg_height;
 			}
-			else if(laser.y >= bg_height)
+			else if(laser.y >= App.bg_height)
 			{
 				laser.y = 0;
 			}
@@ -1050,28 +1034,28 @@ function move_lasers()
 			var enemy = check_enemy_collision(laser);
 			if(enemy)
 			{
-				lasers.splice(i, 1);
+				App.lasers.splice(i, 1);
 				i -= 1;
-				background.removeChild(laser);
+				App.background.removeChild(laser);
 			}
-			else if((Math.pow(((laser.x + (laser_width / 2)) - bg_width / 2), 2) + Math.pow(((laser.y + (laser_height / 2)) - bg_height / 2), 2)) < Math.pow(safe_zone_radius, 2))
+			else if((Math.pow(((laser.x + (App.laser_width / 2)) - App.bg_width / 2), 2) + Math.pow(((laser.y + (App.laser_height / 2)) - App.bg_height / 2), 2)) < Math.pow(App.safe_zone_radius, 2))
 			{
-				lasers.splice(i, 1);
+				App.lasers.splice(i, 1);
 				i -= 1;
-				background.removeChild(laser);
+				App.background.removeChild(laser);
 			}
 		}
 		else
 		{
-			lasers.splice(i, 1);
+			App.lasers.splice(i, 1);
 			i -= 1;
-			background.removeChild(laser);
+			App.background.removeChild(laser);
 		}
 	}
 
-	for(var i = 0; i < enemy_lasers.length; i++)
+	for(var i = 0; i < App.enemy_lasers.length; i++)
 	{
-		var enemy_laser = enemy_lasers[i];
+		var enemy_laser = App.enemy_lasers[i];
 
 		if(enemy_laser.distance < enemy_laser.max_distance)
 		{
@@ -1081,55 +1065,55 @@ function move_lasers()
 
 			if(enemy_laser.x <= 0)
 			{
-				enemy_laser.x = bg_width;
+				enemy_laser.x = App.bg_width;
 			}
-			else if(enemy_laser.x >= bg_width)
+			else if(enemy_laser.x >= App.bg_width)
 			{
 				enemy_laser.x = 0;
 			}
 			else if(enemy_laser.y <= 0)
 			{
-				enemy_laser.y = bg_height;
+				enemy_laser.y = App.bg_height;
 			}
-			else if(enemy_laser.y >= bg_height)
+			else if(enemy_laser.y >= App.bg_height)
 			{
 				enemy_laser.y = 0;
 			}
 
-			if((Math.pow(((enemy_laser.x + (laser_width / 2)) - bg_width / 2), 2) + Math.pow(((enemy_laser.y + (laser_height / 2)) - bg_height / 2), 2)) < Math.pow(safe_zone_radius, 2))
+			if((Math.pow(((enemy_laser.x + (App.laser_width / 2)) - App.bg_width / 2), 2) + Math.pow(((enemy_laser.y + (App.laser_height / 2)) - App.bg_height / 2), 2)) < Math.pow(App.safe_zone_radius, 2))
 			{
-				enemy_lasers.splice(i, 1);
+				App.enemy_lasers.splice(i, 1);
 				i -= 1;
-				background.removeChild(enemy_laser);
+				App.background.removeChild(enemy_laser);
 			}
 			else if(check_ship_collision(enemy_laser))
 			{
 				ship_hit(enemy_laser);
-				enemy_lasers.splice(i, 1);
+				App.enemy_lasers.splice(i, 1);
 				i -= 1;
-				background.removeChild(enemy_laser);
+				App.background.removeChild(enemy_laser);
 			}
 		}
 		else
 		{
-			enemy_lasers.splice(i, 1);
+			App.enemy_lasers.splice(i, 1);
 			i -= 1;
-			background.removeChild(enemy_laser);
+			App.background.removeChild(enemy_laser);
 		}
 	}
 }
 
 function check_enemy_collision(laser)
 {
-	for(var i = 0; i < enemy_ships.length; i++)
+	for(var i = 0; i < App.enemy_ships.length; i++)
 	{
-		var enemy = enemy_ships[i];
+		var enemy = App.enemy_ships[i];
 		if(enemy.container.visible)
 		{
-			var x1 = enemy.container.x - ship_width / 4;
-			var x2 = enemy.container.x + ship_width / 4;
-			var y1 = enemy.container.y - ship_height / 4;
-			var y2 = enemy.container.y + ship_height / 4;
+			var x1 = enemy.container.x - App.ship_width / 4;
+			var x2 = enemy.container.x + App.ship_width / 4;
+			var y1 = enemy.container.y - App.ship_height / 4;
+			var y2 = enemy.container.y + App.ship_height / 4;
 			if( (laser.x >= x1 && laser.x <= x2) && (laser.y >= y1 && laser.y <= y2) )
 			{
 				return enemy;
@@ -1143,10 +1127,10 @@ function check_ship_collision(laser)
 {
 	if(ship.visible)
 	{
-		var x1 = ship.x - ship_width / 4;
-		var x2 = ship.x + ship_width / 4;
-		var y1 = ship.y - ship_height / 4;
-		var y2 = ship.y + ship_height / 4;
+		var x1 = ship.x - App.ship_width / 4;
+		var x2 = ship.x + App.ship_width / 4;
+		var y1 = ship.y - App.ship_height / 4;
+		var y2 = ship.y + App.ship_height / 4;
 		if( (laser.x >= x1 && laser.x <= x2) && (laser.y >= y1 && laser.y <= y2) )
 		{
 			return true;
@@ -1159,7 +1143,7 @@ function ship_hit(laser)
 {
 	if(ship.visible)
 	{
-		ship.health -= laser_hit;
+		ship.health -= App.laser_hit;
 		update_hud();
 		if(ship.health <= 0)
 		{
@@ -1172,7 +1156,7 @@ function destroyed(laser)
 {
 	ship.visible = false;
 	show_explosion(ship.x, ship.y);
-	socket.emit('destroyed', {destroyed_by:laser.username});
+	App.socket.emit('destroyed', {destroyed_by:laser.username});
 	var image = new Image();
 	var num = get_random_int(1, 15);
 	image.src = 'img/nave' + num + '.png';
@@ -1183,10 +1167,10 @@ function destroyed(laser)
 
 function enemy_destroyed(data)
 {
-	if(data.destroyed_by === username)
+	if(data.destroyed_by === App.username)
 	{
 		upgrade();
-		ship.health += laser_hit;
+		ship.health += App.laser_hit;
 		if(ship.health > ship.max_health)
 		{
 			ship.health = ship.max_health;
@@ -1205,11 +1189,11 @@ function respawn()
 		var coords = get_random_coords();
 		ship.x = coords[0];
 		ship.y = coords[1];
-		ship.max_health = min_max_health;
+		ship.max_health = App.min_max_health;
 		ship.health = ship.max_health;
-		ship.max_speed = min_max_speed;
-		ship.laser_level = min_laser_level;
-		move_background(coords[0] - background.canvas.width / 2, coords[1] - background.canvas.height / 2);
+		ship.max_speed = App.min_max_speed;
+		ship.laser_level = App.min_laser_level;
+		move_background(coords[0] - App.background.canvas.width / 2, coords[1] - App.background.canvas.height / 2);
 		ship.visible = true;
 		update_hud();
 
@@ -1224,8 +1208,9 @@ function show_explosion(x, y)
 	explosion_animation.x = x - 33;
 	explosion_animation.y = y - 30;
 	explosion_animation.currentFrame = 0;
-	background.addChild(explosion_animation);
-	if(sound)
+	App.background.addChild(explosion_animation);
+
+	if(App.sound)
 	{
 		new Audio('/audio/explosion.ogg').play();
 	}
@@ -1235,8 +1220,8 @@ function update_minimap()
 {
 	var minimap = document.getElementById('minimap');
 	var context = minimap.getContext('2d');
-	minimap.setAttribute('height', bg_height);
-	minimap.setAttribute('width', bg_width);
+	minimap.setAttribute('height', App.bg_height);
+	minimap.setAttribute('width', App.bg_width);
 	if(ship !== undefined && ship.visible)
 	{
 		var x = ship.x;
@@ -1252,9 +1237,9 @@ function update_minimap()
 		context.stroke();
 	}
 
-	for(var i = 0; i < enemy_ships.length; i++)
+	for(var i = 0; i < App.enemy_ships.length; i++)
 	{
-		var enemy = enemy_ships[i].container
+		var enemy = App.enemy_ships[i].container
 		if(enemy.visible)
 		{
 			var x = enemy.x;
@@ -1274,7 +1259,7 @@ function update_minimap()
 
 function play_yt(id)
 {
-	if(music)
+	if(App.music)
 	{
 		$('#yt_player').attr('src', 'https://www.youtube.com/embed/' + id + '?&autoplay=1&enablejsapi=1&version=3')
 	}
@@ -1316,9 +1301,9 @@ function check_img(msg)
 function place_search_image(url, title)
 {
 	// Check if image already exists
-	for(var i = 0; i < images.length; i++)
+	for(var i = 0; i < App.images.length; i++)
 	{
-		if(images[i].image && images[i].image.src === url)
+		if(App.images[i].image && App.images[i].image.src === url)
 		{
 			return false;
 		}
@@ -1330,14 +1315,14 @@ function place_search_image(url, title)
 	img.onload = function()
 	{
 		var image = new createjs.Bitmap(img);
-		image.x = ship.x - ((img.width / 3) / 2) + (ship_width / 2);
-		image.y = ship.y - ((img.height / 3) / 2) + (ship_height / 2);
+		image.x = ship.x - ((img.width / 3) / 2) + (App.ship_width / 2);
+		image.y = ship.y - ((img.height / 3) / 2) + (App.ship_height / 2);
 		image.scaleX = 0.333;
 		image.scaleY = 0.333;
-		background.addChild(image);
+		App.background.addChild(image);
 		z_order();
 		push_image(image);
-		socket.emit('image', {url:url, x:image.x, y:image.y});
+		App.socket.emit('image', {url:url, x:image.x, y:image.y});
 	}
 
 	img.onerror = function()
@@ -1348,43 +1333,43 @@ function place_search_image(url, title)
 
 function toggle_sound()
 {
-	if(sound)
+	if(App.sound)
 	{
 		$('#sound_toggle').html('turn on sound');
-		sound = false;
+		App.sound = false;
 	}
 	else
 	{
 		$('#sound_toggle').html('turn off sound');
-		sound = true;
+		App.sound = true;
 	}
 }
 
 function toggle_music()
 {
-	if(music)
+	if(App.music)
 	{
 		$('#music_toggle').html('turn on music');
 		$('#yt_player').attr('src', '');
-		music = false;
+		App.music = false;
 	}
 	else
 	{
 		$('#music_toggle').html('turn off music');
-		music = true;
+		App.music = true;
 	}
 }
 
 function yt_search(q)
 {
     // Send YouTube search request to server to keep API key private
-    socket.emit('youtube_search', {query: q});
+    App.socket.emit('youtube_search', {query: q});
 }
 
 function img_search(q)
 {
     // Send image search request to server
-    socket.emit('image_search', {query: q});
+    App.socket.emit('image_search', {query: q});
 }// YouTube API functions - using direct fetch instead of gapi client
 // googleApiClientReady = function()
 // {
@@ -1402,9 +1387,9 @@ function check_image(msg)
 	{
 		if(msg.indexOf('.jpg') !== -1 || msg.indexOf('.png') !== -1 || msg.indexOf('.jpeg') !== -1 || msg.indexOf('.JPG') !== -1 || msg.indexOf('.PNG') !== -1 || msg.indexOf('.JPEG') !== -1)
 		{
-			for(var i = 0; i < images.length; i++)
+			for(var i = 0; i < App.images.length; i++)
 			{
-				if(images[i].image.src === msg)
+				if(App.images[i].image.src === msg)
 				{
 					return false;
 				}
@@ -1415,14 +1400,14 @@ function check_image(msg)
 			img.onload = function()
 			{
 				var image = new createjs.Bitmap(img);
-				image.x = ship.x - ((img.width / 3) / 2) + (ship_width / 2);
-				image.y = ship.y - ((img.height / 3) / 2) + (ship_height / 2);
+				image.x = ship.x - ((img.width / 3) / 2) + (App.ship_width / 2);
+				image.y = ship.y - ((img.height / 3) / 2) + (App.ship_height / 2);
 				image.scaleX = 0.333;
 				image.scaleY = 0.333;
-				background.addChild(image);
+				App.background.addChild(image);
 				z_order();
 				push_image(image);
-				socket.emit('image', {url:msg, x:image.x, y:image.y});
+				App.socket.emit('image', {url:msg, x:image.x, y:image.y});
 			}
 		}
 	}
@@ -1439,7 +1424,7 @@ function place_images(imgs)
 		image.y = imgs[i].y;
 		image.scaleX = 0.333;
 		image.scaleY = 0.333;
-		background.addChild(image);
+		App.background.addChild(image);
 		z_order();
 		push_image(image);
 	}
@@ -1447,31 +1432,32 @@ function place_images(imgs)
 
 function push_image(image)
 {
-	images.push(image);
-	if(images.length > 20)
+	App.images.push(image);
+
+	if(App.images.length > 20)
 	{
-		background.removeChild(images[0]);
-		images.splice(0, 1);
+		App.background.removeChild(App.images[0]);
+		App.images.splice(0, 1);
 	}
 }
 
 function z_order()
 {
-	background.setChildIndex(safe_zone, background.getNumChildren() - 1);
+	App.background.setChildIndex(safe_zone, App.background.getNumChildren() - 1);
 
-	for(var i = 0; i < enemy_ships.length; i++)
+	for(var i = 0; i < App.enemy_ships.length; i++)
 	{
-		background.setChildIndex(enemy_ships[i].container, background.getNumChildren() - 1);
+		App.background.setChildIndex(App.enemy_ships[i].container, App.background.getNumChildren() - 1);
 	}
 
-	background.setChildIndex(ship, background.getNumChildren() - 1);
+	App.background.setChildIndex(ship, App.background.getNumChildren() - 1);
 }
 
 function start_heartbeat()
 {
 	setInterval(function()
 	{
-		socket.emit('heartbeat', {});
+		App.socket.emit('heartbeat', {});
 
 	}, 10000);
 }
@@ -1480,17 +1466,17 @@ function upgrade()
 {
 	var nums = [];
 
-	if(ship.laser_level < max_laser_level)
+	if(ship.laser_level < App.max_laser_level)
 	{
 		nums.push(1);
 	}
 
-	if(ship.max_health < max_max_health)
+	if(ship.max_health < App.max_max_health)
 	{
 		nums.push(2);
 	}
 
-	if(ship.max_speed < max_max_speed)
+	if(ship.max_speed < App.max_max_speed)
 	{
 		nums.push(3);
 	}
