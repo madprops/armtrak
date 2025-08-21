@@ -22,6 +22,7 @@ App.max_laser_level = 10
 App.laser_hit = 20
 App.max_username_length = 28
 App.dot_radius = 8
+App.dot_radius_small = 5
 App.label_size = 8
 
 class EnemyShip {
@@ -467,20 +468,20 @@ App.create_background = () => {
   let star_small_radius_var = 2
 
   for (let i = 0; i < stars; i++) {
-      let radius
-      radius = star_small_radius_min + (Math.random() * star_small_radius_var)
-      let color, color_type = Math.round(Math.random() * 2)
+    let radius
+    radius = star_small_radius_min + (Math.random() * star_small_radius_var)
+    let color, color_type = Math.round(Math.random() * 2)
 
-      switch (color_type) {
-        case 0:
-          color = `white`
-          break
-        case 1:
-          color = `grey`
-          break
-      }
+    switch (color_type) {
+    case 0:
+      color = `white`
+      break
+    case 1:
+      color = `grey`
+      break
+    }
 
-      star_field.graphics.beginFill(color)
+    star_field.graphics.beginFill(color)
 
       .drawPolyStar(
         Math.random() * App.bg_width,
@@ -1142,7 +1143,7 @@ App.update_minimap = () => {
     let scaleY = image.scaleY || 1
     let x = (image.x + (imgWidth * scaleX / 2)) * 0.2
     let y = (image.y + (imgHeight * scaleY / 2)) * 0.2
-    let radius = App.dot_radius * 0.6 // Smaller radius for image markers
+    let radius = App.dot_radius_small
 
     context.beginPath()
     context.arc(x, y, radius, 0, 2 * Math.PI, false)
