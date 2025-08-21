@@ -68,6 +68,7 @@ App.init = () => {
   App.start_chat()
   App.start_socket()
   App.activate_key_detection()
+  App.setup_clicks()
   App.start_game()
 }
 
@@ -83,6 +84,7 @@ App.start_socket = () => {
 
     if (data.type === `username`) {
       App.username = data.username
+      App.current_youtube = data.current_youtube
       App.chat_announce(data.username + ` has joined`)
       App.chat_announce(`you move with the arrow keys and shoot with spacebar`)
       App.chat_announce(`you can place an image on the map (visible to everyone) with "img something" or by pasting an image url`)
@@ -92,8 +94,8 @@ App.start_socket = () => {
     }
 
     if (data.type === `youtube_result`) {
-      App.play_yt(data.videoId)
-      App.chat_announce(`Now playing: ` + data.title + ` (requested by ` + data.requestedBy + `)`)
+      App.current_youtube = data
+      App.play_youtube()
     }
 
     if (data.type === `youtube_error`) {
@@ -1341,4 +1343,23 @@ App.update_hud = () => {
   $(`#health`).html(`health: ` + App.ship.health + `/` + App.ship.max_health)
   $(`#max_speed`).html(`max speed: ` + (Math.round((App.ship.max_speed - 1) * 10) / 10))
   $(`#laser_level`).html(`laser level: ` + App.ship.laser_level)
+}
+
+App.play_youtube = () => {
+  let data = App.current_youtube
+
+  if (!data) {
+    return
+  }
+
+  App.play_yt(data.videoId)
+  App.chat_announce(`Now playing: ` + data.title + ` (requested by ` + data.requestedBy + `)`)
+}
+
+App.setup_clicks = () => {
+  document.addEventListener(`click`, () => {
+    setTimeout(() => {
+      App.play_youtube()
+    }, 500)
+  }, {once: true})
 }

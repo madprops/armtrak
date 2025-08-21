@@ -50,8 +50,17 @@ module.exports = (io) => {
   io.on(`connection`, (socket) => {
 	    socket.on(`adduser`, (data) => {
 	    	socket.username = App.add_username(App.clean_string(data.username.toLowerCase()))
-	    	socket.emit(`update`, {type:`username`, username:socket.username})
-	    	socket.broadcast.emit(`update`, {type: `chat_announcement`, msg: socket.username + ` has joined`})
+
+	    	socket.emit(`update`, {
+        type: `username`,
+        username: socket.username,
+        current_youtube: App.current_youtube,
+      })
+
+	    	socket.broadcast.emit(`update`, {
+        type: `chat_announcement`,
+        msg: socket.username + ` has joined`,
+      })
 	    })
 
 	    socket.on(`sendchat`, (data) => {
@@ -125,12 +134,14 @@ module.exports = (io) => {
 	    	if ((socket.username !== undefined) && data.query) {
 	    		App.perform_youtube_search(data.query, socket.username, (result) => {
 	    			if (result.success) {
-	    				io.sockets.emit(`update`, {
-	    					type:`youtube_result`,
-	    					videoId: result.videoId,
-	    					title: result.title,
-	    					requestedBy: socket.username,
-	    				})
+            App.current_youtube = {
+              type: `youtube_result`,
+              videoId: result.videoId,
+              title: result.title,
+              requestedBy: socket.username,
+            }
+
+	    				io.sockets.emit(`update`, App.current_youtube)
 	    			}
           else {
 	    				// Send error only to requesting user
