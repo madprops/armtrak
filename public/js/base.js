@@ -323,8 +323,6 @@ function update_chat(uname, msg)
 	var fmt = format_msg(uname, msg)
 	$('#chat_area').append(fmt);
 	goto_bottom();
-	check_yt(msg);
-	check_img(msg);
 }
 
 function chat_announce(msg)
@@ -371,12 +369,22 @@ function msg_is_ok(msg)
 function send_to_chat()
 {
 	msg = clean_string($('#chat_input').val());
+
+	if (check_yt(msg)) {
+		return
+	}
+
+	if (check_img(msg)) {
+		return
+	}
+
 	if(msg_is_ok(msg))
 	{
 		update_chat(username, msg);
 		check_image(msg);
 		socket.emit('sendchat', {msg:msg});
 	}
+
 	$('#chat_input').val('');
 }
 
