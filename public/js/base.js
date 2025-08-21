@@ -60,7 +60,7 @@ App.init = () => {
 
 	App.start_chat()
 	App.start_socket()
-	activate_key_detection()
+	App.activate_key_detection()
 	App.start_game()
 }
 
@@ -81,7 +81,7 @@ App.start_socket = () => {
 			App.chat_announce(`you can place an image on the map (visible to everyone) by pasting an image url or with "img something"`)
 			App.chat_announce(`you can play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url`)
 			App.chat_announce(`you upgrade your ship by destroying other players`)
-			label.text = App.space_word(App.username)
+			// App.label.text = App.space_word(App.username)
 			App.start_heartbeat()
 		}
 
@@ -383,7 +383,7 @@ App.create_ship = () => {
 		App.ship_width = image.width
 		App.ship_height = image.height
 
-		move_background(coords[0] - (App.background.canvas.width / 2) + (App.ship_width / 2), coords[1] - (App.background.canvas.height / 2) + (App.ship_height / 2))
+		App.move_background(coords[0] - (App.background.canvas.width / 2) + (App.ship_width / 2), coords[1] - (App.background.canvas.height / 2) + (App.ship_height / 2))
 
 		ship_image.regX = App.ship_width / 2
 		ship_image.regY = App.ship_height / 2
@@ -501,22 +501,22 @@ App.show_safe_zone = () => {
 
 App.move = () => {
 	if (ship.visible) {
-		move_ship()
+		App.move_ship()
 	}
 
 	App.move_lasers()
 
 	if (App.left_arrow) {
-		turn_left()
+		App.turn_left()
 		return true
 	}
 
 	if (App.right_arrow) {
-		turn_right()
+		App.turn_right()
 		return true
 	}
 
-	clear_arrows()
+	App.clear_arrows()
 }
 
 App.move_background = (x, y) => {
@@ -543,7 +543,7 @@ App.to_radians = (degrees) => {
 }
 
 App.get_vector_velocities = (container, speed) => {
-	let direction = get_direction(container)
+	let direction = App.get_direction(container)
 	let angle
 	let x, y
 
@@ -572,28 +572,28 @@ App.get_vector_velocities = (container, speed) => {
 	}
 
 	if (direction > 0 && direction < 90) {
-		angle = to_radians(90 - direction)
+		angle = App.to_radians(90 - direction)
 		x = Math.cos(angle) * speed
 		y = - Math.sin(angle) * speed
 		return [x, y]
 	}
 
 	if (direction > 90 && direction < 180) {
-		angle = to_radians(direction - 90)
+		angle = App.to_radians(direction - 90)
 		x = Math.cos(angle) * speed
 		y = Math.sin(angle) * speed
 		return [x, y]
 	}
 
 	if (direction >= 181 && direction <= 269) {
-		angle = to_radians(270 - direction)
+		angle = App.to_radians(270 - direction)
 		x = - Math.cos(angle) * speed
 		y = Math.sin(angle) * speed
 		return [x, y]
 	}
 
 	if (direction > 270 && direction < 360) {
-		angle = to_radians(direction - 270)
+		angle = App.to_radians(direction - 270)
 		x = - Math.cos(angle) * speed
 		y = - Math.sin(angle) * speed
 		return [x, y]
@@ -601,7 +601,7 @@ App.get_vector_velocities = (container, speed) => {
 }
 
 App.move_ship = () => {
-	let velocities = get_vector_velocities(ship, ship.speed)
+	let velocities = App.get_vector_velocities(ship, ship.speed)
 	let vx = velocities[0]
 	let vy = velocities[1]
 
@@ -610,25 +610,25 @@ App.move_ship = () => {
 
 	if (ship.x <= 0) {
 		ship.x = App.bg_width
-		move_background(ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY)
+		App.move_background(ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY)
 	}
 	else if (ship.x >= App.bg_width) {
 		ship.x = 0
-		move_background(ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY)
+		App.move_background(ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY)
 	}
 	else if (ship.y <= 0) {
 		ship.y = App.bg_height
-		move_background(App.background.regX, ship.y - (App.background.canvas.height / 2) + (App.ship_height / 2))
+		App.move_background(App.background.regX, ship.y - (App.background.canvas.height / 2) + (App.ship_height / 2))
 	}
 	else if (ship.y >= App.bg_height) {
 		ship.y = 0
-		move_background(App.background.regX, ship.y - (App.background.canvas.height / 2) + (App.ship_height / 2))
+		App.move_background(App.background.regX, ship.y - (App.background.canvas.height / 2) + (App.ship_height / 2))
 	}
 	else {
-		move_background(App.background.regX + vx, App.background.regY + vy)
+		App.move_background(App.background.regX + vx, App.background.regY + vy)
 	}
 
-	check_safe_zone()
+	App.check_safe_zone()
 }
 
 App.check_safe_zone = () => {
@@ -703,7 +703,7 @@ App.create_laser = (x, y, rotation, speed, max_distance) => {
 	laser.addChild(laser_image)
 	App.background.addChild(laser)
 
-	let velocities = get_vector_velocities(laser, speed)
+	let velocities = App.get_vector_velocities(laser, speed)
 	laser.vx = velocities[0]
 	laser.vy = velocities[1]
 
@@ -733,8 +733,8 @@ App.fire_laser = () => {
 	}
 
 	if (ship.laser_level === 3) {
-		let d = get_direction(ship)
-		d = to_radians(d)
+		let d = App.get_direction(ship)
+		d = App.to_radians(d)
 		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
 		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
@@ -743,8 +743,8 @@ App.fire_laser = () => {
 	}
 
 	if (ship.laser_level === 4) {
-		let d = get_direction(ship)
-		d = to_radians(d)
+		let d = App.get_direction(ship)
+		d = App.to_radians(d)
 		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
 		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
@@ -753,8 +753,8 @@ App.fire_laser = () => {
 	}
 
 	if (ship.laser_level === 5) {
-		let d = get_direction(ship)
-		d = to_radians(d)
+		let d = App.get_direction(ship)
+		d = App.to_radians(d)
 		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
 		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
@@ -763,8 +763,8 @@ App.fire_laser = () => {
 	}
 
 	if (ship.laser_level === 6) {
-		let d = get_direction(ship)
-		d = to_radians(d)
+		let d = App.get_direction(ship)
+		d = App.to_radians(d)
 		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
 		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
@@ -775,8 +775,8 @@ App.fire_laser = () => {
 	}
 
 	if (ship.laser_level === 7) {
-		let d = get_direction(ship)
-		d = to_radians(d)
+		let d = App.get_direction(ship)
+		d = App.to_radians(d)
 		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
 		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
@@ -787,8 +787,8 @@ App.fire_laser = () => {
 	}
 
 	if (ship.laser_level === 8) {
-		let d = get_direction(ship)
-		d = to_radians(d)
+		let d = App.get_direction(ship)
+		d = App.to_radians(d)
 		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
 		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
@@ -799,8 +799,8 @@ App.fire_laser = () => {
 	}
 
 	if (ship.laser_level === 9) {
-		let d = get_direction(ship)
-		d = to_radians(d)
+		let d = App.get_direction(ship)
+		d = App.to_radians(d)
 		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
 		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
@@ -811,8 +811,8 @@ App.fire_laser = () => {
 	}
 
 	if (ship.laser_level === 10) {
-		let d = get_direction(ship)
-		d = to_radians(d)
+		let d = App.get_direction(ship)
+		d = App.to_radians(d)
 		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
 		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
@@ -836,19 +836,19 @@ App.fire_laser = () => {
 App.emit_laser = (lasers) => {
 	let laser = []
 
-	for (let laser of lasers) {
+	for (let item of lasers) {
 		laser.push({
 			username:App.username,
-			x:laser.x,
-			y:laser.y,
-			rotation:laser.children[0].rotation,
-			vx:laser.vx,
-			vy:laser.vy,
-			max_distance:laser.max_distance,
+			x:item.x,
+			y:item.y,
+			rotation:item.children[0].rotation,
+			vx:item.vx,
+			vy:item.vy,
+			max_distance:item.max_distance,
 		})
 	}
 
-	App.socket.emit(`laser`, {laser:laser})
+	App.socket.emit(`laser`, {laser})
 }
 
 App.create_enemy_laser = (enemy_laser) => {
@@ -891,7 +891,7 @@ App.fire_enemy_laser = (data) => {
 }
 
 App.move_lasers = () => {
-	for (let laser of App.lasers) {
+	for (let [i, laser] of App.lasers.entries()) {
 		if (laser.distance < laser.max_distance) {
 			laser.x += laser.vx
 			laser.y += laser.vy
@@ -977,7 +977,7 @@ App.move_lasers = () => {
 }
 
 App.check_enemy_collision = (laser) => {
-	for (let enemy of App.enemy_ships.length) {
+	for (let enemy of App.enemy_ships) {
 		if (enemy.container.visible) {
 			let x1 = enemy.container.x - App.ship_width / 4
 			let x2 = enemy.container.x + App.ship_width / 4
@@ -1055,7 +1055,7 @@ App.respawn = () => {
 		ship.health = ship.max_health
 		ship.max_speed = App.min_max_speed
 		ship.laser_level = App.min_laser_level
-		move_background(coords[0] - App.background.canvas.width / 2, coords[1] - App.background.canvas.height / 2)
+		App.move_background(coords[0] - App.background.canvas.width / 2, coords[1] - App.background.canvas.height / 2)
 		ship.visible = true
 		App.update_hud()
 	}, 5000)
