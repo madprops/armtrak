@@ -57,24 +57,24 @@ module.exports = (io) => {
 	    socket.on(`sendchat`, (data) => {
 	    	if (socket.username !== undefined) {
     			socket.broadcast.emit(`update`, {
-            type: `chat_msg`,
-            username: socket.username,
-            msg: App.clean_string(data.msg),
-          })
+          type: `chat_msg`,
+          username: socket.username,
+          msg: App.clean_string(data.msg),
+        })
 	    	}
     	})
 
 	    socket.on(`ship_info`, (data) => {
 	    	if (socket.username !== undefined) {
     			socket.broadcast.emit(`update`, {
-            type:`ship_info`,
-            username: socket.username,
-            x: data.x,
-            y: data.y,
-            rotation: data.rotation,
-            visible: data.visible,
-            model: data.model,
-          })
+          type:`ship_info`,
+          username: socket.username,
+          x: data.x,
+          y: data.y,
+          rotation: data.rotation,
+          visible: data.visible,
+          model: data.model,
+        })
 	    	}
     	})
 
