@@ -2,6 +2,13 @@ const App = {}
 const fs = require(`fs`)
 const path = require(`path`)
 
+class Score {
+	constructor(username, kills) {
+		this.username = username
+		this.kills = kills
+	}
+}
+
 module.exports = function (io)
 {
 	App.usernames = []
@@ -38,11 +45,6 @@ module.exports = function (io)
 	catch (error) {
 		console.error(`Failed to load image scraper from image_scraper.txt:`, error.message)
 		console.log(`Image search functionality will be disabled`)
-	}
-
-	function Score() {
-		let username
-		let kills
 	}
 
 	let scores = []
@@ -172,7 +174,7 @@ module.exports = function (io)
 	}
 
 	function get_random_int(min, max) {
-	    return Math.floor(Math.random() * (max-min+1) + min)
+	  return Math.floor(Math.random() * (max-min+1) + min)
 	}
 
 	function add_username(username) {
@@ -211,15 +213,14 @@ module.exports = function (io)
 
 	function add_image(data) {
 		images.push(data)
+
 		if (images.length > 20) {
 			images.splice(0, 1)
 		}
 	}
 
 	function create_score(username) {
-		var score = new Score()
-		score.username = username
-		score.kills = 0
+		let score = new Score(username, 0)
 		scores.push(score)
 		return score
 	}
@@ -244,13 +245,13 @@ module.exports = function (io)
 	}
 
 	function add_kill(username) {
-		var score = get_score(username)
+		let score = get_score(username)
 		score.kills += 1
 		return score.kills
 	}
 
 	function reset_kills(username) {
-		var score = get_score(username)
+		let score = get_score(username)
 		score.kills = 0
 	}
 
@@ -286,28 +287,29 @@ module.exports = function (io)
 
 			res.on(`end`, () => {
 				try {
-					const response = JSON.parse(data)
+					let response = JSON.parse(data)
 
 					if (response && response.items && response.items.length > 0) {
-						const video = response.items[0]
+						let video = response.items[0]
+
 						if (video.id && video.id.videoId) {
 							callback({
 								success: true,
 								videoId: video.id.videoId,
-								title: video.snippet.title
+								title: video.snippet.title,
 							})
 						}
 						else {
 							callback({
 								success: false,
-								message: `No valid video found`
+								message: `No valid video found`,
 							})
 						}
 					}
 					else {
 						callback({
 							success: false,
-							message: `No search results found`
+							message: `No search results found`,
 						})
 					}
 				}
@@ -315,7 +317,7 @@ module.exports = function (io)
 					console.error(`YouTube API response parsing error:`, error)
 					callback({
 						success: false,
-						message: `Failed to parse YouTube response`
+						message: `Failed to parse YouTube response`,
 					})
 				}
 			})
@@ -323,7 +325,7 @@ module.exports = function (io)
 			console.error(`YouTube API request error:`, error)
 			callback({
 				success: false,
-				message: `YouTube search request failed`
+				message: `YouTube search request failed`,
 			})
 		})
 	}
@@ -332,16 +334,15 @@ module.exports = function (io)
 		if (!App.image_instance || !App.image_scraper) {
 			callback({
 				success: false,
-				message: `Image search configuration not properly set`
+				message: `Image search configuration not properly set`,
 			})
+
 			return
 		}
 
-		const https = require(`https`)
-		const querystring = require(`querystring`)
-
-		const encodedQuery = encodeURIComponent(query)
-		const url = `${App.image_instance}/api/v1/images?s=${encodedQuery}&scraper=${App.image_scraper}`
+		let https = require(`https`)
+		let encoded_query = encodeURIComponent(query)
+		let url = `${App.image_instance}/api/v1/images?s=${encoded_query}&scraper=${App.image_scraper}`
 
 		https.get(url, (res) => {
 			let data = ``
@@ -352,28 +353,29 @@ module.exports = function (io)
 
 			res.on(`end`, () => {
 				try {
-					const response = JSON.parse(data)
+					let response = JSON.parse(data)
 
 					if (response && response.image && response.image.length > 0) {
-						const firstImage = response.image[0]
-						if (firstImage.source && firstImage.source.length > 0 && firstImage.source[0].url) {
+						let first_image = response.image[0]
+
+						if (first_image.source && first_image.source.length > 0 && first_image.source[0].url) {
 							callback({
 								success: true,
-								imageUrl: firstImage.source[0].url,
-								title: firstImage.title || `Image`
+								imageUrl: first_image.source[0].url,
+								title: first_image.title || `Image`
 							})
 						}
 						else {
 							callback({
 								success: false,
-								message: `No valid image URL found`
+								message: `No valid image URL found`,
 							})
 						}
 					}
 					else {
 						callback({
 							success: false,
-							message: `No image results found`
+							message: `No image results found`,
 						})
 					}
 				}
@@ -381,7 +383,7 @@ module.exports = function (io)
 					console.error(`Image search response parsing error:`, error)
 					callback({
 						success: false,
-						message: `Failed to parse image search response`
+						message: `Failed to parse image search response`,
 					})
 				}
 			})
@@ -389,7 +391,7 @@ module.exports = function (io)
 			console.error(`Image search request error:`, error)
 			callback({
 				success: false,
-				message: `Image search request failed`
+				message: `Image search request failed`,
 			})
 		})
 	}
