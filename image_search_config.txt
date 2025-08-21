@@ -1,2 +1,0 @@
-https://your-search-instance.com
-your-scraper-name
