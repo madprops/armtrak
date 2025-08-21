@@ -1146,10 +1146,10 @@ App.check_img = (msg) => {
 	}
 }
 
-App.place_search_image = (url, title) => {
+App.place_search_image = (url) => {
 	// Check if image already exists
-	for (let i = 0; i < App.images.length; i++) {
-		if (App.images[i].image && App.images[i].image.src === url) {
+	for (let image of App.images) {
+		if (image.image && image.image.src === url) {
 			return false
 		}
 	}
@@ -1210,8 +1210,8 @@ App.img_search = (q) => {
 App.check_image = (msg) => {
 	if (msg.indexOf(` `) === -1) {
 		if (msg.indexOf(`.jpg`) !== -1 || msg.indexOf(`.png`) !== -1 || msg.indexOf(`.jpeg`) !== -1 || msg.indexOf(`.JPG`) !== -1 || msg.indexOf(`.PNG`) !== -1 || msg.indexOf(`.JPEG`) !== -1) {
-			for (let i = 0; i < App.images.length; i++) {
-				if (App.images[i].image.src === msg) {
+			for (let image of App.images) {
+				if (image.image.src === msg) {
 					return false
 				}
 			}
@@ -1235,12 +1235,12 @@ App.check_image = (msg) => {
 }
 
 App.place_images = (imgs) => {
-	for (let i = 0; i < imgs.length; i++) {
-		let img = new Image()
-		img.src = imgs[i].url
-		let image = new createjs.Bitmap(img)
-		image.x = imgs[i].x
-		image.y = imgs[i].y
+	for (let img of imgs) {
+		let img_obj = new Image()
+		img_obj.src = img.url
+		let image = new createjs.Bitmap(img_obj)
+		image.x = img.x
+		image.y = img.y
 		image.scaleX = 0.333
 		image.scaleY = 0.333
 		App.background.addChild(image)
@@ -1261,8 +1261,8 @@ App.push_image = (image) => {
 App.z_order = () => {
 	App.background.setChildIndex(safe_zone, App.background.getNumChildren() - 1)
 
-	for (let i = 0; i < App.enemy_ships.length; i++) {
-		App.background.setChildIndex(App.enemy_ships[i].container, App.background.getNumChildren() - 1)
+	for (let ship of App.enemy_ships) {
+		App.background.setChildIndex(ship.container, App.background.getNumChildren() - 1)
 	}
 
 	App.background.setChildIndex(ship, App.background.getNumChildren() - 1)
