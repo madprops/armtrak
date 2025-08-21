@@ -391,7 +391,6 @@ module.exports = (io) => {
           }
         }
         catch (error) {
-          console.error(`Image search response parsing error:`, error)
           callback({
             success: false,
             message: `Failed to parse image search response`,
@@ -400,7 +399,6 @@ module.exports = (io) => {
       })
     })
       .on(`error`, (error) => {
-        console.error(`Image search request error:`, error)
         callback({
           success: false,
           message: `Image search request failed`,
