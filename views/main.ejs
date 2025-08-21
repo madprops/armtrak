@@ -16,32 +16,40 @@
 
 	<body>
 		<div id="main">
-			<div id="canvas_container">
-				<canvas id="canvas"></canvas>
+			<div id="top">
+				<div id="hud">
+					<span id="health"> Health: 100/100</span>
+					<span id="max_speed"> Max Speed: 1 </span>
+					<span id="laser_level"> Laser Level: 1 </span>
+					<span id="sound_toggle"> Turn Off Sound </span>
+					<span id="music_toggle"> Turn Off Music </span>
+				</div>
 			</div>
 
-			<div id="panel">
-				<div id="minimap_container">
-					<canvas id="minimap"></canvas>
+			<div id="middle">
+				<div id="canvas_container">
+					<canvas id="canvas"></canvas>
 				</div>
 
-				<div id="chat_main">
-					<div id="chat_area_parent">
-						<div id="chat_area"></div>
+				<div id="panel">
+					<div id="minimap_container">
+						<canvas id="minimap"></canvas>
 					</div>
 
-					<input id="chat_input" type="text">
+					<div id="chat_main">
+						<div id="chat_area_parent">
+							<div id="chat_area"></div>
+						</div>
+
+						<input id="chat_input" type="text">
+					</div>
 				</div>
+
+				<iframe id="yt_player" width="200" height="200" src="" frameborder="0" allowfullscreen></iframe>
 			</div>
 
-			<iframe id="yt_player" width="200" height="200" src="" frameborder="0" allowfullscreen></iframe>
-
-			<div id="hud">
-				<span id="health"> Health: 100/100</span>
-				<span id="max_speed"> Max Speed: 1 </span>
-				<span id="laser_level"> Laser Level: 1 </span>
-				<span id="sound_toggle"> Turn Off Sound </span>
-				<span id="music_toggle"> Turn Off Music </span>
+			<div id="bottom">
+				<!-- Nothing for now -->
 			</div>
 		</div>
 	</body>
