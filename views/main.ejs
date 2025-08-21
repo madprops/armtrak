@@ -1,48 +1,44 @@
 <html>
 	<head>
-		<title> armtrak </title>
+		<title>Armtrak</title>
 		<script src="/js/jquery.min.js"></script>
 		<script src="/js/socket.io.min.js"></script>
 		<script src="/js/easel.min.js"></script>
 		<script src="/js/base.js"></script>
     	<script src="https://apis.google.com/js/client.js?onload=googleApiClientReady"></script>
 		<link rel="stylesheet" type="text/css" href="css/style.css" />
+
 		<script>
 			$(function() {
-			    init()
+			    App.init()
 			})
 		</script>
 	</head>
+
 	<body>
 
-		<canvas id='canvas'></canvas>
+		<canvas id="canvas"></canvas>
 
-		<div id='panel'>
+		<div id="panel">
+			<canvas id="minimap"></canvas>
 
-			<canvas id='minimap'></canvas>
-
-			<div id='chat_main'>
-
-				<div id='chat_area_parent'>
-					<div id='chat_area'></div>
+			<div id="chat_main">
+				<div id="chat_area_parent">
+					<div id="chat_area"></div>
 				</div>
 
-				<input id='chat_input' type='text'>
-
+				<input id="chat_input" type="text">
 			</div>
-
 		</div>
 
-		<iframe id='yt_player' width='200' height='200' src='' frameborder='0' allowfullscreen></iframe>
+		<iframe id="yt_player" width="200" height="200" src=" frameborder="0" allowfullscreen></iframe>
 
-		<div id='hud'>
-			<span id='health'> health: 100/100</span>
-			<span id='max_speed'> max speed: 1 </span>
-			<span id='laser_level'> laser level: 1 </span>
-			<span id='sound_toggle' onclick='toggle_sound();'> turn off sound </span>
-			<span id='music_toggle' onclick='toggle_music();'> turn off music </span>
+		<div id="hud">
+			<span id="health"> health: 100/100</span>
+			<span id="max_speed"> max speed: 1 </span>
+			<span id="laser_level"> laser level: 1 </span>
+			<span id="sound_toggle" onclick="toggle_sound();"> turn off sound </span>
+			<span id="music_toggle" onclick="toggle_music();"> turn off music </span>
 		</div>
-
-
 	</body>
 </html>
