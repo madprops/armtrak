@@ -20,6 +20,7 @@ App.max_max_health = 200
 App.max_max_speed = 3
 App.max_laser_level = 10
 App.laser_hit = 20
+App.max_username_length = 28
 
 class EnemyShip {
   constructor(username) {
@@ -53,10 +54,10 @@ App.init = () => {
   let keep_naming = true
 
   while (keep_naming) {
-    App.username = App.clean_string(prompt(`pick your name`))
+    App.username = App.clean_string(prompt(`Pick Your Name`))
 
     if ((App.username === null) || (App.username.length < 1) ||
-		(App.username.length > 12) ||
+		(App.username.length > App.max_username_length) ||
 		(App.username.indexOf(`<`) !== -1)) {
       keep_naming = true
     }
@@ -1196,25 +1197,27 @@ App.place_search_image = (url) => {
 }
 
 App.toggle_sound = () => {
+  App.sound = !App.sound
+
   if (App.sound) {
-    $(`#sound_toggle`).html(`turn on sound`)
-    App.sound = false
+    $(`#sound_toggle`).html(`Turn Off Sound`)
   }
   else {
-    $(`#sound_toggle`).html(`turn off sound`)
-    App.sound = true
+    $(`#sound_toggle`).html(`Turn On Sound`)
   }
 }
 
 App.toggle_music = () => {
+  App.music = !App.music
+
   if (App.music) {
-    $(`#music_toggle`).html(`turn on music`)
-    $(`#yt_player`).attr(`src`, ``)
-    App.music = false
+    $(`#music_toggle`).html(`Turn Off Music`)
+    App.play_youtube()
   }
   else {
-    $(`#music_toggle`).html(`turn off music`)
-    App.music = true
+    $(`#music_toggle`).html(`Turn On Music`)
+    $(`#yt_player`).attr(`src`, ``)
+    App.loaded_youtube = null
   }
 }
 
@@ -1349,9 +1352,9 @@ App.increase_max_speed = () => {
 }
 
 App.update_hud = () => {
-  $(`#health`).html(`health: ` + App.ship.health + `/` + App.ship.max_health)
-  $(`#max_speed`).html(`max speed: ` + (Math.round((App.ship.max_speed - 1) * 10) / 10))
-  $(`#laser_level`).html(`laser level: ` + App.ship.laser_level)
+  $(`#health`).html(`Health: ` + App.ship.health + `/` + App.ship.max_health)
+  $(`#max_speed`).html(`Max Speed: ` + (Math.round((App.ship.max_speed - 1) * 10) / 10))
+  $(`#laser_level`).html(`Laser Level: ` + App.ship.laser_level)
 }
 
 App.play_youtube = () => {
@@ -1362,7 +1365,7 @@ App.play_youtube = () => {
   }
 
   App.play_yt(data.videoId)
-  App.chat_announce(`Now playing: ` + data.title + ` (requested by ` + data.requestedBy + `)`)
+  App.chat_announce(`Now Playing: ` + data.title + ` (requested by ` + data.requestedBy + `)`)
 }
 
 App.setup_clicks = () => {
@@ -1371,4 +1374,12 @@ App.setup_clicks = () => {
       App.play_youtube()
     }, 500)
   }, {once: true})
+
+  document.querySelector(`#sound_toggle`).addEventListener(`click`, () => {
+    App.toggle_sound()
+  })
+
+  document.querySelector(`#music_toggle`).addEventListener(`click`, () => {
+    App.toggle_music()
+  })
 }

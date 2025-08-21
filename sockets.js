@@ -49,7 +49,8 @@ module.exports = (io) => {
 
   io.on(`connection`, (socket) => {
 	    socket.on(`adduser`, (data) => {
-	    	socket.username = App.add_username(App.clean_string(data.username.toLowerCase()))
+      let username = App.clean_string(data.username.toLowerCase())
+	    	socket.username = App.add_username(username)
 
 	    	socket.emit(`update`, {
         type: `username`,
