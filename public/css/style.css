@@ -1,55 +1,66 @@
-body, html
-{
+body, html {
 	height: 100%;
 	width: 100%;
-	margin: 0px;
+	margin: 0;
+	padding: 0;
 	font-family: sans-serif;
 	background-color: blue;
 	overflow: hidden;
 }
 
-#canvas
-{
-	height: 100%;
-	width: 80%;
-	float: left;
-	background-color: black;
-}
-
-#panel
-{
-	position: relative;
-	width: 20%;
-	height: 100%;
-	float: left;
-}
-
-#minimap
-{
+#main {
 	width: 100%;
-	height: 30%;
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+}
+
+#canvas_container {
+	position: relative;
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+#canvas {
+	float: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: black;
+	width: 800px;
+	height: 600px;
+}
+
+#panel {
+	display: flex;
+	width: 360px;
+}
+
+#minimap_container {
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+#minimap {
 	background-color: grey;
 }
 
-#chat_main
-{
-	position: relative;
-	height: 70%;
-	width: 100%;
+#chat_main {
 	background-color: black;
+	flex-grow: 1;
+	flex-shrink: 1;
 }
 
-#chat_area_parent
-{
+#chat_area_parent {
 	position: absolute;
 	max-width: 100%;
 	width: 100%;
-    top: 0px;
+	top: 0px;
 	bottom: 2em;
 }
 
-#chat_area
-{
+#chat_area {
 	height: 100%;
 	max-height: 100%;
 	width: 100%;
@@ -59,8 +70,7 @@ body, html
 	background-color: black;
 }
 
-#chat_input
-{
+#chat_input {
 	position: absolute;
 	max-width: 100%;
 	width: 100%;
@@ -73,46 +83,39 @@ body, html
 	padding-left: 5px;
 }
 
-.chat_message
-{
+.chat_message {
 	padding-left: 5px;
 	clear: both;
 	color: white;
 	word-wrap: break-word;
 }
 
-.chat_announcement
-{
+.chat_announcement {
 	padding-left: 5px;
 	clear: both;
 	color: grey;
 	word-wrap: break-word;
 }
 
-.chat_username
-{
+.chat_username {
 	float: left;
 	font-weight: bold;
 }
 
-a.chat:link, a.chat:visited, a.chat:hover 
-{
-    color: white;
-    text-decoration: underline;
+a.chat:link, a.chat:visited, a.chat:hover {
+	color: white;
+	text-decoration: underline;
 }
 
-.clear
-{
+.clear {
 	clear: both;
 }
 
-iframe
-{
+iframe {
 	display: none;
 }
 
-#hud
-{
+#hud {
 	position: fixed;
 	top: 1em;
 	left: 1em;
@@ -121,28 +124,23 @@ iframe
 	text-shadow: 1px 1px black;
 }
 
-#health
-{
+#health {
 	padding-right: 40px;
 }
 
-#max_speed
-{
+#max_speed {
 	padding-right: 40px;
 }
 
-#laser_level
-{
+#laser_level {
 	padding-right: 40px;
 }
 
-#sound_toggle
-{
+#sound_toggle {
 	cursor: pointer;
 	padding-right: 40px;
 }
 
-#music_toggle
-{
+#music_toggle {
 	cursor: pointer;
 }

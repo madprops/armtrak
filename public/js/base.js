@@ -87,10 +87,10 @@ App.start_socket = () => {
       App.username = data.username
       App.current_youtube = data.current_youtube
       App.chat_announce(data.username + ` has joined`)
-      App.chat_announce(`you move with the arrow keys and shoot with spacebar`)
-      App.chat_announce(`you can place an image on the map (visible to everyone) with "img something" or by pasting an image url`)
-      App.chat_announce(`you can play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url`)
-      App.chat_announce(`you upgrade your ship by destroying other players`)
+      App.chat_announce(`Move with the arrow keys and shoot with spacebar`)
+      App.chat_announce(`Place an image on the map (visible to everyone) with "img something" or by pasting an image url`)
+      App.chat_announce(`Play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url`)
+      App.chat_announce(`Upgrade your ship by destroying other players`)
       App.start_heartbeat()
     }
 
@@ -1101,8 +1101,8 @@ App.show_explosion = (x, y) => {
 App.update_minimap = () => {
   let minimap = document.getElementById(`minimap`)
   let context = minimap.getContext(`2d`)
-  minimap.setAttribute(`height`, App.bg_height)
-  minimap.setAttribute(`width`, App.bg_width)
+  minimap.setAttribute(`height`, App.bg_height * 0.2)
+  minimap.setAttribute(`width`, App.bg_width * 0.2)
 
   if ((App.ship !== undefined) && App.ship.visible) {
     let x = App.ship.x
