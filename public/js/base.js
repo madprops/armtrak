@@ -149,16 +149,19 @@ function EnemyShip() {
 }
 
 function update_enemy_ship(data) {
-	var enemy = get_enemy_ship_or_create(data)
+	let enemy = get_enemy_ship_or_create(data)
+
 	if (enemy) {
 		enemy.container.x = data.x
 		enemy.container.y = data.y
 		enemy.container.visible = data.visible
+
 		if (enemy.container.model !== data.model) {
-			var image = new Image()
+			let image = new Image()
 			image.src = `img/nave` + data.model + `.png`
 			enemy.container.children[0].image = image
 		}
+
 		enemy.container.model = data.model
 		enemy.container.model = data.model
 		enemy.container.children[0].rotation = data.rotation
@@ -166,7 +169,7 @@ function update_enemy_ship(data) {
 }
 
 function get_enemy_ship_or_create(data) {
-	var enemy = get_enemy_ship(data.username)
+	let enemy = get_enemy_ship(data.username)
 
 	if (!enemy) {
 		enemy = new EnemyShip()
@@ -179,7 +182,7 @@ function get_enemy_ship_or_create(data) {
 }
 
 function get_enemy_ship(uname) {
-	for(var i = 0; i < App.enemy_ships.length; i++) {
+	for(let i = 0; i < App.enemy_ships.length; i++) {
 		if (App.enemy_ships[i].username === uname) {
 			return App.enemy_ships[i]
 		}
@@ -189,7 +192,7 @@ function get_enemy_ship(uname) {
 }
 
 function remove_enemy(uname) {
-	for(var i = 0; i < App.enemy_ships.length; i++) {
+	for(let i = 0; i < App.enemy_ships.length; i++) {
 		if (App.enemy_ships[i].username === uname) {
 			App.background.removeChild(App.enemy_ships[i].container)
 			App.enemy_ships.splice(i, 1)
@@ -263,13 +266,13 @@ function clear_arrows() {
 }
 
 function update_chat(uname, msg) {
-	var fmt = format_msg(uname, msg)
+	let fmt = format_msg(uname, msg)
 	$(`#chat_area`).append(fmt)
 	goto_bottom()
 }
 
 function chat_announce(msg) {
-	var fmt = format_announcement_msg(msg)
+	let fmt = format_announcement_msg(msg)
 	$(`#chat_area`).append(fmt)
 	goto_bottom()
 }
@@ -295,8 +298,7 @@ function msg_is_ok(msg) {
 	if (msg.length > 0 && msg.length < 444) {
 		return true
 	}
-	else
-	{
+	else {
 		return false
 	}
 }
@@ -340,9 +342,9 @@ function start_game() {
 }
 
 function space_word(word) {
-	var s = ``
+	let s = ``
 
-	for(var i = 0; i < word.length; i++) {
+	for(let i = 0; i < word.length; i++) {
 		s += word[i] + ` `
 	}
 
@@ -350,19 +352,19 @@ function space_word(word) {
 }
 
 function create_label(username) {
-	var label = new createjs.Text(space_word(username), `8px Arial`, `#ffffff`)
+	let label = new createjs.Text(space_word(username), `8px Arial`, `#ffffff`)
 	label.textAlign = `center`
 	label.shadow = new createjs.Shadow(`#000000`, 0, 0, 5)
 	return label
 }
 
 function create_ship() {
-	var image = new Image()
-	var num = get_random_int(1, 15)
+	let image = new Image()
+	let num = get_random_int(1, 15)
 	image.src = `img/nave` + num + `.png`
 	ship_image = new createjs.Bitmap(image)
 	ship = new createjs.Container()
-	var coords = get_random_coords()
+	let coords = get_random_coords()
 	ship.x = coords[0]
 	ship.y = coords[1]
 	ship.speed = 0
@@ -374,7 +376,7 @@ function create_ship() {
 
 	ship.addChild(ship_image)
 
-	var label = create_label(App.username)
+	let label = create_label(App.username)
 	ship.addChild(label)
 
 	App.background.addChild(ship)
@@ -399,17 +401,17 @@ function create_ship() {
 }
 
 function create_enemy_ship(enemy, x, y, model) {
-	var image = new Image()
+	let image = new Image()
 	image.src = `img/nave` + model + `.png`
-	var enemy_image = new createjs.Bitmap(image)
-	var enemy_ship = new createjs.Container()
+	let enemy_image = new createjs.Bitmap(image)
+	let enemy_ship = new createjs.Container()
 	enemy_ship.x = x
 	enemy_ship.y = y
 	enemy_ship.model = model
 
 	enemy_ship.addChild(enemy_image)
 
-	var label = create_label(enemy.username)
+	let label = create_label(enemy.username)
 	enemy_ship.addChild(label)
 
 	App.background.addChild(enemy_ship)
@@ -435,24 +437,24 @@ function get_random_int(min, max) {
 }
 
 function get_random_coords() {
-	var x = get_random_int(10, App.bg_width - 10)
-	var y = get_random_int(10, App.bg_height - 10)
+	let x = get_random_int(10, App.bg_width - 10)
+	let y = get_random_int(10, App.bg_height - 10)
 	return [x, y]
 }
 
 function create_background() {
 	App.background = new createjs.Stage(`canvas`)
 
-	var stars = 3000
-	var starField = new createjs.Shape()
+	let stars = 3000
+	let starField = new createjs.Shape()
 
-	var starSmallRadiusMin = 1
-	var starSmallRadiusVarience = 2
+	let starSmallRadiusMin = 1
+	let starSmallRadiusVarience = 2
 
-	for (var i = 0; i < stars; i++) {
-	    var radius
+	for (let i = 0; i < stars; i++) {
+	    let radius
 	    radius = starSmallRadiusMin + (Math.random() * starSmallRadiusVarience)
-	    var colour, colourType = Math.round(Math.random() * 2)
+	    let colour, colourType = Math.round(Math.random() * 2)
 
 	    switch (colourType) {
 	        case 0:
@@ -488,7 +490,7 @@ function create_background() {
 }
 
 function show_safe_zone() {
-	var image = new Image()
+	let image = new Image()
 	image.src = `img/safe_zone.png`
 	safe_zone = new createjs.Bitmap(image)
 	App.background.addChild(safe_zone)
@@ -526,13 +528,16 @@ function move_background(x, y) {
 }
 
 function get_direction(container) {
-	var direction = ((container.children[0].rotation / 360) % 1) * 360
+	let direction = ((container.children[0].rotation / 360) % 1) * 360
+
 	if (direction < 0) {
 		direction = 360 - Math.abs(direction)
 	}
+
 	if (direction >= 360) {
 		direction = 0
 	}
+
 	return direction
 }
 
@@ -541,9 +546,9 @@ function to_radians(degrees) {
 }
 
 function get_vector_velocities(container, speed) {
-	var direction = get_direction(container)
-	var angle
-	var x, y
+	let direction = get_direction(container)
+	let angle
+	let x, y
 
 	if (direction === 0) {
 		x = 0
@@ -599,9 +604,9 @@ function get_vector_velocities(container, speed) {
 }
 
 function move_ship() {
-	var velocities = get_vector_velocities(ship, ship.speed)
-	var vx = velocities[0]
-	var vy = velocities[1]
+	let velocities = get_vector_velocities(ship, ship.speed)
+	let vx = velocities[0]
+	let vy = velocities[1]
 
 	ship.x += vx
 	ship.y += vy
@@ -622,8 +627,7 @@ function move_ship() {
 		ship.y = 0
 		move_background(App.background.regX, ship.y - (App.background.canvas.height / 2) + (App.ship_height / 2))
 	}
-	else
-	{
+	else {
 		move_background(App.background.regX + vx, App.background.regY + vy)
 	}
 
@@ -634,8 +638,7 @@ function check_safe_zone() {
 	if ((Math.pow(((ship.x + (App.ship_width / 2)) - App.bg_width / 2), 2) + Math.pow(((ship.y + (App.ship_height / 2)) - App.bg_height / 2), 2)) < Math.pow(App.safe_zone_radius, 2)) {
 		App.in_safe_zone = true
 	}
-	else
-	{
+	else {
 		App.in_safe_zone = false
 	}
 }
@@ -685,15 +688,15 @@ function increase_ship_speed() {
 }
 
 function create_laser(x, y, rotation, speed, max_distance) {
-	var laser_image = new createjs.Bitmap(App.laser_img)
+	let laser_image = new createjs.Bitmap(App.laser_img)
 
-	var laser = new createjs.Container()
+	let laser = new createjs.Container()
 	laser.x = x
 	laser.y = y
 	laser.distance = 0
 
-	var laser_width = App.laser_img.width
-	var laser_height = App.laser_img.height
+	let laser_width = App.laser_img.width
+	let laser_height = App.laser_img.height
 
 	laser_image.regX = laser_width / 2
 	laser_image.regY = laser_height / 2
@@ -704,7 +707,7 @@ function create_laser(x, y, rotation, speed, max_distance) {
 	laser.addChild(laser_image)
 	App.background.addChild(laser)
 
-	var velocities = get_vector_velocities(laser, speed)
+	let velocities = get_vector_velocities(laser, speed)
 	laser.vx = velocities[0]
 	laser.vy = velocities[1]
 
@@ -723,7 +726,7 @@ function fire_laser() {
 		return false
 	}
 
-	var lasers_to_fire = []
+	let lasers_to_fire = []
 
 	if (ship.laser_level === 1) {
 		lasers_to_fire.push(create_laser(ship.x, ship.y, ship_image.rotation, 4, 100))
@@ -734,40 +737,40 @@ function fire_laser() {
 	}
 
 	if (ship.laser_level === 3) {
-		var d = get_direction(ship)
+		let d = get_direction(ship)
 		d = to_radians(d)
-		var x = (App.ship_width / 2 * 0.6) * Math.cos(d)
-		var y = (App.ship_width / 2 * 0.6) * Math.sin(d)
+		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
+		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.2, 110))
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.2, 110))
 	}
 
 	if (ship.laser_level === 4) {
-		var d = get_direction(ship)
+		let d = get_direction(ship)
 		d = to_radians(d)
-		var x = (App.ship_width / 2 * 0.6) * Math.cos(d)
-		var y = (App.ship_width / 2 * 0.6) * Math.sin(d)
+		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
+		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.2, 110))
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.2, 110))
 	}
 
 	if (ship.laser_level === 5) {
-		var d = get_direction(ship)
+		let d = get_direction(ship)
 		d = to_radians(d)
-		var x = (App.ship_width / 2 * 0.6) * Math.cos(d)
-		var y = (App.ship_width / 2 * 0.6) * Math.sin(d)
+		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
+		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.4, 115))
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.4, 115))
 	}
 
 	if (ship.laser_level === 6) {
-		var d = get_direction(ship)
+		let d = get_direction(ship)
 		d = to_radians(d)
-		var x = (App.ship_width / 2 * 0.6) * Math.cos(d)
-		var y = (App.ship_width / 2 * 0.6) * Math.sin(d)
+		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
+		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.4, 115))
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.4, 115))
@@ -776,10 +779,10 @@ function fire_laser() {
 	}
 
 	if (ship.laser_level === 7) {
-		var d = get_direction(ship)
+		let d = get_direction(ship)
 		d = to_radians(d)
-		var x = (App.ship_width / 2 * 0.6) * Math.cos(d)
-		var y = (App.ship_width / 2 * 0.6) * Math.sin(d)
+		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
+		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.5, 120))
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.5, 120))
@@ -788,10 +791,10 @@ function fire_laser() {
 	}
 
 	if (ship.laser_level === 8) {
-		var d = get_direction(ship)
+		let d = get_direction(ship)
 		d = to_radians(d)
-		var x = (App.ship_width / 2 * 0.6) * Math.cos(d)
-		var y = (App.ship_width / 2 * 0.6) * Math.sin(d)
+		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
+		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.7, 125))
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.7, 125))
@@ -800,10 +803,10 @@ function fire_laser() {
 	}
 
 	if (ship.laser_level === 9) {
-		var d = get_direction(ship)
+		let d = get_direction(ship)
 		d = to_radians(d)
-		var x = (App.ship_width / 2 * 0.6) * Math.cos(d)
-		var y = (App.ship_width / 2 * 0.6) * Math.sin(d)
+		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
+		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 4.8, 130))
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 4.8, 130))
@@ -812,10 +815,10 @@ function fire_laser() {
 	}
 
 	if (ship.laser_level === 10) {
-		var d = get_direction(ship)
+		let d = get_direction(ship)
 		d = to_radians(d)
-		var x = (App.ship_width / 2 * 0.6) * Math.cos(d)
-		var y = (App.ship_width / 2 * 0.6) * Math.sin(d)
+		let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
+		let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
 
 		lasers_to_fire.push(create_laser(ship.x + x, ship.y + y, ship_image.rotation, 5, 140))
 		lasers_to_fire.push(create_laser(ship.x - x, ship.y - y, ship_image.rotation, 5, 140))
@@ -835,27 +838,35 @@ function fire_laser() {
 }
 
 function emit_laser(lasers) {
-	var laser = []
+	let laser = []
 
-	for(var i = 0 i < lasers.length i++) {
-		laser.push({username:App.username, x:lasers[i].x, y:lasers[i].y, rotation:lasers[i].children[0].rotation, vx:lasers[i].vx, vy:lasers[i].vy, max_distance:lasers[i].max_distance})
+	for(let i = 0; i < lasers.length; i++) {
+		laser.push({
+			username:App.username,
+			x:lasers[i].x,
+			y:lasers[i].y,
+			rotation:lasers[i].children[0].rotation,
+			vx:lasers[i].vx,
+			vy:lasers[i].vy,
+			max_distance:lasers[i].max_distance,
+		})
 	}
 
 	App.socket.emit(`laser`, {laser:laser})
 }
 
 function create_enemy_laser(enemy_laser) {
-	var laser_image = new createjs.Bitmap(App.laser_img)
+	let laser_image = new createjs.Bitmap(App.laser_img)
 
-	var laser = new createjs.Container()
+	let laser = new createjs.Container()
 	laser.x = enemy_laser.x
 	laser.y = enemy_laser.y
 	laser.distance = 0
 	laser.max_distance = enemy_laser.max_distance
 	laser.username = enemy_laser.username
 
-	var laser_width = App.laser_img.width
-	var laser_height = App.laser_img.height
+	let laser_width = App.laser_img.width
+	let laser_height = App.laser_img.height
 
 	laser_image.regX = laser_width / 2
 	laser_image.regY = laser_height / 2
@@ -873,7 +884,7 @@ function create_enemy_laser(enemy_laser) {
 }
 
 function fire_enemy_laser(data) {
-	for(var i = 0; i < data.laser.laser.length; i++) {
+	for(let i = 0; i < data.laser.laser.length; i++) {
 		create_enemy_laser(data.laser.laser[i])
 	}
 
@@ -884,8 +895,8 @@ function fire_enemy_laser(data) {
 }
 
 function move_lasers() {
-	for(var i = 0; i < App.lasers.length; i++) {
-		var laser
+	for(let i = 0; i < App.lasers.length; i++) {
+		let laser
 		laser = App.lasers[i]
 
 		if (laser.distance < laser.max_distance) {
@@ -906,7 +917,7 @@ function move_lasers() {
 				laser.y = 0
 			}
 
-			var enemy = check_enemy_collision(laser)
+			let enemy = check_enemy_collision(laser)
 			if (enemy) {
 				App.lasers.splice(i, 1)
 				i -= 1
@@ -926,8 +937,8 @@ function move_lasers() {
 		}
 	}
 
-	for(var i = 0; i < App.enemy_lasers.length; i++) {
-		var enemy_laser = App.enemy_lasers[i]
+	for(let i = 0; i < App.enemy_lasers.length; i++) {
+		let enemy_laser = App.enemy_lasers[i]
 
 		if (enemy_laser.distance < enemy_laser.max_distance) {
 			enemy_laser.x += enemy_laser.vx
@@ -969,27 +980,30 @@ function move_lasers() {
 }
 
 function check_enemy_collision(laser) {
-	for(var i = 0; i < App.enemy_ships.length; i++) {
-		var enemy = App.enemy_ships[i]
+	for(let i = 0; i < App.enemy_ships.length; i++) {
+		let enemy = App.enemy_ships[i]
+
 		if (enemy.container.visible) {
-			var x1 = enemy.container.x - App.ship_width / 4
-			var x2 = enemy.container.x + App.ship_width / 4
-			var y1 = enemy.container.y - App.ship_height / 4
-			var y2 = enemy.container.y + App.ship_height / 4
-			if ( (laser.x >= x1 && laser.x <= x2) && (laser.y >= y1 && laser.y <= y2) ) {
+			let x1 = enemy.container.x - App.ship_width / 4
+			let x2 = enemy.container.x + App.ship_width / 4
+			let y1 = enemy.container.y - App.ship_height / 4
+			let y2 = enemy.container.y + App.ship_height / 4
+
+			if (((laser.x >= x1) && (laser.x <= x2)) && ((laser.y >= y1) && (laser.y <= y2))) {
 				return enemy
 			}
 		}
 	}
+
 	return false
 }
 
 function check_ship_collision(laser) {
 	if (ship.visible) {
-		var x1 = ship.x - App.ship_width / 4
-		var x2 = ship.x + App.ship_width / 4
-		var y1 = ship.y - App.ship_height / 4
-		var y2 = ship.y + App.ship_height / 4
+		let x1 = ship.x - App.ship_width / 4
+		let x2 = ship.x + App.ship_width / 4
+		let y1 = ship.y - App.ship_height / 4
+		let y2 = ship.y + App.ship_height / 4
 		if ( (laser.x >= x1 && laser.x <= x2) && (laser.y >= y1 && laser.y <= y2) ) {
 			return true
 		}
@@ -1011,8 +1025,8 @@ function destroyed(laser) {
 	ship.visible = false
 	show_explosion(ship.x, ship.y)
 	App.socket.emit(`destroyed`, {destroyed_by:laser.username})
-	var image = new Image()
-	var num = get_random_int(1, 15)
+	let image = new Image()
+	let num = get_random_int(1, 15)
 	image.src = `img/nave` + num + `.png`
 	ship_image.image = image
 	ship.model = num
@@ -1023,19 +1037,21 @@ function enemy_destroyed(data) {
 	if (data.destroyed_by === App.username) {
 		upgrade()
 		ship.health += App.laser_hit
+
 		if (ship.health > ship.max_health) {
 			ship.health = ship.max_health
 		}
+
 		update_hud()
 	}
-	var enemy = get_enemy_ship(data.username)
+
+	let enemy = get_enemy_ship(data.username)
 	show_explosion(enemy.container.x, enemy.container.y)
 }
 
 function respawn() {
 	window.setTimeout(function() {
-
-		var coords = get_random_coords()
+		let coords = get_random_coords()
 		ship.x = coords[0]
 		ship.y = coords[1]
 		ship.max_health = App.min_max_health
@@ -1045,12 +1061,11 @@ function respawn() {
 		move_background(coords[0] - App.background.canvas.width / 2, coords[1] - App.background.canvas.height / 2)
 		ship.visible = true
 		update_hud()
-
 	}, 5000)
 }
 
 function show_explosion(x, y) {
-	var explosion_animation = new createjs.Sprite(explosion_sheet)
+	let explosion_animation = new createjs.Sprite(explosion_sheet)
 	explosion_animation.gotoAndPlay(`explode`)
 	explosion_animation.name = `explosion`
 	explosion_animation.x = x - 33
@@ -1064,14 +1079,14 @@ function show_explosion(x, y) {
 }
 
 function update_minimap() {
-	var minimap = document.getElementById(`minimap`)
-	var context = minimap.getContext(`2d`)
+	let minimap = document.getElementById(`minimap`)
+	let context = minimap.getContext(`2d`)
 	minimap.setAttribute(`height`, App.bg_height)
 	minimap.setAttribute(`width`, App.bg_width)
 	if (ship !== undefined && ship.visible) {
-		var x = ship.x
-		var y = ship.y
-		var radius = 50
+		let x = ship.x
+		let y = ship.y
+		let radius = 50
 
 		context.beginPath()
 		context.arc(x, y, radius, 0, 2 * Math.PI, false)
@@ -1082,12 +1097,13 @@ function update_minimap() {
 		context.stroke()
 	}
 
-	for(var i = 0 i < App.enemy_ships.length i++) {
-		var enemy = App.enemy_ships[i].container
+	for(let i = 0; i < App.enemy_ships.length; i++) {
+		let enemy = App.enemy_ships[i].container
+
 		if (enemy.visible) {
-			var x = enemy.x
-			var y = enemy.y
-			var radius = 50
+			let x = enemy.x
+			let y = enemy.y
+			let radius = 50
 
 			context.beginPath()
 			context.arc(x, y, radius, 0, 2 * Math.PI, false)
@@ -1108,15 +1124,16 @@ function play_yt(id) {
 
 function check_yt(msg) {
 	if (msg.lastIndexOf(`yt `, 0) === 0) {
-		var q = msg.substring(3)
+		let q = msg.substring(3)
+
 		if (q !== ``) {
 			yt_search(q)
 		}
 	}
-	else
-	{
-		var expr = /(youtu\.be\/|[?&]v=)([^&]+)/
-		var result = msg.match(expr)
+	else {
+		let expr = /(youtu\.be\/|[?&]v=)([^&]+)/
+		let result = msg.match(expr)
+
 		if (result) {
 			play_yt(result[2])
 		}
@@ -1125,7 +1142,8 @@ function check_yt(msg) {
 
 function check_img(msg) {
 	if (msg.lastIndexOf(`img `, 0) === 0) {
-		var q = msg.substring(4)
+		let q = msg.substring(4)
+
 		if (q !== ``) {
 			img_search(q)
 		}
@@ -1134,17 +1152,17 @@ function check_img(msg) {
 
 function place_search_image(url, title) {
 	// Check if image already exists
-	for(var i = 0 i < App.images.length i++) {
+	for(let i = 0; i < App.images.length; i++) {
 		if (App.images[i].image && App.images[i].image.src === url) {
 			return false
 		}
 	}
 
-	var img = new Image()
+	let img = new Image()
 	img.src = url
 
 	img.onload = function() {
-		var image = new createjs.Bitmap(img)
+		let image = new createjs.Bitmap(img)
 		image.x = ship.x - ((img.width / 3) / 2) + (App.ship_width / 2)
 		image.y = ship.y - ((img.height / 3) / 2) + (App.ship_height / 2)
 		image.scaleX = 0.333
@@ -1165,8 +1183,7 @@ function toggle_sound() {
 		$(`#sound_toggle`).html(`turn on sound`)
 		App.sound = false
 	}
-	else
-	{
+	else {
 		$(`#sound_toggle`).html(`turn off sound`)
 		App.sound = true
 	}
@@ -1178,8 +1195,7 @@ function toggle_music() {
 		$(`#yt_player`).attr(`src`, ``)
 		App.music = false
 	}
-	else
-	{
+	else {
 		$(`#music_toggle`).html(`turn off music`)
 		App.music = true
 	}
@@ -1198,17 +1214,17 @@ function img_search(q) {
 function check_image(msg) {
 	if (msg.indexOf(` `) === -1) {
 		if (msg.indexOf(`.jpg`) !== -1 || msg.indexOf(`.png`) !== -1 || msg.indexOf(`.jpeg`) !== -1 || msg.indexOf(`.JPG`) !== -1 || msg.indexOf(`.PNG`) !== -1 || msg.indexOf(`.JPEG`) !== -1) {
-			for(var i = 0; i < App.images.length; i++) {
+			for(let i = 0; i < App.images.length; i++) {
 				if (App.images[i].image.src === msg)
 				{
 					return false
 				}
 			}
-			var img = new Image()
+			let img = new Image()
 			img.src = msg
 
 			img.onload = function() {
-				var image = new createjs.Bitmap(img)
+				let image = new createjs.Bitmap(img)
 				image.x = ship.x - ((img.width / 3) / 2) + (App.ship_width / 2)
 				image.y = ship.y - ((img.height / 3) / 2) + (App.ship_height / 2)
 				image.scaleX = 0.333
@@ -1223,10 +1239,10 @@ function check_image(msg) {
 }
 
 function place_images(imgs) {
-	for(var i = 0; i < imgs.length; i++) {
-		var img = new Image()
+	for(let i = 0; i < imgs.length; i++) {
+		let img = new Image()
 		img.src = imgs[i].url
-		var image = new createjs.Bitmap(img)
+		let image = new createjs.Bitmap(img)
 		image.x = imgs[i].x
 		image.y = imgs[i].y
 		image.scaleX = 0.333
@@ -1249,7 +1265,7 @@ function push_image(image) {
 function z_order() {
 	App.background.setChildIndex(safe_zone, App.background.getNumChildren() - 1)
 
-	for(var i = 0; i < App.enemy_ships.length; i++) {
+	for(let i = 0; i < App.enemy_ships.length; i++) {
 		App.background.setChildIndex(App.enemy_ships[i].container, App.background.getNumChildren() - 1)
 	}
 
@@ -1264,7 +1280,7 @@ function start_heartbeat() {
 }
 
 function upgrade() {
-	var nums = []
+	let nums = []
 
 	if (ship.laser_level < App.max_laser_level) {
 		nums.push(1)
@@ -1282,7 +1298,7 @@ function upgrade() {
 		return false
 	}
 
-	var num = nums.sort(function(){return 0.5 - Math.random()})[0]
+	let num = nums.sort(function(){return 0.5 - Math.random()})[0]
 
 	if (num === 1) {
 		increase_laser_level()
