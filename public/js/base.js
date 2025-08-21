@@ -76,6 +76,7 @@ App.init = () => {
   App.start_socket()
   App.activate_key_detection()
   App.setup_clicks()
+  App.setup_focus()
   App.start_game()
 }
 
@@ -259,6 +260,13 @@ App.activate_key_detection = () => {
       App.down_arrow = false
     }
   })
+}
+
+App.reset_arrows = () => {
+  App.left_arrow = false
+  App.right_arrow = false
+  App.up_arrow = false
+  App.down_arrow = false
 }
 
 App.clear_arrows = () => {
@@ -665,7 +673,7 @@ App.loop = () => {
 }
 
 App.clockwork = () => {
-  if (Date.now() - App.clock >= 200) {
+  if ((Date.now() - App.clock) >= 200) {
     if (App.up_arrow) {
       App.increase_ship_speed()
     }
@@ -1397,7 +1405,6 @@ App.increase_max_speed = () => {
 App.update_hud = () => {
   $(`#health`).html(`Health: ` + App.ship.health + `/` + App.ship.max_health)
   $(`#max_speed`).html(`Max Speed: ` + (Math.round((App.ship.max_speed - 1) * 10) / 10))
-  $(`#laser_level`).html(`Laser Level: ` + App.ship.laser_level)
 }
 
 App.play_youtube = () => {
@@ -1424,5 +1431,11 @@ App.setup_clicks = () => {
 
   document.querySelector(`#music_toggle`).addEventListener(`click`, () => {
     App.toggle_music()
+  })
+}
+
+App.setup_focus = () => {
+  document.addEventListener(`blur`, () => {
+    App.reset_arrows()
   })
 }
