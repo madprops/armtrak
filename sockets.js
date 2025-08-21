@@ -210,10 +210,10 @@ module.exports = (io) => {
 	}
 
 	App.add_image = (data) => {
-		images.push(data)
+		App.images.push(data)
 
-		if (images.length > 20) {
-			images.splice(0, 1)
+		if (App.images.length > 20) {
+			App.images.splice(0, 1)
 		}
 	}
 
