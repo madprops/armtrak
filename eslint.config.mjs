@@ -12,7 +12,7 @@ export default [
       "indent": ["error", 2],
       "linebreak-style": ["error", "unix"],
       "quotes": ["error", "backtick"],
-      "no-console": "error",
+      "no-console": "off",
       "no-multi-spaces": "error",
       "no-multiple-empty-lines": ["error", {"max": 1}],
       "object-shorthand": ["error", "always"],
@@ -95,6 +95,9 @@ export default [
         require: "readable",
         module: "readable",
         __dirname: "readable",
+        createjs: "readable",
+        "$": "readable",
+        io: "readable",
       }
     }
   }

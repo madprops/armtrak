@@ -21,12 +21,19 @@ App.max_max_speed = 3
 App.max_laser_level = 10
 App.laser_hit = 20
 
+class EnemyShip {
+  constructor(username) {
+    this.username = username
+    this.container = null
+  }
+}
+
 App.init = () => {
   App.explosion_image = new Image()
   App.explosion_image.src = `/img/explosion.png`
 
   App.explosion_image.onload = () => {
-    explosion_sheet = new createjs.SpriteSheet({
+    App.explosion_sheet = new createjs.SpriteSheet({
       images: [App.explosion_image],
       frames: {width: 96, height: 96, regX: 0, regY: 0},
       animations: {
@@ -108,7 +115,7 @@ App.start_socket = () => {
     }
 
     if (data.type === `ship_info`) {
-      update_enemy_ship(data)
+      App.update_enemy_ship(data)
     }
 
     if (data.type === `laser`) {
@@ -139,20 +146,15 @@ App.start_socket = () => {
 
     if (data.type === `disconnection`) {
       App.chat_announce(data.username + ` has left`)
-      remove_enemy(data.username)
+      App.remove_enemy(data.username)
     }
   })
 
   App.socket.emit(`adduser`, {username:App.username})
 }
 
-App.EnemyShip = () => {
-  this.username
-  this.container
-}
-
 App.update_enemy_ship = (data) => {
-  let enemy = get_enemy_ship_or_create(data)
+  let enemy = App.get_enemy_ship_or_create(data)
 
   if (enemy) {
     enemy.container.x = data.x
@@ -172,11 +174,10 @@ App.update_enemy_ship = (data) => {
 }
 
 App.get_enemy_ship_or_create = (data) => {
-  let enemy = get_enemy_ship(data.username)
+  let enemy = App.get_enemy_ship(data.username)
 
   if (!enemy) {
-    enemy = new EnemyShip()
-    enemy.username = data.username
+    enemy = new EnemyShip(data.username)
     App.enemy_ships.push(enemy)
     App.create_enemy_ship(enemy, data.x, data.y, data.model)
   }
@@ -209,10 +210,10 @@ App.activate_key_detection = () => {
   })
 
   $(document).keydown(function(e) {
-    code = e.keyCode ? e.keyCode : e.which
+    let code = e.keyCode ? e.keyCode : e.which
     $(`#chat_input`).focus()
 
-    if (code == 13) {
+    if (code === 13) {
       App.send_to_chat()
       e.preventDefault()
       return false
@@ -243,7 +244,7 @@ App.activate_key_detection = () => {
   })
 
   $(document).keyup(function(e) {
-    code = e.keyCode ? e.keyCode : e.which
+    let code = e.keyCode ? e.keyCode : e.which
 
     if (code === 37) {
       App.left_arrow = false
@@ -297,7 +298,7 @@ App.chat_urlize = (msg) => {
 }
 
 App.msg_is_ok = (msg) => {
-  if (msg.length > 0 && msg.length < 444) {
+  if ((msg.length > 0) && (msg.length < 444)) {
     return true
   }
 
@@ -305,19 +306,22 @@ App.msg_is_ok = (msg) => {
 }
 
 App.send_to_chat = () => {
-  msg = App.clean_string($(`#chat_input`).val())
+  let msg = App.clean_string($(`#chat_input`).val())
 
   if (App.check_yt(msg)) {
-    return
+    // Do nothing
   }
 
   if (App.check_img(msg)) {
-    return
+    // Do nothing
+  }
+
+  if (App.check_image(msg)) {
+    // Do nothing
   }
 
   if (App.msg_is_ok(msg)) {
     App.update_chat(App.username, msg)
-    App.check_image(msg)
     App.socket.emit(`sendchat`, {msg})
   }
 
@@ -487,12 +491,12 @@ App.create_background = () => {
 App.show_safe_zone = () => {
   let image = new Image()
   image.src = `img/safe_zone.png`
-  safe_zone = new createjs.Bitmap(image)
-  App.background.addChild(safe_zone)
+  App.safe_zone = new createjs.Bitmap(image)
+  App.background.addChild(App.safe_zone)
 
   image.onload = function() {
-    safe_zone.x = (App.bg_width / 2) - (image.width / 2)
-    safe_zone.y = (App.bg_height / 2) - (image.height / 2)
+    App.safe_zone.x = (App.bg_width / 2) - (image.width / 2)
+    App.safe_zone.y = (App.bg_height / 2) - (image.height / 2)
     App.safe_zone_radius = image.height / 2
   }
 }
@@ -934,7 +938,7 @@ App.move_lasers = () => {
     }
   }
 
-  for (let enemy_laser of App.enemy_lasers) {
+  for (let [i, enemy_laser] of App.enemy_lasers.entries()) {
     if (enemy_laser.distance < enemy_laser.max_distance) {
       enemy_laser.x += enemy_laser.vx
       enemy_laser.y += enemy_laser.vy
@@ -1040,7 +1044,7 @@ App.enemy_destroyed = (data) => {
     App.update_hud()
   }
 
-  let enemy = get_enemy_ship(data.username)
+  let enemy = App.get_enemy_ship(data.username)
   App.show_explosion(enemy.container.x, enemy.container.y)
 }
 
@@ -1060,7 +1064,7 @@ App.respawn = () => {
 }
 
 App.show_explosion = (x, y) => {
-  let explosion_animation = new createjs.Sprite(explosion_sheet)
+  let explosion_animation = new createjs.Sprite(App.explosion_sheet)
   explosion_animation.gotoAndPlay(`explode`)
   explosion_animation.name = `explosion`
   explosion_animation.x = x - 33
@@ -1079,7 +1083,7 @@ App.update_minimap = () => {
   minimap.setAttribute(`height`, App.bg_height)
   minimap.setAttribute(`width`, App.bg_width)
 
-  if (App.ship !== undefined && App.ship.visible) {
+  if ((App.ship !== undefined) && App.ship.visible) {
     let x = App.ship.x
     let y = App.ship.y
     let radius = 50
@@ -1122,6 +1126,7 @@ App.check_yt = (msg) => {
 
     if (q !== ``) {
       App.yt_search(q)
+      return true
     }
   }
   else {
@@ -1130,8 +1135,11 @@ App.check_yt = (msg) => {
 
     if (result) {
       App.play_yt(result[2])
+      return true
     }
   }
+
+  return false
 }
 
 App.check_img = (msg) => {
@@ -1140,14 +1148,17 @@ App.check_img = (msg) => {
 
     if (q !== ``) {
       App.img_search(q)
+      return true
     }
   }
+
+  return false
 }
 
 App.place_search_image = (url) => {
   // Check if image already exists
   for (let image of App.images) {
-    if (image.image && image.image.src === url) {
+    if (image.image && (image.image.src === url)) {
       return false
     }
   }
@@ -1207,7 +1218,7 @@ App.img_search = (q) => {
 
 App.check_image = (msg) => {
   if (msg.indexOf(` `) === -1) {
-    if (msg.indexOf(`.jpg`) !== -1 || msg.indexOf(`.png`) !== -1 || msg.indexOf(`.jpeg`) !== -1 || msg.indexOf(`.JPG`) !== -1 || msg.indexOf(`.PNG`) !== -1 || msg.indexOf(`.JPEG`) !== -1) {
+    if (/\.(jpe?g|png)$/i.test(msg)) {
       for (let image of App.images) {
         if (image.image.src === msg) {
           return false
@@ -1228,8 +1239,12 @@ App.check_image = (msg) => {
         App.push_image(image)
         App.socket.emit(`image`, {url:msg, x:image.x, y:image.y})
       }
+
+      return true
     }
   }
+
+  return false
 }
 
 App.place_images = (imgs) => {
@@ -1257,7 +1272,7 @@ App.push_image = (image) => {
 }
 
 App.z_order = () => {
-  App.background.setChildIndex(safe_zone, App.background.getNumChildren() - 1)
+  App.background.setChildIndex(App.safe_zone, App.background.getNumChildren() - 1)
 
   for (let ship of App.enemy_ships) {
     App.background.setChildIndex(ship.container, App.background.getNumChildren() - 1)

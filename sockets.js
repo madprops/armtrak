@@ -51,18 +51,30 @@ module.exports = (io) => {
 	    socket.on(`adduser`, (data) => {
 	    	socket.username = App.add_username(App.clean_string(data.username.toLowerCase()))
 	    	socket.emit(`update`, {type:`username`, username:socket.username})
-	    	socket.broadcast.emit(`update`, {type:`chat_announcement`, msg:socket.username + ` has joined`})
+	    	socket.broadcast.emit(`update`, {type: `chat_announcement`, msg: socket.username + ` has joined`})
 	    })
 
 	    socket.on(`sendchat`, (data) => {
 	    	if (socket.username !== undefined) {
-    			socket.broadcast.emit(`update`, {type:`chat_msg`, username:socket.username, msg:App.clean_string(data.msg)})
+    			socket.broadcast.emit(`update`, {
+            type: `chat_msg`,
+            username: socket.username,
+            msg: App.clean_string(data.msg),
+          })
 	    	}
     	})
 
 	    socket.on(`ship_info`, (data) => {
 	    	if (socket.username !== undefined) {
-    			socket.broadcast.emit(`update`, {type:`ship_info`, username:socket.username, x:data.x, y:data.y, rotation:data.rotation, visible:data.visible, model:data.model})
+    			socket.broadcast.emit(`update`, {
+            type:`ship_info`,
+            username: socket.username,
+            x: data.x,
+            y: data.y,
+            rotation: data.rotation,
+            visible: data.visible,
+            model: data.model,
+          })
 	    	}
     	})
 
@@ -110,7 +122,7 @@ module.exports = (io) => {
     	})
 
 	    socket.on(`youtube_search`, (data) => {
-	    	if (socket.username !== undefined && data.query) {
+	    	if ((socket.username !== undefined) && data.query) {
 	    		App.perform_youtube_search(data.query, socket.username, (result) => {
 	    			if (result.success) {
 	    				io.sockets.emit(`update`, {
@@ -224,7 +236,7 @@ module.exports = (io) => {
   }
 
   App.remove_score = (username) => {
-    for (let score of App.scores) {
+    for (let [i, score] of App.scores.entries()) {
       if (username === score.username) {
         App.scores.splice(i, 1)
         return true
@@ -287,7 +299,7 @@ module.exports = (io) => {
         try {
           let response = JSON.parse(data)
 
-          if (response && response.items && response.items.length > 0) {
+          if (response && response.items && (response.items.length > 0)) {
             let video = response.items[0]
 
             if (video.id && video.id.videoId) {
@@ -354,10 +366,10 @@ module.exports = (io) => {
         try {
           let response = JSON.parse(data)
 
-          if (response && response.image && response.image.length > 0) {
+          if (response && response.image && (response.image.length > 0)) {
             let first_image = response.image[0]
 
-            if (first_image.source && first_image.source.length > 0 && first_image.source[0].url) {
+            if (first_image.source && (first_image.source.length > 0) && first_image.source[0].url) {
               callback({
                 success: true,
                 imageUrl: first_image.source[0].url,
