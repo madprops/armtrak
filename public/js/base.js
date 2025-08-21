@@ -24,6 +24,9 @@ App.max_username_length = 28
 App.dot_radius = 8
 App.dot_radius_small = 5
 App.label_size = 8
+App.image_icon = `🖼️`
+App.radio_icon = `🔊`
+App.max_images = 18
 
 class EnemyShip {
   constructor(username) {
@@ -85,8 +88,7 @@ App.start_socket = () => {
     if (data.type === `chat_msg`) {
       App.update_chat(data.username, data.msg)
     }
-
-    if (data.type === `username`) {
+    else if (data.type === `username`) {
       App.username = data.username
       App.current_youtube = data.current_youtube
       App.chat_announce(data.username + ` has joined`)
@@ -96,46 +98,36 @@ App.start_socket = () => {
       App.chat_announce(`Upgrade your ship by destroying other players`)
       App.start_heartbeat()
     }
-
-    if (data.type === `youtube_result`) {
+    else if (data.type === `youtube_result`) {
       App.current_youtube = data
       App.play_youtube()
     }
-
-    if (data.type === `youtube_error`) {
+    else if (data.type === `youtube_error`) {
       App.chat_announce(`YouTube search failed: ` + data.message)
     }
-
-    if (data.type === `image_result`) {
+    else if (data.type === `image_result`) {
       App.place_image(data.imageUrl, data.title)
-      App.chat_announce(`Image found: ` + data.title + ` (requested by ` + data.requestedBy + `)`)
+      App.chat_announce(`${App.image_icon} ${data.title} (placed by ${data.requestedBy})`)
     }
-
-    if (data.type === `image_error`) {
+    else if (data.type === `image_error`) {
       App.chat_announce(`Image search failed: ` + data.message)
     }
-
-    if (data.type === `chat_announcement`) {
+    else if (data.type === `chat_announcement`) {
       App.chat_announce(data.msg)
     }
-
-    if (data.type === `ship_info`) {
+    else if (data.type === `ship_info`) {
       App.update_enemy_ship(data)
     }
-
-    if (data.type === `laser`) {
+    else if (data.type === `laser`) {
       App.fire_enemy_laser(data)
     }
-
-    if (data.type === `success`) {
+    else if (data.type === `success`) {
       App.chat_announce(data.message)
     }
-
-    if (data.type === `error`) {
+    else if (data.type === `error`) {
       App.chat_announce(data.message)
     }
-
-    if (data.type === `destroyed`) {
+    else if (data.type === `destroyed`) {
       if (data.username !== App.username) {
         App.enemy_destroyed(data)
       }
@@ -148,16 +140,13 @@ App.start_socket = () => {
 
       App.chat_announce(data.destroyed_by + ` destroyed ` + data.username + kills)
     }
-
-    if (data.type === `images`) {
+    else if (data.type === `images`) {
       App.place_images(data.images)
     }
-
-    if (data.type === `connection_lost`) {
+    else if (data.type === `connection_lost`) {
       window.location = `/`
     }
-
-    if (data.type === `disconnection`) {
+    else if (data.type === `disconnection`) {
       App.chat_announce(data.username + ` has left`)
       App.remove_enemy(data.username)
     }
@@ -1202,7 +1191,6 @@ App.check_img = (msg) => {
 }
 
 App.place_image = (url) => {
-  // Check if image already exists
   for (let image of App.images) {
     if (image.image && (image.image.src === url)) {
       return false
@@ -1214,10 +1202,20 @@ App.place_image = (url) => {
 
   img.onload = function() {
     let image = new createjs.Bitmap(img)
-    image.x = App.ship.x - ((img.width / 3) / 2) + (App.ship_width / 2)
-    image.y = App.ship.y - ((img.height / 3) / 2) + (App.ship_height / 2)
-    image.scaleX = 0.333
-    image.scaleY = 0.333
+
+    if ((img.width > 1000) || (img.height > 1000)) {
+      image.x = App.ship.x - ((img.width / 3) / 2) + (App.ship_width / 2)
+      image.y = App.ship.y - ((img.height / 3) / 2) + (App.ship_height / 2)
+      image.scaleX = 0.333
+      image.scaleY = 0.333
+    }
+    else {
+      image.x = App.ship.x - (img.width / 2) + (App.ship_width / 2)
+      image.y = App.ship.y - (img.height / 2) + (App.ship_height / 2)
+      image.scaleX = 1
+      image.scaleY = 1
+    }
+
     App.background.addChild(image)
     App.z_order()
     App.push_image(image)
@@ -1325,7 +1323,7 @@ App.place_images = (imgs) => {
 App.push_image = (image) => {
   App.images.push(image)
 
-  if (App.images.length > 20) {
+  if (App.images.length > App.max_images) {
     App.background.removeChild(App.images[0])
     App.images.splice(0, 1)
   }
@@ -1410,7 +1408,7 @@ App.play_youtube = () => {
   }
 
   App.play_yt(data.videoId)
-  App.chat_announce(`Now Playing: ` + data.title + ` (requested by ` + data.requestedBy + `)`)
+  App.chat_announce(`${App.radio_icon} ${data.title} (changed by ${data.requestedBy})`)
 }
 
 App.setup_clicks = () => {

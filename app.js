@@ -1,9 +1,7 @@
-let express = require(`express`)
-let session = require(`express-session`)
-let path = require(`path`)
-let bodyParser = require(`body-parser`)
-
-let routes = require(`./routes/index`)
+const express = require(`express`)
+const path = require(`path`)
+const bodyParser = require(`body-parser`)
+const routes = require(`./routes/index`)
 
 let app = express()
 
