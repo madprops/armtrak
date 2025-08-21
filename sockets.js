@@ -9,8 +9,7 @@ class Score {
 	}
 }
 
-module.exports = function (io)
-{
+module.exports = (io) => {
 	App.usernames = []
 	App.images = []
 	App.youtube_key = ``
@@ -49,32 +48,32 @@ module.exports = function (io)
 
 	let scores = []
 
-	io.on(`connection`, function(socket) {
-	    socket.on(`adduser`, function(data) {
+	io.on(`connection`, (socket) => {
+	    socket.on(`adduser`, (data) => {
 	    	socket.username = add_username(clean_string(data.username.toLowerCase()))
 	    	socket.emit(`update`, {type:`username`, username:socket.username})
 	    	socket.broadcast.emit(`update`, {type:`chat_announcement`, msg:socket.username + ` has joined`})
 	    })
 
-	    socket.on(`sendchat`, function (data) {
+	    socket.on(`sendchat`, (data) => {
 	    	if (socket.username !== undefined) {
     			socket.broadcast.emit(`update`, {type:`chat_msg`, username:socket.username, msg:clean_string(data.msg)})
 	    	}
     	})
 
-	    socket.on(`ship_info`, function (data) {
+	    socket.on(`ship_info`, (data) => {
 	    	if (socket.username !== undefined) {
     			socket.broadcast.emit(`update`, {type:`ship_info`, username:socket.username, x:data.x, y:data.y, rotation:data.rotation, visible:data.visible, model:data.model})
 	    	}
     	})
 
-	    socket.on(`laser`, function (data) {
+	    socket.on(`laser`, (data) => {
 	    	if (socket.username !== undefined) {
     			socket.broadcast.emit(`update`, {type:`laser`, laser:data})
 	    	}
     	})
 
-	    socket.on(`destroyed`, function (data) {
+	    socket.on(`destroyed`, (data) => {
 	    	if (socket.username !== undefined) {
 	    		let kills = add_kill(data.destroyed_by)
 	    		reset_kills(socket.username)
@@ -88,7 +87,7 @@ module.exports = function (io)
 	    	}
     	})
 
-	    socket.on(`image`, function (data) {
+	    socket.on(`image`, (data) => {
 	    	if (socket.username !== undefined) {
 	    		add_image(data)
 
@@ -99,21 +98,21 @@ module.exports = function (io)
 	    	}
     	})
 
-	    socket.on(`get_images`, function (data) {
+	    socket.on(`get_images`, (data) => {
 	    	if (socket.username !== undefined) {
     			socket.emit(`update`, {type: `images`, images: App.images})
 	    	}
     	})
 
-	    socket.on(`heartbeat`, function (data) {
+	    socket.on(`heartbeat`, (data) => {
 	    	if (socket.username === undefined) {
     			socket.emit(`update`, {type: `connection_lost`})
 	    	}
     	})
 
-	    socket.on(`youtube_search`, function (data) {
+	    socket.on(`youtube_search`, (data) => {
 	    	if (socket.username !== undefined && data.query) {
-	    		performYouTubeSearch(data.query, socket.username, function(result) {
+	    		perform_youtube_search(data.query, socket.username, (result) => {
 	    			if (result.success) {
 	    				io.sockets.emit(`update`, {
 	    					type:`youtube_result`,
@@ -133,9 +132,9 @@ module.exports = function (io)
 	    	}
     	})
 
-	    socket.on(`image_search`, function (data) {
-	    	if (socket.username !== undefined && data.query) {
-	    		performImageSearch(data.query, socket.username, function(result) {
+	    socket.on(`image_search`, (data) => {
+	    	if ((socket.username !== undefined) && data.query) {
+	    		perform_image_search(data.query, socket.username, (result) => {
 	    			if (result.success) {
 	    				// Broadcast to all users
 	    				socket.emit(`update`, {
@@ -255,7 +254,7 @@ module.exports = function (io)
 		score.kills = 0
 	}
 
-	function performYouTubeSearch(query, username, callback) {
+	function perform_youtube_search(query, username, callback) {
 		if (!App.youtube_key) {
 			callback({
 				success: false,
@@ -330,7 +329,7 @@ module.exports = function (io)
 		})
 	}
 
-	function performImageSearch(query, username, callback) {
+	function perform_image_search(query, username, callback) {
 		if (!App.image_instance || !App.image_scraper) {
 			callback({
 				success: false,
@@ -395,5 +394,4 @@ module.exports = function (io)
 			})
 		})
 	}
-
 }
