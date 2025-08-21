@@ -81,17 +81,20 @@ export default [
     },
     languageOptions: {
       globals: {
-        App: "writable",
-        DOM: "writable",
-        Addlist: "writable",
-        NiceGesture: "writable",
-        NeedContext: "writable",
-        Menubutton: "writable",
-        ColorLib: "writable",
-        AColorPicker: "writable",
-        dateFormat: "writable",
-        jdenticon: "writable",
-        browser: "writable",
+        App: "readable",
+        DOM: "readable",
+        Addlist: "readable",
+        NiceGesture: "readable",
+        NeedContext: "readable",
+        Menubutton: "readable",
+        ColorLib: "readable",
+        AColorPicker: "readable",
+        dateFormat: "readable",
+        jdenticon: "readable",
+        browser: "readable",
+        require: "readable",
+        module: "readable",
+        __dirname: "readable",
       }
     }
   }

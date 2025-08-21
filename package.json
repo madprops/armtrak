@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node ./bin/www",
     "dev": "PORT=3000 node ./bin/www",
-    "prod": "PORT=80 node ./bin/www"
+    "prod": "PORT=80 node ./bin/www",
+		"lint":	"eslint --cache -c eslint.config.mjs",
+		"fix": "eslint --fix -c eslint.config.mjs"
   },
   "dependencies": {
     "socket.io": "^4.7.5",
@@ -18,9 +20,5 @@
   "devDependencies": {
     "eslint": "~9.11.1",
     "globals": "~15.9.0"
-  },
-	"scripts": {
-		"lint":	"eslint --cache -c eslint.config.mjs",
-		"fix": "eslint --fix -c eslint.config.mjs"
-	},
+  }
 }
