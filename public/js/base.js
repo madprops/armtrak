@@ -88,7 +88,6 @@ App.start_socket = () => {
       App.chat_announce(`you can place an image on the map (visible to everyone) with "img something" or by pasting an image url`)
       App.chat_announce(`you can play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url`)
       App.chat_announce(`you upgrade your ship by destroying other players`)
-      // App.label.text = App.space_word(App.username)
       App.start_heartbeat()
     }
 
