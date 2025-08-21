@@ -107,7 +107,7 @@ App.start_socket = () => {
     }
 
     if (data.type === `image_result`) {
-      App.place_search_image(data.imageUrl, data.title)
+      App.place_image(data.imageUrl, data.title)
       App.chat_announce(`Image found: ` + data.title + ` (requested by ` + data.requestedBy + `)`)
     }
 
@@ -1201,7 +1201,7 @@ App.check_img = (msg) => {
   return false
 }
 
-App.place_search_image = (url) => {
+App.place_image = (url) => {
   // Check if image already exists
   for (let image of App.images) {
     if (image.image && (image.image.src === url)) {
@@ -1273,21 +1273,7 @@ App.check_image = (msg) => {
         }
       }
 
-      let img = new Image()
-      img.src = msg
-
-      img.onload = function() {
-        let image = new createjs.Bitmap(img)
-        image.x = App.ship.x - ((img.width / 3) / 2) + (App.ship_width / 2)
-        image.y = App.ship.y - ((img.height / 3) / 2) + (App.ship_height / 2)
-        image.scaleX = 0.333
-        image.scaleY = 0.333
-        App.background.addChild(image)
-        App.z_order()
-        App.push_image(image)
-        App.socket.emit(`image`, {url:msg, x:image.x, y:image.y})
-      }
-
+      App.place_image(msg)
       return true
     }
   }

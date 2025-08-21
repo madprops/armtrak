@@ -181,3 +181,11 @@ iframe {
 #music_toggle {
 	cursor: pointer;
 }
+
+.button {
+	user-select: none;
+}
+
+.button:hover {
+	text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
