@@ -85,7 +85,7 @@ App.start_socket = () => {
       App.username = data.username
       App.chat_announce(data.username + ` has joined`)
       App.chat_announce(`you move with the arrow keys and shoot with spacebar`)
-      App.chat_announce(`you can place an image on the map (visible to everyone) by pasting an image url or with "img something"`)
+      App.chat_announce(`you can place an image on the map (visible to everyone) with "img something" or by pasting an image url`)
       App.chat_announce(`you can play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url`)
       App.chat_announce(`you upgrade your ship by destroying other players`)
       // App.label.text = App.space_word(App.username)
