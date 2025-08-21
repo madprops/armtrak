@@ -937,9 +937,7 @@ App.move_lasers = () => {
 		}
 	}
 
-	for (let i = 0; i < App.enemy_lasers.length; i++) {
-		let enemy_laser = App.enemy_lasers[i]
-
+	for (let enemy_laser of App.enemy_lasers) {
 		if (enemy_laser.distance < enemy_laser.max_distance) {
 			enemy_laser.x += enemy_laser.vx
 			enemy_laser.y += enemy_laser.vy
@@ -979,9 +977,7 @@ App.move_lasers = () => {
 }
 
 App.check_enemy_collision = (laser) => {
-	for (let i = 0; i < App.enemy_ships.length; i++) {
-		let enemy = App.enemy_ships[i]
-
+	for (let enemy of App.enemy_ships.length) {
 		if (enemy.container.visible) {
 			let x1 = enemy.container.x - App.ship_width / 4
 			let x2 = enemy.container.x + App.ship_width / 4
@@ -999,11 +995,12 @@ App.check_enemy_collision = (laser) => {
 
 App.check_ship_collision = (laser) => {
 	if (ship.visible) {
-		let x1 = ship.x - App.ship_width / 4
-		let x2 = ship.x + App.ship_width / 4
-		let y1 = ship.y - App.ship_height / 4
-		let y2 = ship.y + App.ship_height / 4
-		if ( (laser.x >= x1 && laser.x <= x2) && (laser.y >= y1 && laser.y <= y2) ) {
+		let x1 = ship.x - (App.ship_width / 4)
+		let x2 = ship.x + (App.ship_width / 4)
+		let y1 = ship.y - (App.ship_height / 4)
+		let y2 = ship.y + (App.ship_height / 4)
+
+		if (((laser.x >= x1) && (laser.x <= x2)) && ((laser.y >= y1) && (laser.y <= y2))) {
 			return true
 		}
 	}
@@ -1098,9 +1095,7 @@ App.update_minimap = () => {
 		context.stroke()
 	}
 
-	for (let i = 0; i < App.enemy_ships.length; i++) {
-		let enemy = App.enemy_ships[i].container
-
+	for (let enemy of App.enemy_ships) {
 		if (enemy.visible) {
 			let x = enemy.x
 			let y = enemy.y
