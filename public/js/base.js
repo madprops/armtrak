@@ -101,7 +101,7 @@ function start_socket()
 			username = data.username;
 			chat_announce(data.username + ' has joined');
 			chat_announce('you move with the arrow keys and shoot with spacebar');
-			chat_announce('you can place an image on the map (visible to everyone) by pasting an image url');
+			chat_announce('you can place an image on the map (visible to everyone) by pasting an image url or with "img something"');
 			chat_announce('you can play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url');
 			chat_announce('you upgrade your ship by destroying other players');
 			label.text = space_word(username);
