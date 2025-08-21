@@ -124,6 +124,14 @@ App.start_socket = () => {
       App.fire_enemy_laser(data)
     }
 
+    if (data.type === `success`) {
+      App.chat_announce(data.message)
+    }
+
+    if (data.type === `error`) {
+      App.chat_announce(data.message)
+    }
+
     if (data.type === `destroyed`) {
       if (data.username !== App.username) {
         App.enemy_destroyed(data)
@@ -313,6 +321,7 @@ App.msg_is_ok = (msg) => {
 
 App.send_to_chat = () => {
   let msg = App.clean_string($(`#chat_input`).val())
+  $(`#chat_input`).val(``)
 
   if (App.check_yt(msg)) {
     // Do nothing
@@ -326,12 +335,18 @@ App.send_to_chat = () => {
     // Do nothing
   }
 
+  if (App.check_instance(msg)) {
+    return
+  }
+
+  if (App.check_scraper(msg)) {
+    return
+  }
+
   if (App.msg_is_ok(msg)) {
     App.update_chat(App.username, msg)
     App.socket.emit(`sendchat`, {msg})
   }
-
-  $(`#chat_input`).val(``)
 }
 
 App.goto_bottom = () => {
@@ -1134,8 +1149,8 @@ App.play_yt = (id) => {
 }
 
 App.check_yt = (msg) => {
-  if (msg.lastIndexOf(`yt `, 0) === 0) {
-    let q = msg.substring(3)
+  if (msg.startsWith(`yt `)) {
+    let q = msg.split(`yt `)[1].trim()
 
     if (q !== ``) {
       App.yt_search(q)
@@ -1156,8 +1171,8 @@ App.check_yt = (msg) => {
 }
 
 App.check_img = (msg) => {
-  if (msg.lastIndexOf(`img `, 0) === 0) {
-    let q = msg.substring(4)
+  if (msg.startsWith(`img `)) {
+    let q = msg.split(`img `)[1].trim()
 
     if (q !== ``) {
       App.img_search(q)
@@ -1255,6 +1270,32 @@ App.check_image = (msg) => {
         App.socket.emit(`image`, {url:msg, x:image.x, y:image.y})
       }
 
+      return true
+    }
+  }
+
+  return false
+}
+
+App.check_instance = (msg) => {
+  if (msg.startsWith(`/instance `)) {
+    let q = msg.split(`/instance `)[1].trim()
+
+    if (q !== ``) {
+      App.socket.emit(`change_instance`, {query: q})
+      return true
+    }
+  }
+
+  return false
+}
+
+App.check_scraper = (msg) => {
+  if (msg.startsWith(`/scraper `)) {
+    let q = msg.split(`/scraper `)[1].trim()
+
+    if (q !== ``) {
+      App.socket.emit(`change_scraper`, {query: q})
       return true
     }
   }

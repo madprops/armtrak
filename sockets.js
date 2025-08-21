@@ -178,6 +178,43 @@ module.exports = (io) => {
 	    	}
     	})
 
+	    socket.on(`change_instance`, (data) => {
+	    	if (data.query) {
+	    		let file_path = path.join(__dirname, `image_instance.txt`)
+        let url = App.add_https(data.query)
+
+	    		fs.writeFile(file_path, url, (err) => {
+	    			if (err) {
+	    				console.error(`Failed to update image_instance.txt:`, err.message)
+	    				socket.emit(`update`, {type: `error`, message: `Failed to update image instance.`})
+	    			}
+          else {
+            console.log(`image_instance.txt updated successfully`)
+	    				socket.emit(`update`, {type: `success`, message: `Image instance updated.`})
+            App.image_instance = url
+	    			}
+	    		})
+	    	}
+	    })
+
+	    socket.on(`change_scraper`, (data) => {
+	    	if (data.query) {
+	    		let file_path = path.join(__dirname, `image_scraper.txt`)
+
+	    		fs.writeFile(file_path, data.query, (err) => {
+	    			if (err) {
+	    				console.error(`Failed to update image_scraper.txt:`, err.message)
+	    				socket.emit(`update`, {type: `error`, message: `Failed to update image scraper.`})
+	    			}
+          else {
+            console.log(`image_scraper.txt updated successfully`)
+	    				socket.emit(`update`, {type: `success`, message: `Image scraper updated.`})
+            App.image_scraper = data.query
+	    			}
+	    		})
+	    	}
+	    })
+
     	socket.on(`disconnect`, () => {
     		if (socket.username !== undefined) {
 	    		App.remove_username(socket.username)
@@ -366,6 +403,7 @@ module.exports = (io) => {
     let https = require(`https`)
     let encoded_query = encodeURIComponent(query)
     let url = `${App.image_instance}/api/v1/images?s=${encoded_query}&scraper=${App.image_scraper}`
+    console.log(url)
 
     https.get(url, (res) => {
       let data = ``
@@ -417,4 +455,12 @@ module.exports = (io) => {
         })
       })
   }
+}
+
+App.add_https = (url) => {
+  if (!url.startsWith(`https://`)) {
+    return `https://${url}`
+  }
+
+  return url
 }
