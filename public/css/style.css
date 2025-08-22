@@ -157,6 +157,8 @@ iframe {
 	flex-grow: 1;
 	flex-shrink: 1;
 	padding-left: 1rem;
+	display: flex;
+	gap: 2rem;
 }
 
 #about {
@@ -167,28 +169,8 @@ iframe {
 	padding-right: 1rem;
 }
 
-#health {
-	padding-right: 40px;
-}
-
-#max_speed {
-	padding-right: 40px;
-}
-
-#laser_level {
-	padding-right: 40px;
-}
-
-#sound_toggle {
-	cursor: pointer;
-	padding-right: 40px;
-}
-
-#music_toggle {
-	cursor: pointer;
-}
-
 .button {
+	cursor: pointer;
 	user-select: none;
 }
 
