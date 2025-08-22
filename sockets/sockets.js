@@ -53,7 +53,7 @@ module.exports = (io, App) => {
 
     socket.on(`ship_update`, (data) => {
       if (socket.ak_username !== undefined) {
-        App.update_ship(data)
+        App.update_ship(socket, data)
       }
     })
 

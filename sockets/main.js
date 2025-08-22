@@ -1,3 +1,6 @@
+const fs = require(`fs`)
+const path = require(`path`)
+
 module.exports = (io, App) => {
   App.usernames = []
   App.images = []
@@ -7,11 +10,13 @@ module.exports = (io, App) => {
   App.scores = []
   App.max_username_length = 28
 
-  require(`../sockets/utils.js`)(io, App)
-  require(`../sockets/media.js`)(io, App)
-  require(`../sockets/players.js`)(io, App)
-  require(`../sockets/commands.js`)(io, App)
-  require(`../sockets/sockets.js`)(io, App)
+  let sockets_dir = path.join(__dirname, `../sockets`)
+
+  fs.readdirSync(sockets_dir).forEach(file => {
+    if (file !== `main.js` && file.endsWith(`.js`)) {
+      require(path.join(sockets_dir, file))(io, App)
+    }
+  })
 
   App.init = () => {
     App.read_file(`images`, `json`, [])

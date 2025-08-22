@@ -26,6 +26,7 @@ App.image_icon = `🖼️`
 App.radio_icon = `🔊`
 App.max_images = 18
 App.big_image_width = 2560
+App.activity = false
 
 App.init = () => {
   App.prepare_game()

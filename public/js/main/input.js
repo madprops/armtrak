@@ -30,6 +30,8 @@ App.activate_key_detection = () => {
         e.preventDefault()
       }
     }
+
+    App.activity = true
   })
 
   $(document).keyup(function(e) {

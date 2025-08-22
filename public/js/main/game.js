@@ -1,3 +1,5 @@
+const UPDATE_FPS = 30
+
 App.prepare_game = () => {
   App.setup_explosions()
   App.setup_lasers()
@@ -7,7 +9,26 @@ App.prepare_game = () => {
   App.activate_key_detection()
   App.setup_clicks()
   App.setup_focus()
-  App.start_game()
+  App.create_background()
+  App.show_safe_zone()
+  App.do_game_update()
+}
+
+App.do_game_update = () => {
+  if (App.activity) {
+    App.socket.emit(`ship_update`, {
+      up_arrow: App.up_arrow,
+      down_arrow: App.down_arrow,
+      left_arrow: App.left_arrow,
+      right_arrow: App.right_arrow,
+    })
+
+    App.activity = false
+  }
+
+  setTimeout(() => {
+    App.do_game_update()
+  }, 1000 / UPDATE_FPS)
 }
 
 App.setup_explosions = () => {
@@ -109,9 +130,4 @@ App.start_socket = () => {
   })
 
   App.socket.emit(`adduser`, { username: App.username })
-}
-
-App.start_game = () => {
-  App.create_background()
-  App.show_safe_zone()
 }
