@@ -1,4 +1,3 @@
+data/*
 /node_modules/
-*key.txt
 .eslintcache
-image_*.txt

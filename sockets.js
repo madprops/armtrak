@@ -17,6 +17,10 @@ module.exports = (io, App) => {
   App.scores = []
   App.max_username_length = 28
 
+  App.init = () => {
+    App.read_file(`images`, `json`, [])
+  }
+
   io.on(`connection`, (socket) => {
     socket.on(`adduser`, (data) => {
       let username = App.clean_username(data.username)
@@ -41,13 +45,20 @@ module.exports = (io, App) => {
       socket.emit(`update`, {
         type: `username`,
         username: socket.ak_username,
-        current_youtube: App.current_youtube,
+        youtube: App.read_file(`youtube`),
       })
 
       socket.broadcast.emit(`update`, {
         type: `joined`,
         username: socket.ak_username,
       })
+
+      if (App.images.length) {
+        for (let image of App.images) {
+          image.silent = true
+          io.sockets.emit(`update`, image)
+        }
+      }
     })
 
     socket.on(`sendchat`, (data) => {
@@ -96,16 +107,17 @@ module.exports = (io, App) => {
 
     socket.on(`image_placed`, (data) => {
       if (socket.ak_username !== undefined) {
-        App.add_image(data)
-
-        io.sockets.emit(`update`, {
+        let obj = {
           type: `image_placed`,
           url: data.url,
           x: data.x,
           y: data.y,
           title: data.title,
           username: socket.ak_username,
-        })
+        }
+
+        App.add_image(obj)
+        io.sockets.emit(`update`, obj)
       }
     })
 
@@ -119,14 +131,15 @@ module.exports = (io, App) => {
       if ((socket.ak_username !== undefined) && data.query) {
         App.perform_youtube_search(data.query, socket.ak_username, (result) => {
           if (result.success) {
-            App.current_youtube = {
+            let obj = {
               type: `youtube_result`,
               videoId: result.videoId,
               title: result.title,
               requestedBy: socket.ak_username,
             }
 
-            io.sockets.emit(`update`, App.current_youtube)
+            io.sockets.emit(`update`, obj)
+            App.write_file(`youtube`, JSON.stringify(obj))
           }
           else {
             socket.emit(`update`, {
@@ -247,6 +260,8 @@ module.exports = (io, App) => {
     if (App.images.length > 20) {
       App.images.splice(0, 1)
     }
+
+    App.write_file(`images`, JSON.stringify(App.images), false)
   }
 
   App.create_score = (username) => {
@@ -500,23 +515,35 @@ module.exports = (io, App) => {
     socket.disconnect()
   }
 
-  App.read_file = (what) => {
+  App.read_file = (what, mode = `normal`, def_value = ``) => {
     try {
-      App[what] = fs.readFileSync(path.join(__dirname, `${what}.txt`), `utf8`).trim()
+      let s = fs.readFileSync(path.join(__dirname, `data/${what}.txt`), `utf8`).trim()
+
+      if (mode === `json`) {
+        if (s) {
+          App[what] = JSON.parse(s)
+        }
+        else {
+          App[what] = def_value
+        }
+      }
+      else {
+        App[what] = s
+      }
     }
     catch (error) {
       console.error(`Failed to load ${what}`, error.message)
     }
   }
 
-  App.write_file = (what, value) => {
+  App.write_file = (what, value, set = true) => {
     value = value.trim()
 
     if (!value) {
       return
     }
 
-    let file_path = path.join(__dirname, `${what}.txt`)
+    let file_path = path.join(__dirname, `data/${what}.txt`)
 
     if ([`image_instance`].includes(what)) {
       value = App.add_https(value)
@@ -526,9 +553,11 @@ module.exports = (io, App) => {
       if (err) {
         console.error(`Failed to update ${what}.txt:`, err.message)
       }
-      else {
+      else if (set) {
         App[what] = value
       }
     })
   }
+
+  App.init()
 }

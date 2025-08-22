@@ -21,8 +21,8 @@ App.max_max_speed = 3
 App.max_laser_level = 10
 App.laser_hit = 20
 App.max_username_length = 28
-App.dot_radius = 50
-App.dot_radius_small = 30
+App.dot_radius = 45
+App.dot_radius_small = 28
 App.label_size = 8
 App.image_icon = `🖼️`
 App.radio_icon = `🔊`
@@ -101,7 +101,7 @@ App.start_socket = () => {
       App.on_join(data)
     }
     else if (data.type === `youtube_result`) {
-      App.current_youtube = data
+      App.youtube = data
       App.play_youtube()
     }
     else if (data.type === `youtube_error`) {
@@ -1316,7 +1316,10 @@ App.image_placed = (data) => {
   App.background.addChild(image)
   App.z_order()
   App.push_image(image)
-  App.chat_announce(`${App.image_icon} ${data.title} (${data.username})`)
+
+  if (!data.silent) {
+    App.chat_announce(`${App.image_icon} ${data.title} (${data.username})`)
+  }
 }
 
 App.push_image = (image) => {
@@ -1393,7 +1396,7 @@ App.update_hud = () => {
 }
 
 App.play_youtube = () => {
-  let data = App.current_youtube
+  let data = App.youtube
 
   if (!data) {
     return
@@ -1440,7 +1443,7 @@ App.already_playing = (data) => {
 
 App.on_join = (data) => {
   App.username = data.username
-  App.current_youtube = data.current_youtube
+  App.youtube = data.youtube
 
   App.greet(data.username)
   App.chat_announce(`Move with the arrow keys and shoot with spacebar`)
