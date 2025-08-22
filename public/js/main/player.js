@@ -53,19 +53,12 @@ App.update_hud = () => {
   $(`#max_speed`).html(`Max Speed: ` + (Math.round((App.ship.max_speed - 1) * 10) / 10))
 }
 
-App.respawn = () => {
-  window.setTimeout(function() {
-    let coords = App.get_random_coords()
-    App.ship.x = coords[0]
-    App.ship.y = coords[1]
-    App.ship.max_health = App.min_max_health
-    App.ship.health = App.ship.max_health
-    App.ship.max_speed = App.min_max_speed
-    App.ship.laser_level = App.min_laser_level
-    App.move_background(coords[0] - App.background.canvas.width / 2, coords[1] - App.background.canvas.height / 2)
-    App.ship.visible = true
-    App.update_hud()
-  }, 5000)
+App.on_respawn = (data) => {
+  App.ship = data.ship
+  let coords_1 = App.ship.x - App.background.canvas.width / 2
+  let coords_2 = App.ship.y - App.background.canvas.height / 2
+  App.move_background(coords_1, coords_2)
+  App.update_hud()
 }
 
 App.reduce_ship_speed = () => {

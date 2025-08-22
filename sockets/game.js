@@ -240,6 +240,7 @@ App.respawn = (socket) => {
   setTimeout(function() {
     let ship = socket.ak_ship
     let coords = App.get_random_coords()
+
     ship.x = coords[0]
     ship.y = coords[1]
     ship.max_health = MIN_MAX_HEALTH
@@ -247,6 +248,7 @@ App.respawn = (socket) => {
     ship.max_speed = MIN_MAX_SPEED
     ship.laser_level = MIN_LASER_LEVEL
     ship.visible = true
-    App.update_hud()
+
+    socket.emit(`update`, {type: `respawn`, ship})
   }, 5000)
 }
