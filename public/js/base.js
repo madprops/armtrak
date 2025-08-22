@@ -27,6 +27,8 @@ App.label_size = 8
 App.image_icon = `🖼️`
 App.radio_icon = `🔊`
 App.max_images = 18
+App.big_image_width = 2000
+App.big_image_scale = 0.333
 
 class EnemyShip {
   constructor(username) {
@@ -129,8 +131,8 @@ App.start_socket = () => {
     else if (data.type === `destroyed`) {
       App.on_destroyed(data)
     }
-    else if (data.type === `images`) {
-      App.place_images(data.images)
+    else if (data.type === `image_placed`) {
+      App.image_placed(data)
     }
     else if (data.type === `connection_lost`) {
       window.location = `/`
@@ -310,24 +312,28 @@ App.msg_is_ok = (msg) => {
 }
 
 App.send_to_chat = () => {
+  let send = true
   let msg = App.clean_string($(`#chat_input`).val())
   $(`#chat_input`).val(``)
 
   if (App.check_yt(msg)) {
-    // Do nothing
+    send = false
   }
 
   if (App.check_img(msg)) {
-    // Do nothing
+    send = false
   }
 
   if (App.check_image(msg)) {
-    // Do nothing
+    send = false
   }
 
   if (App.msg_is_ok(msg)) {
     App.update_chat(App.username, msg)
-    App.socket.emit(`sendchat`, {msg})
+
+    if (send) {
+      App.socket.emit(`sendchat`, {msg})
+    }
   }
 }
 
@@ -1185,7 +1191,14 @@ App.check_img = (msg) => {
   return false
 }
 
-App.place_image = (url) => {
+App.setup_image = (image) => {
+  if (image.width >= App.big_image_width) {
+    image.scaleX = App.big_image_scale
+    image.scaleY = App.big_image_scale
+  }
+}
+
+App.place_image = (url, title) => {
   for (let image of App.images) {
     if (image.image && (image.image.src === url)) {
       return false
@@ -1201,20 +1214,13 @@ App.place_image = (url) => {
     if ((img.width > 1000) || (img.height > 1000)) {
       image.x = App.ship.x - ((img.width / 3) / 2) + (App.ship_width / 2)
       image.y = App.ship.y - ((img.height / 3) / 2) + (App.ship_height / 2)
-      image.scaleX = 0.333
-      image.scaleY = 0.333
     }
     else {
       image.x = App.ship.x - (img.width / 2) + (App.ship_width / 2)
       image.y = App.ship.y - (img.height / 2) + (App.ship_height / 2)
-      image.scaleX = 1
-      image.scaleY = 1
     }
 
-    App.background.addChild(image)
-    App.z_order()
-    App.push_image(image)
-    App.socket.emit(`image`, {url, x:image.x, y:image.y})
+    App.socket.emit(`image_placed`, {url, x: image.x, y: image.y, title})
   }
 
   img.onerror = function() {
@@ -1248,12 +1254,10 @@ App.toggle_music = () => {
 }
 
 App.yt_search = (q) => {
-  // Send YouTube search request to server to keep API key private
   App.socket.emit(`youtube_search`, {query: q})
 }
 
 App.img_search = (q) => {
-  // Send image search request to server
   App.socket.emit(`image_search`, {query: q})
 }
 
@@ -1274,19 +1278,17 @@ App.check_image = (msg) => {
   return false
 }
 
-App.place_images = (imgs) => {
-  for (let img of imgs) {
-    let img_obj = new Image()
-    img_obj.src = img.url
-    let image = new createjs.Bitmap(img_obj)
-    image.x = img.x
-    image.y = img.y
-    image.scaleX = 0.333
-    image.scaleY = 0.333
-    App.background.addChild(image)
-    App.z_order()
-    App.push_image(image)
-  }
+App.image_placed = (data) => {
+  let img_obj = new Image()
+  img_obj.src = data.url
+  let image = new createjs.Bitmap(img_obj)
+  image.x = data.x
+  image.y = data.y
+  App.setup_image(image)
+  App.background.addChild(image)
+  App.z_order()
+  App.push_image(image)
+  App.chat_announce(`${App.image_icon} ${data.title} (${data.username})`)
 }
 
 App.push_image = (image) => {
@@ -1434,8 +1436,7 @@ App.on_destroyed = (data) => {
 }
 
 App.on_image_result = (data) => {
-  App.place_image(data.imageUrl, data.title)
-  App.chat_announce(`${App.image_icon} ${data.title} (${data.requestedBy})`)
+  App.place_image(data.image_url, data.title)
 }
 
 App.on_disconnection = (data) => {

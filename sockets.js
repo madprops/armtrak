@@ -94,13 +94,17 @@ module.exports = (io, App) => {
       }
     })
 
-    socket.on(`image`, (data) => {
+    socket.on(`image_placed`, (data) => {
       if (socket.ak_username !== undefined) {
         App.add_image(data)
 
-        socket.broadcast.emit(`update`, {
-          type: `images`,
-          images: [{url: data.url, x: data.x, y: data.y}],
+        io.sockets.emit(`update`, {
+          type: `image_placed`,
+          url: data.url,
+          x: data.x,
+          y: data.y,
+          title: data.title,
+          username: socket.ak_username,
         })
       }
     })
@@ -140,7 +144,7 @@ module.exports = (io, App) => {
           if (result.success) {
             socket.emit(`update`, {
               type: `image_result`,
-              imageUrl: result.imageUrl,
+              image_url: result.imageUrl,
               title: result.title,
               requestedBy: socket.ak_username,
             })
@@ -375,7 +379,6 @@ module.exports = (io, App) => {
     let https = require(`https`)
     let encoded_query = encodeURIComponent(query)
     let url = `${App.image_instance}/api/v1/images?s=${encoded_query}&scraper=${App.image_scraper}`
-    console.log(url)
 
     https.get(url, (res) => {
       let data = ``
@@ -420,12 +423,12 @@ module.exports = (io, App) => {
         }
       })
     })
-      .on(`error`, (error) => {
-        callback({
-          success: false,
-          message: `Image search request failed`,
-        })
+    .on(`error`, (error) => {
+      callback({
+        success: false,
+        message: `Image search request failed`,
       })
+    })
   }
 
   App.add_https = (url) => {
