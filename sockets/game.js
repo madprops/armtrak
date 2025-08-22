@@ -32,6 +32,7 @@ let CLOCK = Date.now()
 
 // Lasers
 LASER_STEP = 1
+LAST_FIRED_MIN = 300
 
 module.exports = (io, App) => {
   class Ship {
@@ -40,6 +41,7 @@ module.exports = (io, App) => {
     constructor() {
       let coords = App.get_random_coords()
       let model = App.get_random_int(1, NUM_MODELS)
+      let now = Date.now()
 
       this.id = Ship.id
       this.x = coords[0]
@@ -56,8 +58,21 @@ module.exports = (io, App) => {
       this.max_health = 100
       this.max_speed = MIN_MAX_SPEED
       this.laser_level = MIN_LASER_LEVEL
+      this.in_safe_zone = false
+      this.last_fired = now
 
       Ship.id += 1
+    }
+  }
+
+  class Laser {
+    constructor(data) {
+      this.x = data.x
+      this.y = data.y
+      this.rotation = data.rotation
+      this.speed = data.speed
+      this.max_distance = data.max_distance
+      this.distance = 0
     }
   }
 
@@ -137,6 +152,7 @@ module.exports = (io, App) => {
   App.move = () => {
     App.move_ships()
     App.move_lasers()
+    App.check_lasers()
   }
 
   App.move_ships = () => {
@@ -153,6 +169,29 @@ module.exports = (io, App) => {
       if (ship.right_arrow) {
         App.turn_right(ship)
         return true
+      }
+    }
+  }
+
+  App.check_lasers = () => {
+    for (let laser of App.lasers) {
+      let enemy = App.check_enemy_collision(laser)
+
+      function check_col() {
+        let x1 = Math.pow((laser.x + (LASER_WIDTH / 2)) - (BG_WIDTH / 2), 2)
+        let x2 = Math.pow((laser.y + (LASER_HEIGHT / 2)) - (BG_HEIGHT / 2), 2)
+        let x3 = Math.pow(App.safe_zone_radius, 2)
+        return x1 + x2 < x3
+      }
+
+      if (enemy) {
+        App.lasers.splice(i, 1)
+        i -= 1
+        App.background.removeChild(laser)
+      }
+      else if (check_col()) {
+        App.lasers.splice(i, 1)
+        i -= 1
       }
     }
   }
@@ -176,30 +215,10 @@ module.exports = (io, App) => {
         else if (laser.y >= BG_HEIGHT) {
           laser.y = 0
         }
-
-        let enemy = App.check_enemy_collision(laser)
-
-        function check_col() {
-          let x1 = Math.pow((laser.x + (LASER_WIDTH / 2)) - (BG_WIDTH / 2), 2)
-          let x2 = Math.pow((laser.y + (LASER_HEIGHT / 2)) - (BG_HEIGHT / 2), 2)
-          let x3 = Math.pow(App.safe_zone_radius, 2)
-          return x1 + x2 < x3
-        }
-
-        if (enemy) {
-          App.lasers.splice(i, 1)
-          i -= 1
-          App.background.removeChild(laser)
-        }
-        else if (check_col()) {
-          App.lasers.splice(i, 1)
-          i -= 1
-        }
       }
       else {
         App.lasers.splice(i, 1)
         i -= 1
-        App.background.removeChild(laser)
       }
     }
   }
@@ -321,10 +340,10 @@ module.exports = (io, App) => {
     let radius = App.safe_zone_radius
 
     if ((Math.pow(num_1, 2) + Math.pow(num_2, 2)) < Math.pow(radius, 2)) {
-      App.in_safe_zone = true
+      ship.in_safe_zone = true
     }
     else {
-      App.in_safe_zone = false
+      ship.in_safe_zone = false
     }
   }
 
@@ -357,7 +376,7 @@ module.exports = (io, App) => {
       App.move_background(App.background.regX + vx, App.background.regY + vy)
     }
 
-    App.check_safe_zone()
+    App.check_safe_zone(socket)
   }
 
   App.setup_safe_zone = () => {
@@ -367,8 +386,12 @@ module.exports = (io, App) => {
     App.safe_zone.radius = SAFE_ZONE_HEIGHT / 2
   }
 
-  App.check_enemy_collision = (socket, laser) => {
-    for (let ship of App.enemy_ships) {
+  App.check_enemy_collision = (laser) => {
+    for (let ship of App.ships) {
+      if (laser.ship == ship) {
+        continue
+      }
+
       if (ship.container.visible) {
         let x1 = ship.container.x - App.ship_width / 4
         let x2 = ship.container.x + App.ship_width / 4
@@ -382,5 +405,286 @@ module.exports = (io, App) => {
     }
 
     return false
+  }
+
+  App.fire_laser = (socket) => {
+    let ship = socket.ak_ship
+
+    if (!ship.visible || ship.in_safe_zone) {
+      return false
+    }
+
+    if ((Date.now() - ship.last_fired) < LAST_FIRED_MIN) {
+      return false
+    }
+
+    let lasers = []
+
+    if (ship.laser_level === 1) {
+      lasers.push({
+        speed: 4,
+        max_distance: 100,
+        rotation: ship.rotation,
+        x: App.ship.x,
+        y: App.ship.y,
+      })
+    }
+
+    if (ship.laser_level === 2) {
+      lasers.push({
+        speed: 4.1,
+        max_distance: 105,
+        rotation: ship.rotation,
+        x: App.ship.x,
+        y: App.ship.y,
+      })
+    }
+
+    if (ship.laser_level === 3) {
+      lasers.push({
+        speed: 4.2,
+        max_distance: 110,
+        rotation: ship.rotation,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 4.2,
+        max_distance: 110,
+        rotation: ship.rotation,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+    }
+
+    if (ship.laser_level === 4) {
+      lasers.push({
+        speed: 4.2,
+        max_distance: 110,
+        rotation: ship.rotation,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 4.2,
+        max_distance: 110,
+        rotation: ship.rotation,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+    }
+
+    if (ship.laser_level === 5) {
+      lasers.push({
+        speed: 4.4,
+        max_distance: 115,
+        rotation: ship.rotation,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 4.4,
+        max_distance: 115,
+        rotation: ship.rotation,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+    }
+
+    if (ship.laser_level === 6) {
+      lasers.push({
+        speed: 4.4,
+        max_distance: 115,
+        rotation: ship.rotation,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 4.4,
+        max_distance: 115,
+        rotation: ship.rotation,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+
+      lasers.push({
+        speed: 4.4,
+        max_distance: 115,
+        rotation: ship.rotation + 15,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 4.4,
+        max_distance: 115,
+        rotation: ship.rotation - 15,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+    }
+
+    if (ship.laser_level === 7) {
+      lasers.push({
+        speed: 4.5,
+        max_distance: 120,
+        rotation: ship.rotation,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 4.5,
+        max_distance: 120,
+        rotation: ship.rotation,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+
+      lasers.push({
+        speed: 4.5,
+        max_distance: 120,
+        rotation: ship.rotation + 15,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 4.5,
+        max_distance: 120,
+        rotation: ship.rotation - 15,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+    }
+
+    if (ship.laser_level === 8) {
+      lasers.push({
+        speed: 4.7,
+        max_distance: 125,
+        rotation: ship.rotation,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 4.7,
+        max_distance: 125,
+        rotation: ship.rotation,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+
+      lasers.push({
+        speed: 4.7,
+        max_distance: 125,
+        rotation: ship.rotation + 15,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 4.7,
+        max_distance: 125,
+        rotation: ship.rotation - 15,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+    }
+
+    if (ship.laser_level === 9) {
+      lasers.push({
+        speed: 4.8,
+        max_distance: 130,
+        rotation: ship.rotation,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 4.8,
+        max_distance: 130,
+        rotation: ship.rotation,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+
+      lasers.push({
+        speed: 4.8,
+        max_distance: 130,
+        rotation: ship.rotation + 15,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 4.8,
+        max_distance: 130,
+        rotation: ship.rotation - 15,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+    }
+
+    if (ship.laser_level === 10) {
+      lasers.push({
+        speed: 5,
+        max_distance: 120,
+        rotation: ship.rotation,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 5,
+        max_distance: 120,
+        rotation: ship.rotation,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+
+      lasers.push({
+        speed: 5,
+        max_distance: 120,
+        rotation: ship.rotation + 15,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 5,
+        max_distance: 120,
+        rotation: ship.rotation - 15,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+
+      lasers.push({
+        speed: 5,
+        max_distance: 120,
+        rotation: ship.rotation + 30,
+        x: App.ship.x + x,
+        y: App.ship.y + y,
+      })
+
+      lasers.push({
+        speed: 5,
+        max_distance: 120,
+        rotation: ship.rotation - 30,
+        x: App.ship.x - x,
+        y: App.ship.y - y,
+      })
+    }
+
+    if (App.sound) {
+      new Audio(`/audio/laser.ogg`).play()
+    }
+
+    ship.last_fired = Date.now()
+    App.lasers.push(lasers)
   }
 }
