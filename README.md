@@ -40,8 +40,27 @@ There is a console on the server's terminal to issue commands.
 
 Available commands:
 
+---
 `instance` with or without argument.
+
+This is the 4get instance for image search.
+
+Find an instance you like in `4get.ca`.
+
+---
 
 `scraper` with or without argument.
 
+This is the 4get image search scraper.
+
+For instance it can be `ddg` or `brave`, or `google`, etc.
+
+---
+
 `kick` with a username argument.
+
+Used to kick players.
+
+There is still no ban mechanism in place.
+
+And there are no special/admin accounts.
