@@ -89,15 +89,14 @@ App.start_socket = () => {
     if (data.type === `chat_msg`) {
       App.update_chat(data.username, data.msg)
     }
+    else if (data.type === `joined`) {
+      App.greet(data.username)
+    }
+    else if (data.type === `already`) {
+      App.already_playing(data)
+    }
     else if (data.type === `username`) {
-      App.username = data.username
-      App.current_youtube = data.current_youtube
-      App.chat_announce(data.username + ` has joined`)
-      App.chat_announce(`Move with the arrow keys and shoot with spacebar`)
-      App.chat_announce(`Place an image on the map (visible to everyone) with "img something" or by pasting an image url`)
-      App.chat_announce(`Play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url`)
-      App.chat_announce(`Upgrade your ship by destroying other players`)
-      App.start_heartbeat()
+      App.on_join(data)
     }
     else if (data.type === `youtube_result`) {
       App.current_youtube = data
@@ -107,8 +106,7 @@ App.start_socket = () => {
       App.chat_announce(`YouTube search failed: ` + data.message)
     }
     else if (data.type === `image_result`) {
-      App.place_image(data.imageUrl, data.title)
-      App.chat_announce(`${App.image_icon} ${data.title} (placed by ${data.requestedBy})`)
+      App.on_image_result(data)
     }
     else if (data.type === `image_error`) {
       App.chat_announce(`Image search failed: ` + data.message)
@@ -129,17 +127,7 @@ App.start_socket = () => {
       App.chat_announce(data.message)
     }
     else if (data.type === `destroyed`) {
-      if (data.username !== App.username) {
-        App.enemy_destroyed(data)
-      }
-
-      let kills = ``
-
-      if (data.kills > 1) {
-        kills = `<br>(` + data.kills + ` kills in a row)`
-      }
-
-      App.chat_announce(`💥 ${data.destroyed_by} destroyed ${data.username}${kills}`)
+      App.on_destroyed(data)
     }
     else if (data.type === `images`) {
       App.place_images(data.images)
@@ -148,8 +136,7 @@ App.start_socket = () => {
       window.location = `/`
     }
     else if (data.type === `disconnection`) {
-      App.chat_announce(data.username + ` has left`)
-      App.remove_enemy(data.username)
+      App.on_disconnection(data)
     }
     else if (data.type === `kicked`) {
       App.on_kicked()
@@ -336,14 +323,6 @@ App.send_to_chat = () => {
 
   if (App.check_image(msg)) {
     // Do nothing
-  }
-
-  if (App.check_instance(msg)) {
-    return
-  }
-
-  if (App.check_scraper(msg)) {
-    return
   }
 
   if (App.msg_is_ok(msg)) {
@@ -1295,36 +1274,6 @@ App.check_image = (msg) => {
   return false
 }
 
-App.check_command = (msg, what) => {
-  if (msg.startsWith(`/${what}`)) {
-    let q = ``
-    let split = msg.split(` `)
-
-    if (split.length >= 2) {
-      q = split.slice(1).join(` `).trim()
-    }
-
-    if (q) {
-      App.socket.emit(`change_${what}`, {query: q})
-    }
-    else {
-      App.socket.emit(`get_${what}`)
-    }
-
-    return true
-  }
-
-  return false
-}
-
-App.check_instance = (msg) => {
-  return App.check_command(msg, `instance`)
-}
-
-App.check_scraper = (msg) => {
-  return App.check_command(msg, `scraper`)
-}
-
 App.place_images = (imgs) => {
   for (let img of imgs) {
     let img_obj = new Image()
@@ -1357,12 +1306,6 @@ App.z_order = () => {
   }
 
   App.background.setChildIndex(App.ship, App.background.getNumChildren() - 1)
-}
-
-App.start_heartbeat = () => {
-  setInterval(function() {
-    App.socket.emit(`heartbeat`, {})
-  }, 10000)
 }
 
 App.upgrade = () => {
@@ -1427,7 +1370,7 @@ App.play_youtube = () => {
   }
 
   App.play_yt(data.videoId)
-  App.chat_announce(`${App.radio_icon} ${data.title} (changed by ${data.requestedBy})`)
+  App.chat_announce(`${App.radio_icon} ${data.title} (${data.requestedBy})`)
 }
 
 App.setup_clicks = () => {
@@ -1453,6 +1396,49 @@ App.setup_focus = () => {
 }
 
 App.on_kicked = () => {
-  App.chat_announce(`😭 You were disconnected.`)
+  App.chat_announce(`😭 You were disconnected`)
   document.querySelector(`#canvas_container`).classList.add(`kicked`)
+}
+
+App.greet = (username) => {
+  App.chat_announce(`🚀 ${username} has joined`)
+}
+
+App.already_playing = (data) => {
+  App.chat_announce(`${data.username} is already playing. Refresh and try again`)
+}
+
+App.on_join = (data) => {
+  App.username = data.username
+  App.current_youtube = data.current_youtube
+
+  App.greet(data.username)
+  App.chat_announce(`Move with the arrow keys and shoot with spacebar`)
+  App.chat_announce(`Place an image on the map (visible to everyone) with "img something" or by pasting an image url`)
+  App.chat_announce(`Play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url`)
+  App.chat_announce(`Upgrade your ship by destroying other players`)
+}
+
+App.on_destroyed = (data) => {
+  if (data.username !== App.username) {
+    App.enemy_destroyed(data)
+  }
+
+  let kills = ``
+
+  if (data.kills > 1) {
+    kills = `<br>(` + data.kills + ` kills in a row)`
+  }
+
+  App.chat_announce(`💥 ${data.destroyed_by} destroyed ${data.username}${kills}`)
+}
+
+App.on_image_result = (data) => {
+  App.place_image(data.imageUrl, data.title)
+  App.chat_announce(`${App.image_icon} ${data.title} (${data.requestedBy})`)
+}
+
+App.on_disconnection = (data) => {
+  App.chat_announce(`➡️ ${data.username} has left`)
+  App.remove_enemy(data.username)
 }

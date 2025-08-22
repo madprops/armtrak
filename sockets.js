@@ -17,20 +17,6 @@ module.exports = (io, App) => {
   App.scores = []
   App.max_username_length = 28
 
-  App.read_file = (what) => {
-    try {
-      App[what] = fs.readFileSync(path.join(__dirname, `${what}.txt`), `utf8`).trim()
-      console.log(`💾 ${what} loaded.`)
-    }
-    catch (error) {
-      console.error(`Failed to load ${what}`, error.message)
-    }
-  }
-
-  App.read_file(`youtube_key`)
-  App.read_file(`image_instance`)
-  App.read_file(`image_scraper`)
-
   io.on(`connection`, (socket) => {
     socket.on(`adduser`, (data) => {
       let username = App.clean_username(data.username)
@@ -41,6 +27,11 @@ module.exports = (io, App) => {
       }
 
       if (App.get_socket_by_username(username)) {
+        socket.emit(`update`, {
+          type: `already`,
+          username,
+        })
+
         socket.disconnect()
         return
       }
@@ -54,8 +45,8 @@ module.exports = (io, App) => {
       })
 
       socket.broadcast.emit(`update`, {
-        type: `chat_announcement`,
-        msg: socket.ak_username + ` has joined`,
+        type: `joined`,
+        username: socket.ak_username,
       })
     })
 
@@ -120,12 +111,6 @@ module.exports = (io, App) => {
       }
     })
 
-    socket.on(`heartbeat`, (data) => {
-      if (socket.ak_username === undefined) {
-        socket.emit(`update`, {type: `connection_lost`})
-      }
-    })
-
     socket.on(`youtube_search`, (data) => {
       if ((socket.ak_username !== undefined) && data.query) {
         App.perform_youtube_search(data.query, socket.ak_username, (result) => {
@@ -172,20 +157,7 @@ module.exports = (io, App) => {
 
     socket.on(`change_instance`, (data) => {
       if (data.query) {
-        let file_path = path.join(__dirname, `image_instance.txt`)
-        let url = App.add_https(data.query)
-
-        fs.writeFile(file_path, url, (err) => {
-          if (err) {
-            console.error(`Failed to update image_instance.txt:`, err.message)
-            socket.emit(`update`, {type: `error`, message: `Failed to update image instance.`})
-          }
-          else {
-            console.log(`image_instance.txt updated successfully`)
-            socket.emit(`update`, {type: `success`, message: `Image instance updated.`})
-            App.image_instance = url
-          }
-        })
+        App.write_file(`image_instance`, data.query)
       }
     })
 
@@ -196,19 +168,7 @@ module.exports = (io, App) => {
 
     socket.on(`change_scraper`, (data) => {
       if (data.query) {
-        let file_path = path.join(__dirname, `image_scraper.txt`)
-
-        fs.writeFile(file_path, data.query, (err) => {
-          if (err) {
-            console.error(`Failed to update image_scraper.txt:`, err.message)
-            socket.emit(`update`, {type: `error`, message: `Failed to update image scraper.`})
-          }
-          else {
-            console.log(`image_scraper.txt updated successfully`)
-            socket.emit(`update`, {type: `success`, message: `Image scraper updated.`})
-            App.image_scraper = data.query
-          }
-        })
+        App.write_file(`image_scraper`, data.query)
       }
     })
 
@@ -322,6 +282,8 @@ module.exports = (io, App) => {
   }
 
   App.perform_youtube_search = (query, username, callback) => {
+    App.read_file(`youtube_key`)
+
     if (!App.youtube_key) {
       callback({
         success: false,
@@ -398,6 +360,9 @@ module.exports = (io, App) => {
   }
 
   App.perform_image_search = (query, username, callback) => {
+    App.read_file(`image_instance`)
+    App.read_file(`image_scraper`)
+
     if (!App.image_instance || !App.image_scraper) {
       callback({
         success: false,
@@ -474,13 +439,33 @@ module.exports = (io, App) => {
   App.run_command = (cmd) => {
     let split = cmd.split(` `)
 
-    if (cmd.startsWith(`kick `)) {
+    if (split.length === 1) {
+      if (cmd === `instance`) {
+        App.read_file(`image_instance`)
+        console.log(App.image_instance || `No instance set`)
+      }
+      else if (cmd === `scraper`) {
+        App.read_file(`image_scraper`)
+        console.log(App.image_scraper || `No scraper set`)
+      }
+    }
+    else if (cmd.startsWith(`kick `)) {
       let username = split[1].trim()
       let socket = App.get_socket_by_username(username)
 
       if (socket) {
         App.kick_socket(socket)
       }
+    }
+    else if (split[0] === `instance`) {
+      let value = split.slice(1).join(` `).trim()
+      App.write_file(`image_instance`, value)
+      console.log(`Instance set to: ${value}`)
+    }
+    else if (split[0] === `scraper`) {
+      let value = split.slice(1).join(` `).trim()
+      App.write_file(`image_scraper`, value)
+      console.log(`Scraper set to: ${value}`)
     }
   }
 
@@ -510,5 +495,37 @@ module.exports = (io, App) => {
     })
 
     socket.disconnect()
+  }
+
+  App.read_file = (what) => {
+    try {
+      App[what] = fs.readFileSync(path.join(__dirname, `${what}.txt`), `utf8`).trim()
+    }
+    catch (error) {
+      console.error(`Failed to load ${what}`, error.message)
+    }
+  }
+
+  App.write_file = (what, value) => {
+    value = value.trim()
+
+    if (!value) {
+      return
+    }
+
+    let file_path = path.join(__dirname, `${what}.txt`)
+
+    if ([`image_instance`].includes(what)) {
+      value = App.add_https(value)
+    }
+
+    fs.writeFile(file_path, value, (err) => {
+      if (err) {
+        console.error(`Failed to update ${what}.txt:`, err.message)
+      }
+      else {
+        App[what] = value
+      }
+    })
   }
 }
