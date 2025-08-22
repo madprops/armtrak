@@ -57,9 +57,3 @@ App.z_order = () => {
 
   App.background.setChildIndex(App.ship, App.background.getNumChildren() - 1)
 }
-
-App.get_random_coords = () => {
-  let x = App.get_random_int(10, App.bg_width - 10)
-  let y = App.get_random_int(10, App.bg_height - 10)
-  return [x, y]
-}

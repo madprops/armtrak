@@ -5,23 +5,25 @@ class EnemyShip {
   }
 }
 
-App.update_enemy_ship = (data) => {
-  let enemy = App.get_enemy_ship_or_create(data)
+App.update_enemy_ships = (data) => {
+  for (let data of data.ships) {
+    let enemy = App.get_enemy_ship_or_create(data)
 
-  if (enemy) {
-    enemy.container.x = data.x
-    enemy.container.y = data.y
-    enemy.container.visible = data.visible
+    if (enemy) {
+      enemy.container.x = data.x
+      enemy.container.y = data.y
+      enemy.container.visible = data.visible
 
-    if (enemy.container.model !== data.model) {
-      let image = new Image()
-      image.src = `img/nave` + data.model + `.png`
-      enemy.container.children[0].image = image
+      if (enemy.container.model !== data.model) {
+        let image = new Image()
+        image.src = `img/nave` + data.model + `.png`
+        enemy.container.children[0].image = image
+      }
+
+      enemy.container.model = data.model
+      enemy.container.model = data.model
+      enemy.container.children[0].rotation = data.rotation
     }
-
-    enemy.container.model = data.model
-    enemy.container.model = data.model
-    enemy.container.children[0].rotation = data.rotation
   }
 }
 
@@ -56,23 +58,21 @@ App.remove_enemy = (uname) => {
   }
 }
 
-App.create_ship = () => {
+App.create_ship = (data) => {
   let image = new Image()
-  let num = App.get_random_int(1, 15)
-  image.src = `img/nave` + num + `.png`
+  image.src = `img/nave${data.model}.png`
   App.ship_image = new createjs.Bitmap(image)
-  App.ship = new createjs.Container()
-  let coords = App.get_random_coords()
-  App.ship.x = coords[0]
-  App.ship.y = coords[1]
-  App.ship.speed = 0
-  App.ship.max_health = App.min_max_health
-  App.ship.health = App.ship.max_health
-  App.ship.max_speed = App.min_max_speed
-  App.ship.laser_level = App.min_laser_level
-  App.ship.model = num
-
   App.ship.addChild(App.ship_image)
+
+  App.ship = new createjs.Container()
+  App.ship.x = data.x
+  App.ship.y = data.y
+  App.ship.speed = data.speed
+  App.ship.max_health = data.max_health
+  App.ship.health = data.health
+  App.ship.max_speed = data.max_speed
+  App.ship.laser_level = data.laser_level
+  App.ship.model = data.model
 
   let label = App.create_label(App.username)
   App.ship.addChild(label)
@@ -84,7 +84,9 @@ App.create_ship = () => {
     App.ship_width = image.width
     App.ship_height = image.height
 
-    App.move_background(coords[0] - (App.background.canvas.width / 2) + (App.ship_width / 2), coords[1] - (App.background.canvas.height / 2) + (App.ship_height / 2))
+    let bg_coords_1 = coords[0] - (App.background.canvas.width / 2) + (App.ship_width / 2)
+    let bg_coords_2 = coords[1] - (App.background.canvas.height / 2) + (App.ship_height / 2)
+    App.move_background(bg_coords_1, bg_coords_2)
 
     App.ship_image.regX = App.ship_width / 2
     App.ship_image.regY = App.ship_height / 2
@@ -93,8 +95,6 @@ App.create_ship = () => {
 
     label.x = App.ship_width / 2
     label.y = App.ship_height
-
-    App.socket.emit(`get_images`, {})
   }
 }
 
@@ -124,10 +124,6 @@ App.create_enemy_ship = (enemy, x, y, model) => {
     label.x = App.ship_width / 2
     label.y = App.ship_height
   }
-}
-
-App.emit_ship_info = () => {
-  App.socket.emit(`ship_info`, {x:App.ship.x, y:App.ship.y, rotation:App.ship_image.rotation, visible:App.ship.visible, model:App.ship.model})
 }
 
 App.move_ship = () => {

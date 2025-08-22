@@ -19,9 +19,10 @@ module.exports = (io, App) => {
       }
 
       socket.ak_username = App.add_username(username)
+      App.create_ship(socket)
 
       socket.emit(`update`, {
-        type: `username`,
+        type: `on_join`,
         username: socket.ak_username,
         youtube: App.read_file(`youtube`),
       })
@@ -29,6 +30,7 @@ module.exports = (io, App) => {
       socket.broadcast.emit(`update`, {
         type: `joined`,
         username: socket.ak_username,
+        ship: socket.ak_ship,
       })
 
       if (App.images.length) {
@@ -49,23 +51,15 @@ module.exports = (io, App) => {
       }
     })
 
-    socket.on(`ship_info`, (data) => {
+    socket.on(`ship_update`, (data) => {
       if (socket.ak_username !== undefined) {
-        socket.broadcast.emit(`update`, {
-          type: `ship_info`,
-          username: socket.ak_username,
-          x: data.x,
-          y: data.y,
-          rotation: data.rotation,
-          visible: data.visible,
-          model: data.model,
-        })
+        App.update_ship(data)
       }
     })
 
-    socket.on(`laser`, (data) => {
+    socket.on(`fire_laser`, (data) => {
       if (socket.ak_username !== undefined) {
-        socket.broadcast.emit(`update`, {type: `laser`, laser: data})
+        App.fire_laser(data)
       }
     })
 

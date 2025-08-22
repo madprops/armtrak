@@ -84,18 +84,14 @@ App.already_playing = (data) => {
   App.chat_announce(`${data.username} is already playing. Refresh and try again`)
 }
 
-App.on_join = (data) => {
-  App.username = data.username
-  App.youtube = data.youtube
+App.on_disconnection = (data) => {
+  App.chat_announce(`➡️ ${data.username} has left`)
+  App.remove_enemy(data.username)
+}
 
-  App.greet(data.username)
+App.show_intro = () => {
   App.chat_announce(`Move with the arrow keys and shoot with spacebar`)
   App.chat_announce(`Place an image on the map (visible to everyone) with "img something" or by pasting an image url`)
   App.chat_announce(`Play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url`)
   App.chat_announce(`Upgrade your ship by destroying other players`)
-}
-
-App.on_disconnection = (data) => {
-  App.chat_announce(`➡️ ${data.username} has left`)
-  App.remove_enemy(data.username)
 }

@@ -15,6 +15,7 @@ module.exports = (io, App) => {
 
   App.init = () => {
     App.read_file(`images`, `json`, [])
+    App.start_game()
   }
 
   App.init()

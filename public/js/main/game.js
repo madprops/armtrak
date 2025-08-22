@@ -17,21 +17,11 @@ App.setup_explosions = () => {
   App.explosion_image.onload = () => {
     App.explosion_sheet = new createjs.SpriteSheet({
       images: [App.explosion_image],
-      frames: {width: 96, height: 96, regX: 0, regY: 0},
+      frames: { width: 96, height: 96, regX: 0, regY: 0 },
       animations: {
         explode: [0, 71, false],
       },
     })
-  }
-}
-
-App.setup_lasers = () => {
-  App.laser_img = new Image()
-  App.laser_img.src = `img/laser.png`
-
-  App.laser_img.onload = () => {
-    App.laser_width = App.laser_img.width
-    App.laser_height = App.laser_img.height
   }
 }
 
@@ -42,8 +32,8 @@ App.get_username = () => {
     App.username = App.clean_username(prompt(`Pick Your Name`))
 
     if ((App.username === null) || (App.username.length < 1) ||
-    (App.username.length > App.max_username_length) ||
-    (App.username.indexOf(`<`) !== -1)) {
+      (App.username.length > App.max_username_length) ||
+      (App.username.indexOf(`<`) !== -1)) {
       keep_naming = true
     }
     else {
@@ -67,7 +57,7 @@ App.start_socket = () => {
     else if (data.type === `already`) {
       App.already_playing(data)
     }
-    else if (data.type === `username`) {
+    else if (data.type === `on_join`) {
       App.on_join(data)
     }
     else if (data.type === `youtube_result`) {
@@ -86,8 +76,8 @@ App.start_socket = () => {
     else if (data.type === `chat_announcement`) {
       App.chat_announce(data.msg)
     }
-    else if (data.type === `ship_info`) {
-      App.update_enemy_ship(data)
+    else if (data.type === `ship_updates`) {
+      App.update_enemy_ships(data)
     }
     else if (data.type === `laser`) {
       App.fire_enemy_laser(data)
@@ -115,35 +105,10 @@ App.start_socket = () => {
     }
   })
 
-  App.socket.emit(`adduser`, {username:App.username})
+  App.socket.emit(`adduser`, { username: App.username })
 }
 
 App.start_game = () => {
   App.create_background()
   App.show_safe_zone()
-  App.create_ship()
-  App.clock = Date.now()
-  App.loop()
-}
-
-App.loop = () => {
-  App.move()
-  App.clockwork()
-  App.emit_ship_info()
-  App.background.update()
-  setTimeout(App.loop, 1000 / 60)
-}
-
-App.clockwork = () => {
-  if ((Date.now() - App.clock) >= 200) {
-    if (App.up_arrow) {
-      App.increase_ship_speed()
-    }
-    else {
-      App.reduce_ship_speed()
-    }
-
-    App.update_minimap()
-    App.clock = Date.now()
-  }
 }

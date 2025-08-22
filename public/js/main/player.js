@@ -90,27 +90,17 @@ App.turn_right = () => {
   App.ship_image.rotation += 3
 }
 
-App.move = () => {
-  if (App.ship.visible) {
-    App.move_ship()
-  }
-
-  App.move_lasers()
-
-  if (App.left_arrow) {
-    App.turn_left()
-    return true
-  }
-
-  if (App.right_arrow) {
-    App.turn_right()
-    return true
-  }
-}
-
 App.reset_arrows = () => {
   App.left_arrow = false
   App.right_arrow = false
   App.up_arrow = false
   App.down_arrow = false
+}
+
+App.on_join = (data) => {
+  App.username = data.username
+  App.youtube = data.youtube
+  App.create_ship(data.ship)
+  App.greet(data.username)
+  App.show_intro()
 }
