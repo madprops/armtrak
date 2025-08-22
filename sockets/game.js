@@ -30,6 +30,9 @@ const SAFE_ZONE_HEIGHT = 150
 // Time
 let CLOCK = Date.now()
 
+// Lasers
+LASER_STEP = 1
+
 module.exports = (io, App) => {
   class Ship {
     static id = 1
@@ -132,8 +135,13 @@ module.exports = (io, App) => {
   }
 
   App.move = () => {
+    App.move_ships()
+    App.move_lasers()
+  }
+
+  App.move_ships = () => {
     for (let ship of App.ships) {
-      if (App.ship.visible) {
+      if (ship.visible) {
         App.move_ship()
       }
 
@@ -147,8 +155,6 @@ module.exports = (io, App) => {
         return true
       }
     }
-
-    App.move_lasers()
   }
 
   App.move_lasers = () => {
@@ -156,7 +162,7 @@ module.exports = (io, App) => {
       if (laser.distance < laser.max_distance) {
         laser.x += laser.vx
         laser.y += laser.vy
-        laser.distance += 1
+        laser.distance += LASER_STEP
 
         if (laser.x <= 0) {
           laser.x = BG_WIDTH
@@ -188,51 +194,12 @@ module.exports = (io, App) => {
         else if (check_col()) {
           App.lasers.splice(i, 1)
           i -= 1
-          App.background.removeChild(laser)
         }
       }
       else {
         App.lasers.splice(i, 1)
         i -= 1
         App.background.removeChild(laser)
-      }
-    }
-
-    for (let [i, enemy_laser] of App.enemy_lasers.entries()) {
-      if (enemy_laser.distance < enemy_laser.max_distance) {
-        enemy_laser.x += enemy_laser.vx
-        enemy_laser.y += enemy_laser.vy
-        enemy_laser.distance += 1
-
-        if (enemy_laser.x <= 0) {
-          enemy_laser.x = BG_WIDTH
-        }
-        else if (enemy_laser.x >= BG_WIDTH) {
-          enemy_laser.x = 0
-        }
-        else if (enemy_laser.y <= 0) {
-          enemy_laser.y = BG_HEIGHT
-        }
-        else if (enemy_laser.y >= BG_HEIGHT) {
-          enemy_laser.y = 0
-        }
-
-        if ((Math.pow((enemy_laser.x + (LASER_WIDTH / 2)) - BG_WIDTH / 2, 2) + Math.pow((enemy_laser.y + (LASER_HEIGHT / 2)) - BG_HEIGHT / 2, 2)) < Math.pow(App.safe_zone_radius, 2)) {
-          App.enemy_lasers.splice(i, 1)
-          i -= 1
-          App.background.removeChild(enemy_laser)
-        }
-        else if (App.check_ship_collision(enemy_laser)) {
-          App.ship_hit(enemy_laser)
-          App.enemy_lasers.splice(i, 1)
-          i -= 1
-          App.background.removeChild(enemy_laser)
-        }
-      }
-      else {
-        App.enemy_lasers.splice(i, 1)
-        i -= 1
-        App.background.removeChild(enemy_laser)
       }
     }
   }
@@ -398,5 +365,22 @@ module.exports = (io, App) => {
     App.safe_zone.x = (BG_WIDTH / 2) - (SAFE_ZONE_WIDTH / 2)
     App.safe_zone.y = (BG_HEIGHT / 2) - (SAFE_ZONE_HEIGHT / 2)
     App.safe_zone.radius = SAFE_ZONE_HEIGHT / 2
+  }
+
+  App.check_enemy_collision = (socket, laser) => {
+    for (let ship of App.enemy_ships) {
+      if (ship.container.visible) {
+        let x1 = ship.container.x - App.ship_width / 4
+        let x2 = ship.container.x + App.ship_width / 4
+        let y1 = ship.container.y - App.ship_height / 4
+        let y2 = ship.container.y + App.ship_height / 4
+
+        if (((laser.x >= x1) && (laser.x <= x2)) && ((laser.y >= y1) && (laser.y <= y2))) {
+          return ship
+        }
+      }
+    }
+
+    return false
   }
 }
