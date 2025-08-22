@@ -163,7 +163,6 @@ App.image_icon = `🖼️`
 App.radio_icon = `🔊`
 App.max_images = 18
 App.big_image_width = 2000
-App.big_image_scale = 0.333
 
 App.init = () => {
   App.prepare_game()
@@ -422,9 +421,18 @@ App.clockwork = () => {
 }
 
 App.setup_image = (image) => {
-  if (image.width >= App.big_image_width) {
-    image.scaleX = App.big_image_scale
-    image.scaleY = App.big_image_scale
+  let width = image.image.width
+  let height = image.image.height
+
+  if (width >= App.big_image_width) {
+    let scale = App.big_image_width / width
+    image.scaleX = scale
+    image.scaleY = scale
+  }
+  else if (height >= App.big_image_height) {
+    let scale = App.big_image_height / height
+    image.scaleX = scale
+    image.scaleY = scale
   }
 }
 

@@ -25,8 +25,7 @@ App.label_size = 8
 App.image_icon = `🖼️`
 App.radio_icon = `🔊`
 App.max_images = 18
-App.big_image_width = 2000
-App.big_image_scale = 0.333
+App.big_image_width = 2560
 
 App.init = () => {
   App.prepare_game()

@@ -1,7 +1,16 @@
 App.setup_image = (image) => {
-  if (image.width >= App.big_image_width) {
-    image.scaleX = App.big_image_scale
-    image.scaleY = App.big_image_scale
+  let width = image.image.width
+  let height = image.image.height
+
+  if (width >= App.big_image_width) {
+    let scale = App.big_image_width / width
+    image.scaleX = scale
+    image.scaleY = scale
+  }
+  else if (height >= App.big_image_height) {
+    let scale = App.big_image_height / height
+    image.scaleX = scale
+    image.scaleY = scale
   }
 }
 
