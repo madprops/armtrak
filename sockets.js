@@ -508,9 +508,19 @@ module.exports = (io, App) => {
     socket.disconnect()
   }
 
+  App.create_file = (file_path) => {
+    fs.writeFileSync(file_path, (mode === `json` ? JSON.stringify(def_value) : def_value), 'utf8')
+  }
+
   App.read_file = (what, mode = `normal`, def_value = ``) => {
     try {
-      let s = fs.readFileSync(path.join(__dirname, `data/${what}.txt`), `utf8`).trim()
+      let file_path = path.join(__dirname, `data/${what}.txt`)
+
+      if (!fs.existsSync(file_path)) {
+        App.create_file(file_path)
+      }
+
+      let s = fs.readFileSync(file_path, `utf8`).trim()
 
       if (mode === `json`) {
         if (s) {
@@ -537,6 +547,10 @@ module.exports = (io, App) => {
     }
 
     let file_path = path.join(__dirname, `data/${what}.txt`)
+
+    if (!fs.existsSync(file_path)) {
+      App.create_file(file_path)
+    }
 
     if ([`image_instance`].includes(what)) {
       value = App.add_https(value)
