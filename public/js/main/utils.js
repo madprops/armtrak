@@ -98,3 +98,7 @@ App.clean_string = (s) => {
 
   return s.replace(/</g, ``).trim().replace(/\s+/g, ` `)
 }
+
+App.padnum = (num, amount = 3) => {
+  return String(num).padStart(amount, `0`)
+}

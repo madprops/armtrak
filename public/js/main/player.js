@@ -48,7 +48,8 @@ App.increase_max_speed = () => {
 }
 
 App.update_hud = () => {
-  $(`#health`).html(`Health: ` + App.ship.health + `/` + App.ship.max_health)
+  let health = App.padnum(App.ship.health, 3)
+  $(`#health`).html(`Health: ` + health + `/` + App.ship.max_health)
   $(`#max_speed`).html(`Max Speed: ` + (Math.round((App.ship.max_speed - 1) * 10) / 10))
 }
 

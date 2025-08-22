@@ -159,6 +159,7 @@ iframe {
 	padding-left: 1rem;
 	display: flex;
 	gap: 2rem;
+	font-family: monospace;
 }
 
 #about {
