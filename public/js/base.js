@@ -60,7 +60,7 @@ App.init = () => {
   let keep_naming = true
 
   while (keep_naming) {
-    App.username = App.clean_string(prompt(`Pick Your Name`))
+    App.username = App.clean_username(prompt(`Pick Your Name`))
 
     if ((App.username === null) || (App.username.length < 1) ||
     (App.username.length > App.max_username_length) ||
@@ -139,7 +139,7 @@ App.start_socket = () => {
         kills = `<br>(` + data.kills + ` kills in a row)`
       }
 
-      App.chat_announce(data.destroyed_by + ` destroyed ` + data.username + kills)
+      App.chat_announce(`💥 ${data.destroyed_by} destroyed ${data.username}${kills}`)
     }
     else if (data.type === `images`) {
       App.place_images(data.images)
@@ -291,6 +291,11 @@ App.clean_string = (s) => {
   }
 
   return s.replace(/</g, ``).trim().replace(/\s+/g, ` `)
+}
+
+App.clean_username = (s) => {
+  s = s.replace(/[^a-zA-Z0-9 ]/g, ``).trim()
+  return s.replace(/\s+/g, ` `)
 }
 
 App.format_msg = (uname, msg) => {
@@ -1287,30 +1292,34 @@ App.check_image = (msg) => {
   return false
 }
 
-App.check_instance = (msg) => {
-  if (msg.startsWith(`/instance `)) {
-    let q = msg.split(`/instance `)[1].trim()
+App.check_command = (msg, what) => {
+  if (msg.startsWith(`/${what}`)) {
+    let q = ``
+    let split = msg.split(` `)
 
-    if (q !== ``) {
-      App.socket.emit(`change_instance`, {query: q})
-      return true
+    if (split.length >= 2) {
+      q = split.slice(1).join(` `).trim()
     }
+
+    if (q) {
+      App.socket.emit(`change_${what}`, {query: q})
+    }
+    else {
+      App.socket.emit(`get_${what}`)
+    }
+
+    return true
   }
 
   return false
 }
 
+App.check_instance = (msg) => {
+  return App.check_command(msg, `instance`)
+}
+
 App.check_scraper = (msg) => {
-  if (msg.startsWith(`/scraper `)) {
-    let q = msg.split(`/scraper `)[1].trim()
-
-    if (q !== ``) {
-      App.socket.emit(`change_scraper`, {query: q})
-      return true
-    }
-  }
-
-  return false
+  return App.check_command(msg, `scraper`)
 }
 
 App.place_images = (imgs) => {
