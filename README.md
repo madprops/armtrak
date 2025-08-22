@@ -43,6 +43,21 @@ There is a console on the server's terminal to issue commands.
 Available commands:
 
 ---
+
+`youtube_key` with argument.
+
+The YouTube API key.
+
+---
+
+`youtube` with argument
+
+Change the youtube video manually for all players.
+
+The sender is shown as 👾.
+
+---
+
 `instance` with or without argument.
 
 This is the 4get instance for image search.
