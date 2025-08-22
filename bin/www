@@ -45,7 +45,7 @@ const io = new Server(server, {
   }
 })
 
-require(`../sockets`)(io, App)
+require(`../sockets/main`)(io, App)
 
 /**
  * Normalize a port into a number, string, or false.

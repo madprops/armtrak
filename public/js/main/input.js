@@ -55,11 +55,11 @@ App.setup_clicks = () => {
     }, 500)
   }, {once: true})
 
-  document.querySelector(`#sound_toggle`).addEventListener(`click`, () => {
+  DOM.el(`#sound_toggle`).addEventListener(`click`, () => {
     App.toggle_sound()
   })
 
-  document.querySelector(`#music_toggle`).addEventListener(`click`, () => {
+  DOM.el(`#music_toggle`).addEventListener(`click`, () => {
     App.toggle_music()
   })
 }

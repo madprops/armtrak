@@ -162,7 +162,7 @@ App.label_size = 8
 App.image_icon = `🖼️`
 App.radio_icon = `🔊`
 App.max_images = 18
-App.big_image_width = 2000
+App.big_image_width = 2560
 
 App.init = () => {
   App.prepare_game()
@@ -247,7 +247,7 @@ App.format_announcement_msg = (msg) => {
 
 App.on_kicked = () => {
   App.chat_announce(`😭 You were disconnected`)
-  document.querySelector(`#canvas_container`).classList.add(`kicked`)
+  DOM.el(`#canvas_container`).classList.add(`kicked`)
 }
 
 App.already_playing = (data) => {
@@ -586,11 +586,11 @@ App.setup_clicks = () => {
     }, 500)
   }, {once: true})
 
-  document.querySelector(`#sound_toggle`).addEventListener(`click`, () => {
+  DOM.el(`#sound_toggle`).addEventListener(`click`, () => {
     App.toggle_sound()
   })
 
-  document.querySelector(`#music_toggle`).addEventListener(`click`, () => {
+  DOM.el(`#music_toggle`).addEventListener(`click`, () => {
     App.toggle_music()
   })
 }

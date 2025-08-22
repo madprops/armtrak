@@ -77,7 +77,7 @@ App.format_announcement_msg = (msg) => {
 
 App.on_kicked = () => {
   App.chat_announce(`😭 You were disconnected`)
-  document.querySelector(`#canvas_container`).classList.add(`kicked`)
+  DOM.el(`#canvas_container`).classList.add(`kicked`)
 }
 
 App.already_playing = (data) => {
