@@ -44,6 +44,10 @@ body, html {
 	flex-shrink: 1;
 }
 
+#canvas_container.kicked {
+	background-color: red;
+}
+
 #canvas {
 	float: none;
 	position: absolute;

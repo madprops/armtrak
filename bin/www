@@ -4,9 +4,11 @@
  * Module dependencies.
  */
 
-let app = require(`../app`)
-let debug = require(`debug`)(`armtrak:server`)
-let http = require(`http`)
+const App = {}
+const app = require(`../app`)
+const debug = require(`debug`)(`armtrak:server`)
+const http = require(`http`)
+const readline = require(`readline`)
 
 /**
  * Get port from environment and store in Express.
@@ -43,7 +45,7 @@ const io = new Server(server, {
   }
 })
 
-require(`../sockets`)(io)
+require(`../sockets`)(io, App)
 
 /**
  * Normalize a port into a number, string, or false.
@@ -91,6 +93,23 @@ function onError(error) {
   }
 }
 
+let rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  prompt: `Cmd > `
+})
+
+rl.on(`line`, (input) => {
+  let cmd = input.trim()
+
+  if (!cmd) {
+    return
+  }
+
+  App.run_command(cmd)
+  rl.prompt()
+})
+
 /**
  * Event listener for HTTP server `listening` event.
  */
@@ -114,4 +133,5 @@ function onListening() {
   console.log(`${colors.bright}${colors.blue}⚓ Port ${colors.yellow}${addr.port}${colors.reset}`)
 
   debug(`Listening on ` + bind)
+  rl.prompt()
 }

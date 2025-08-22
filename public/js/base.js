@@ -151,6 +151,9 @@ App.start_socket = () => {
       App.chat_announce(data.username + ` has left`)
       App.remove_enemy(data.username)
     }
+    else if (data.type === `kicked`) {
+      App.on_kicked()
+    }
   })
 
   App.socket.emit(`adduser`, {username:App.username})
@@ -1447,4 +1450,9 @@ App.setup_focus = () => {
   document.addEventListener(`blur`, () => {
     App.reset_arrows()
   })
+}
+
+App.on_kicked = () => {
+  App.chat_announce(`😭 You were disconnected.`)
+  document.querySelector(`#canvas_container`).classList.add(`kicked`)
 }

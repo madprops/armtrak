@@ -1,4 +1,3 @@
-const App = {}
 const fs = require(`fs`)
 const path = require(`path`)
 
@@ -9,7 +8,7 @@ class Score {
   }
 }
 
-module.exports = (io) => {
+module.exports = (io, App) => {
   App.usernames = []
   App.images = []
   App.youtube_key = ``
@@ -41,35 +40,40 @@ module.exports = (io) => {
         return
       }
 
-      socket.username = App.add_username(username)
+      if (App.get_socket_by_username(username)) {
+        socket.disconnect()
+        return
+      }
+
+      socket.ak_username = App.add_username(username)
 
       socket.emit(`update`, {
         type: `username`,
-        username: socket.username,
+        username: socket.ak_username,
         current_youtube: App.current_youtube,
       })
 
       socket.broadcast.emit(`update`, {
         type: `chat_announcement`,
-        msg: socket.username + ` has joined`,
+        msg: socket.ak_username + ` has joined`,
       })
     })
 
     socket.on(`sendchat`, (data) => {
-      if (socket.username !== undefined) {
+      if (socket.ak_username !== undefined) {
         socket.broadcast.emit(`update`, {
           type: `chat_msg`,
-          username: socket.username,
+          username: socket.ak_username,
           msg: App.clean_string(data.msg),
         })
       }
     })
 
     socket.on(`ship_info`, (data) => {
-      if (socket.username !== undefined) {
+      if (socket.ak_username !== undefined) {
         socket.broadcast.emit(`update`, {
           type: `ship_info`,
-          username: socket.username,
+          username: socket.ak_username,
           x: data.x,
           y: data.y,
           rotation: data.rotation,
@@ -80,19 +84,19 @@ module.exports = (io) => {
     })
 
     socket.on(`laser`, (data) => {
-      if (socket.username !== undefined) {
-        socket.broadcast.emit(`update`, { type: `laser`, laser: data })
+      if (socket.ak_username !== undefined) {
+        socket.broadcast.emit(`update`, {type: `laser`, laser: data})
       }
     })
 
     socket.on(`destroyed`, (data) => {
-      if (socket.username !== undefined) {
+      if (socket.ak_username !== undefined) {
         let kills = App.add_kill(data.destroyed_by)
-        App.reset_kills(socket.username)
+        App.reset_kills(socket.ak_username)
 
         io.sockets.emit(`update`, {
           type: `destroyed`,
-          username: socket.username,
+          username: socket.ak_username,
           destroyed_by: data.destroyed_by,
           kills,
         })
@@ -100,37 +104,37 @@ module.exports = (io) => {
     })
 
     socket.on(`image`, (data) => {
-      if (socket.username !== undefined) {
+      if (socket.ak_username !== undefined) {
         App.add_image(data)
 
         socket.broadcast.emit(`update`, {
           type: `images`,
-          images: [{ url: data.url, x: data.x, y: data.y }],
+          images: [{url: data.url, x: data.x, y: data.y}],
         })
       }
     })
 
     socket.on(`get_images`, (data) => {
-      if (socket.username !== undefined) {
-        socket.emit(`update`, { type: `images`, images: App.images })
+      if (socket.ak_username !== undefined) {
+        socket.emit(`update`, {type: `images`, images: App.images})
       }
     })
 
     socket.on(`heartbeat`, (data) => {
-      if (socket.username === undefined) {
-        socket.emit(`update`, { type: `connection_lost` })
+      if (socket.ak_username === undefined) {
+        socket.emit(`update`, {type: `connection_lost`})
       }
     })
 
     socket.on(`youtube_search`, (data) => {
-      if ((socket.username !== undefined) && data.query) {
-        App.perform_youtube_search(data.query, socket.username, (result) => {
+      if ((socket.ak_username !== undefined) && data.query) {
+        App.perform_youtube_search(data.query, socket.ak_username, (result) => {
           if (result.success) {
             App.current_youtube = {
               type: `youtube_result`,
               videoId: result.videoId,
               title: result.title,
-              requestedBy: socket.username,
+              requestedBy: socket.ak_username,
             }
 
             io.sockets.emit(`update`, App.current_youtube)
@@ -146,14 +150,14 @@ module.exports = (io) => {
     })
 
     socket.on(`image_search`, (data) => {
-      if ((socket.username !== undefined) && data.query) {
-        App.perform_image_search(data.query, socket.username, (result) => {
+      if ((socket.ak_username !== undefined) && data.query) {
+        App.perform_image_search(data.query, socket.ak_username, (result) => {
           if (result.success) {
             socket.emit(`update`, {
               type: `image_result`,
               imageUrl: result.imageUrl,
               title: result.title,
-              requestedBy: socket.username,
+              requestedBy: socket.ak_username,
             })
           }
           else {
@@ -174,11 +178,11 @@ module.exports = (io) => {
         fs.writeFile(file_path, url, (err) => {
           if (err) {
             console.error(`Failed to update image_instance.txt:`, err.message)
-            socket.emit(`update`, { type: `error`, message: `Failed to update image instance.` })
+            socket.emit(`update`, {type: `error`, message: `Failed to update image instance.`})
           }
           else {
             console.log(`image_instance.txt updated successfully`)
-            socket.emit(`update`, { type: `success`, message: `Image instance updated.` })
+            socket.emit(`update`, {type: `success`, message: `Image instance updated.`})
             App.image_instance = url
           }
         })
@@ -187,7 +191,7 @@ module.exports = (io) => {
 
     socket.on(`get_instance`, (data) => {
       let v = App.image_instance || `Empty`
-      socket.emit(`update`, { type: `success`, message: `Instance: ${v}` })
+      socket.emit(`update`, {type: `success`, message: `Instance: ${v}`})
     })
 
     socket.on(`change_scraper`, (data) => {
@@ -197,11 +201,11 @@ module.exports = (io) => {
         fs.writeFile(file_path, data.query, (err) => {
           if (err) {
             console.error(`Failed to update image_scraper.txt:`, err.message)
-            socket.emit(`update`, { type: `error`, message: `Failed to update image scraper.` })
+            socket.emit(`update`, {type: `error`, message: `Failed to update image scraper.`})
           }
           else {
             console.log(`image_scraper.txt updated successfully`)
-            socket.emit(`update`, { type: `success`, message: `Image scraper updated.` })
+            socket.emit(`update`, {type: `success`, message: `Image scraper updated.`})
             App.image_scraper = data.query
           }
         })
@@ -210,17 +214,17 @@ module.exports = (io) => {
 
     socket.on(`get_scraper`, (data) => {
       let v = App.image_scraper || `Empty`
-      socket.emit(`update`, { type: `success`, message: `Scraper: ${v}` })
+      socket.emit(`update`, {type: `success`, message: `Scraper: ${v}`})
     })
 
     socket.on(`disconnect`, () => {
-      if (socket.username !== undefined) {
-        App.remove_username(socket.username)
-        App.remove_score(socket.username)
+      if (socket.ak_username !== undefined) {
+        App.remove_username(socket.ak_username)
+        App.remove_score(socket.ak_username)
 
         socket.broadcast.emit(`update`, {
           type: `disconnection`,
-          username: socket.username,
+          username: socket.ak_username,
         })
       }
     })
@@ -465,5 +469,46 @@ module.exports = (io) => {
     }
 
     return url
+  }
+
+  App.run_command = (cmd) => {
+    let split = cmd.split(` `)
+
+    if (cmd.startsWith(`kick `)) {
+      let username = split[1].trim()
+      let socket = App.get_socket_by_username(username)
+
+      if (socket) {
+        App.kick_socket(socket)
+      }
+    }
+  }
+
+  App.get_socket_by_username = (username) => {
+    if (!username) {
+      return null
+    }
+
+    username = username.toLowerCase()
+
+    for (let socket of io.sockets.sockets.values()) {
+      if (!socket.ak_username) {
+        continue
+      }
+
+      if (socket.ak_username.toLowerCase() === username) {
+        return socket
+      }
+    }
+
+    return null
+  }
+
+  App.kick_socket = (socket) => {
+    socket.emit(`update`, {
+      type: `kicked`,
+    })
+
+    socket.disconnect()
   }
 }
