@@ -20,6 +20,12 @@ const SPEED_STEP = 0.2
 const HEALTH_UPGRADE_STEP = 10
 const SPEED_UPGRADE_STEP = 0.1
 const LASER_UPGRADE_STEP = 1
+const SHIP_WIDTH = 24
+const SHIP_HEIGHT = 24
+const LASER_WIDTH = 24
+const LASER_HEIGHT = 24
+const SAFE_ZONE_WIDTH = 150
+const SAFE_ZONE_HEIGHT = 150
 
 // Time
 let CLOCK = Date.now()
@@ -68,6 +74,11 @@ module.exports = (io, App) => {
   }
 
   App.start_game = () => {
+    App.setup_safe_zone()
+    App.start_game_loop()
+  }
+
+  App.start_game_loop = () => {
     let previous_time = Date.now()
     let lag = 0.0
 
@@ -148,23 +159,23 @@ module.exports = (io, App) => {
         laser.distance += 1
 
         if (laser.x <= 0) {
-          laser.x = App.bg_width
+          laser.x = BG_WIDTH
         }
-        else if (laser.x >= App.bg_width) {
+        else if (laser.x >= BG_WIDTH) {
           laser.x = 0
         }
         else if (laser.y <= 0) {
-          laser.y = App.bg_height
+          laser.y = BG_HEIGHT
         }
-        else if (laser.y >= App.bg_height) {
+        else if (laser.y >= BG_HEIGHT) {
           laser.y = 0
         }
 
         let enemy = App.check_enemy_collision(laser)
 
         function check_col() {
-          let x1 = Math.pow((laser.x + (App.laser_width / 2)) - (App.bg_width / 2), 2)
-          let x2 = Math.pow((laser.y + (App.laser_height / 2)) - (App.bg_height / 2), 2)
+          let x1 = Math.pow((laser.x + (LASER_WIDTH / 2)) - (BG_WIDTH / 2), 2)
+          let x2 = Math.pow((laser.y + (LASER_HEIGHT / 2)) - (BG_HEIGHT / 2), 2)
           let x3 = Math.pow(App.safe_zone_radius, 2)
           return x1 + x2 < x3
         }
@@ -194,19 +205,19 @@ module.exports = (io, App) => {
         enemy_laser.distance += 1
 
         if (enemy_laser.x <= 0) {
-          enemy_laser.x = App.bg_width
+          enemy_laser.x = BG_WIDTH
         }
-        else if (enemy_laser.x >= App.bg_width) {
+        else if (enemy_laser.x >= BG_WIDTH) {
           enemy_laser.x = 0
         }
         else if (enemy_laser.y <= 0) {
-          enemy_laser.y = App.bg_height
+          enemy_laser.y = BG_HEIGHT
         }
-        else if (enemy_laser.y >= App.bg_height) {
+        else if (enemy_laser.y >= BG_HEIGHT) {
           enemy_laser.y = 0
         }
 
-        if ((Math.pow((enemy_laser.x + (App.laser_width / 2)) - App.bg_width / 2, 2) + Math.pow((enemy_laser.y + (App.laser_height / 2)) - App.bg_height / 2, 2)) < Math.pow(App.safe_zone_radius, 2)) {
+        if ((Math.pow((enemy_laser.x + (LASER_WIDTH / 2)) - BG_WIDTH / 2, 2) + Math.pow((enemy_laser.y + (LASER_HEIGHT / 2)) - BG_HEIGHT / 2, 2)) < Math.pow(App.safe_zone_radius, 2)) {
           App.enemy_lasers.splice(i, 1)
           i -= 1
           App.background.removeChild(enemy_laser)
@@ -242,8 +253,8 @@ module.exports = (io, App) => {
   }
 
   App.get_random_coords = () => {
-    let x = App.get_random_int(10, App.bg_width - 10)
-    let y = App.get_random_int(10, App.bg_height - 10)
+    let x = App.get_random_int(10, BG_WIDTH - 10)
+    let y = App.get_random_int(10, BG_HEIGHT - 10)
     return [x, y]
   }
 
@@ -334,5 +345,58 @@ module.exports = (io, App) => {
 
   App.increase_laser_level = (ship) => {
     ship.laser_level += LASER_UPGRADE_STEP
+  }
+
+  App.check_safe_zone = (socket) => {
+    let ship = socket.ak_ship
+    let num_1 = (ship.x + (SHIP_WIDTH / 2)) - (BG_WIDTH / 2)
+    let num_2 = (ship.y + (SHIP_HEIGHT / 2)) - (BG_HEIGHT / 2)
+    let radius = App.safe_zone_radius
+
+    if ((Math.pow(num_1, 2) + Math.pow(num_2, 2)) < Math.pow(radius, 2)) {
+      App.in_safe_zone = true
+    }
+    else {
+      App.in_safe_zone = false
+    }
+  }
+
+  App.move_ship = (socket) => {
+    let ship = socket.ak_ship
+    let velocities = App.get_vector_velocities(ship, ship.speed)
+    let vx = velocities[0]
+    let vy = velocities[1]
+
+    ship.x += vx
+    ship.y += vy
+
+    if (ship.x <= 0) {
+      ship.x = BG_WIDTH
+      App.move_background(ship.x - (App.background.canvas.width / 2) + (SHIP_WIDTH / 2), App.background.regY)
+    }
+    else if (ship.x >= BG_WIDTH) {
+      ship.x = 0
+      App.move_background(ship.x - (App.background.canvas.width / 2) + (SHIP_WIDTH / 2), App.background.regY)
+    }
+    else if (ship.y <= 0) {
+      ship.y = BG_HEIGHT
+      App.move_background(App.background.regX, ship.y - (App.background.canvas.height / 2) + (SHIP_HEIGHT / 2))
+    }
+    else if (ship.y >= BG_HEIGHT) {
+      ship.y = 0
+      App.move_background(App.background.regX, ship.y - (App.background.canvas.height / 2) + (SHIP_HEIGHT / 2))
+    }
+    else {
+      App.move_background(App.background.regX + vx, App.background.regY + vy)
+    }
+
+    App.check_safe_zone()
+  }
+
+  App.setup_safe_zone = () => {
+    App.safe_zone = {}
+    App.safe_zone.x = (BG_WIDTH / 2) - (SAFE_ZONE_WIDTH / 2)
+    App.safe_zone.y = (BG_HEIGHT / 2) - (SAFE_ZONE_HEIGHT / 2)
+    App.safe_zone.radius = SAFE_ZONE_HEIGHT / 2
   }
 }
