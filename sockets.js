@@ -509,7 +509,7 @@ module.exports = (io, App) => {
   }
 
   App.create_file = (file_path) => {
-    fs.writeFileSync(file_path, (mode === `json` ? JSON.stringify(def_value) : def_value), 'utf8')
+    fs.writeFileSync(file_path, ``, `utf8`)
   }
 
   App.read_file = (what, mode = `normal`, def_value = ``) => {
