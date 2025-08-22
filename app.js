@@ -1,3 +1,4 @@
+const fs = require(`fs`)
 const express = require(`express`)
 const path = require(`path`)
 const bodyParser = require(`body-parser`)
@@ -48,4 +49,26 @@ app.use(function(err, req, res, next) {
   })
 })
 
+function bundle_main() {
+  let main_dir = path.join(__dirname, `public`, `js`, `main`)
+  let files = fs.readdirSync(main_dir)
+
+  let contents = [
+    `const App = {}`
+  ]
+
+  for (let file of files) {
+    if (file.endsWith(`.js`)) {
+      let file_path = path.join(main_dir, file)
+      let content = fs.readFileSync(file_path, `utf8`)
+      contents.push(content)
+    }
+  }
+
+  let bundle = contents.join(`\n\n`)
+  let bundle_path = path.join(__dirname, `public`, `js`, `bundle.main.js`)
+  fs.writeFileSync(bundle_path, bundle)
+}
+
+bundle_main()
 module.exports = app
