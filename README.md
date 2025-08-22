@@ -32,9 +32,7 @@ Some new mechanics I haven't seen in other games.
 
 ---
 
-[Commands](#commands)
-
----
+## Commands <a name="commands"></a>
 
 `youtube_key` with argument.
 
