@@ -129,25 +129,7 @@ module.exports = (io, App) => {
 
     socket.on(`youtube_search`, (data) => {
       if ((socket.ak_username !== undefined) && data.query) {
-        App.perform_youtube_search(data.query, socket.ak_username, (result) => {
-          if (result.success) {
-            let obj = {
-              type: `youtube_result`,
-              videoId: result.videoId,
-              title: result.title,
-              requestedBy: socket.ak_username,
-            }
-
-            io.sockets.emit(`update`, obj)
-            App.write_file(`youtube`, JSON.stringify(obj))
-          }
-          else {
-            socket.emit(`update`, {
-              type: `youtube_error`,
-              message: result.message,
-            })
-          }
-        })
+        App.do_youtube_search(data, socket)
       }
     })
 
@@ -159,7 +141,7 @@ module.exports = (io, App) => {
               type: `image_result`,
               image_url: result.imageUrl,
               title: result.title,
-              requestedBy: socket.ak_username,
+              username: socket.ak_username,
             })
           }
           else {
@@ -342,7 +324,7 @@ module.exports = (io, App) => {
             if (video.id && video.id.videoId) {
               callback({
                 success: true,
-                videoId: video.id.videoId,
+                video_id: video.id.videoId,
                 title: video.snippet.title,
               })
             }
@@ -485,6 +467,17 @@ module.exports = (io, App) => {
       App.write_file(`image_scraper`, value)
       console.log(`Scraper set to: ${value}`)
     }
+    else if (split[0] === `youtube`) {
+      let data = {}
+      data.query = split.slice(1).join(` `).trim()
+      data.username = `👾`
+      App.do_youtube_search(data)
+    }
+    else if (split[0] === `youtube_key`) {
+      let value = split.slice(1).join(` `).trim()
+      App.write_file(`youtube_key`, value)
+      console.log(`YouTube key updated`)
+    }
   }
 
   App.get_socket_by_username = (username) => {
@@ -555,6 +548,41 @@ module.exports = (io, App) => {
       }
       else if (set) {
         App[what] = value
+      }
+    })
+  }
+
+  App.do_youtube_search = (data, socket) => {
+    let username
+
+    if (socket) {
+      username = socket.ak_username
+    }
+    else {
+      username = data.username
+    }
+
+    if (!username) {
+      return
+    }
+
+    App.perform_youtube_search(data.query, username, (result) => {
+      if (result.success) {
+        let obj = {
+          type: `youtube_result`,
+          video_id: result.video_id,
+          title: result.title,
+          username,
+        }
+
+        io.sockets.emit(`update`, obj)
+        App.write_file(`youtube`, JSON.stringify(obj))
+      }
+      else {
+        socket.emit(`update`, {
+          type: `youtube_error`,
+          message: result.message,
+        })
       }
     })
   }

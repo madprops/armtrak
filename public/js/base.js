@@ -1402,8 +1402,8 @@ App.play_youtube = () => {
     return
   }
 
-  App.play_yt(data.videoId)
-  App.chat_announce(`${App.radio_icon} ${data.title} (${data.requestedBy})`)
+  App.play_yt(data.video_id)
+  App.chat_announce(`${App.radio_icon} ${data.title} (${data.username})`)
 }
 
 App.setup_clicks = () => {
