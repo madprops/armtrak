@@ -12,6 +12,8 @@ const MS_PER_TICK = 1000 / NETWORK_TICK_RATE; // 50ms
 const MIN_MAX_HEALTH = 10
 const MAX_MAX_HEALTH = 200
 const MIN_MAX_SPEED = 2
+const MAX_MAX_SPEED = 3
+const MAX_LASER_LEVEL = 10
 const MIN_LASER_LEVEL = 1
 const NUM_MODELS = 15
 const SPEED_STEP = 0.2
@@ -284,42 +286,42 @@ module.exports = (io, App) => {
       ship.speed += ship.max_speed * 0.10
     }
   }
-}
 
-App.upgrade = () => {
-  let nums = []
+  App.upgrade = (ship) => {
+    let nums = []
 
-  if (App.ship.laser_level < App.max_laser_level) {
-    nums.push(1)
-  }
+    if (ship.laser_level < MAX_LASER_LEVEL) {
+      nums.push(1)
+    }
 
-  if (App.ship.max_health < App.max_max_health) {
-    nums.push(2)
-  }
+    if (ship.max_health < MAX_MAX_HEALTH) {
+      nums.push(2)
+    }
 
-  if (App.ship.max_speed < App.max_max_speed) {
-    nums.push(3)
-  }
+    if (ship.max_speed < MAX_MAX_SPEED) {
+      nums.push(3)
+    }
 
-  if (nums.length === 0) {
-    return false
-  }
+    if (nums.length === 0) {
+      return false
+    }
 
-  let num = nums.sort(function(){return 0.5 - Math.random()})[0]
+    let num = nums.sort(function(){return 0.5 - Math.random()})[0]
 
-  if (num === 1) {
-    App.increase_laser_level()
-    return true
-  }
+    if (num === 1) {
+      App.increase_laser_level(ship)
+      return true
+    }
 
-  if (num === 2) {
-    App.increase_max_health()
-    return true
-  }
+    if (num === 2) {
+      App.increase_max_health(ship)
+      return true
+    }
 
-  if (num === 3) {
-    App.increase_max_speed()
-    return true
+    if (num === 3) {
+      App.increase_max_speed(ship)
+      return true
+    }
   }
 
   App.increase_max_health = (ship) => {
