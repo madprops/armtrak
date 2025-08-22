@@ -2,13 +2,15 @@
 
 >npm install
 
->fill youtube_key.txt (get a youtube key first)
+>fill data/youtube_key.txt (get a youtube key first)
 
->fill image_instance.txt (this is a 4get instance url)
+>fill data/image_instance.txt (this is a 4get instance url)
 
->fill image_scraper.txt (for instance ddg)
+>fill data/image_scraper.txt (for instance ddg)
 
 >www start
+
+You can also use `instance` and `scraper` commands while the server runs.
 
 ---
 
