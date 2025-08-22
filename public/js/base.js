@@ -21,8 +21,8 @@ App.max_max_speed = 3
 App.max_laser_level = 10
 App.laser_hit = 20
 App.max_username_length = 28
-App.dot_radius = 8
-App.dot_radius_small = 5
+App.dot_radius = 10
+App.dot_radius_small = 8
 App.label_size = 8
 App.image_icon = `🖼️`
 App.radio_icon = `🔊`
@@ -1087,16 +1087,20 @@ App.show_explosion = (x, y) => {
 App.update_minimap = () => {
   let minimap = document.getElementById(`minimap`)
   let context = minimap.getContext(`2d`)
-  minimap.setAttribute(`height`, App.bg_height * 0.2)
-  minimap.setAttribute(`width`, App.bg_width * 0.2)
+  let desired_width = 400
+  let aspect_ratio = App.bg_width / App.bg_height
+  let minimap_width = desired_width
+  let minimap_height = Math.round(desired_width / aspect_ratio)
+  let scale = minimap_width / App.bg_width
 
-  // Clear the canvas first
+  minimap.setAttribute(`width`, minimap_width)
+  minimap.setAttribute(`height`, minimap_height)
   context.clearRect(0, 0, minimap.width, minimap.height)
 
   if ((App.ship !== undefined) && App.ship.visible) {
-    let x = App.ship.x * 0.2 // Scale coordinates to minimap size
-    let y = App.ship.y * 0.2
-    let radius = App.dot_radius // Bigger radius for better visibility
+    let x = App.ship.x * scale
+    let y = App.ship.y * scale
+    let radius = App.dot_radius
 
     context.beginPath()
     context.arc(x, y, radius, 0, 2 * Math.PI, false)
@@ -1111,9 +1115,9 @@ App.update_minimap = () => {
     let enemy = ship.container
 
     if (enemy.visible) {
-      let x = enemy.x * 0.2 // Scale coordinates to minimap size
-      let y = enemy.y * 0.2
-      let radius = App.dot_radius // Smaller radius for minimap
+      let x = enemy.x * scale
+      let y = enemy.y * scale
+      let radius = App.dot_radius
 
       context.beginPath()
       context.arc(x, y, radius, 0, 2 * Math.PI, false)
@@ -1131,8 +1135,8 @@ App.update_minimap = () => {
     let imgHeight = image.image?.height || 0
     let scaleX = image.scaleX || 1
     let scaleY = image.scaleY || 1
-    let x = (image.x + (imgWidth * scaleX / 2)) * 0.2
-    let y = (image.y + (imgHeight * scaleY / 2)) * 0.2
+    let x = (image.x + (imgWidth * scaleX / 2)) * scale
+    let y = (image.y + (imgHeight * scaleY / 2)) * scale
     let radius = App.dot_radius_small
 
     context.beginPath()
