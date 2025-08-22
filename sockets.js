@@ -423,12 +423,12 @@ module.exports = (io, App) => {
         }
       })
     })
-    .on(`error`, (error) => {
-      callback({
-        success: false,
-        message: `Image search request failed`,
+      .on(`error`, (error) => {
+        callback({
+          success: false,
+          message: `Image search request failed`,
+        })
       })
-    })
   }
 
   App.add_https = (url) => {
