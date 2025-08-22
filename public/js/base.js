@@ -21,8 +21,8 @@ App.max_max_speed = 3
 App.max_laser_level = 10
 App.laser_hit = 20
 App.max_username_length = 28
-App.dot_radius = 10
-App.dot_radius_small = 8
+App.dot_radius = 50
+App.dot_radius_small = 30
 App.label_size = 8
 App.image_icon = `🖼️`
 App.radio_icon = `🔊`
@@ -1087,21 +1087,44 @@ App.show_explosion = (x, y) => {
 App.update_minimap = () => {
   let minimap = document.getElementById(`minimap`)
   let context = minimap.getContext(`2d`)
-  let desired_width = 400
-  let aspect_ratio = App.bg_width / App.bg_height
-  let minimap_width = desired_width
-  let minimap_height = Math.round(desired_width / aspect_ratio)
-  let scale = minimap_width / App.bg_width
+  let minimap_width = 400
 
-  minimap.setAttribute(`width`, minimap_width)
-  minimap.setAttribute(`height`, minimap_height)
+  // Use the main canvas dimensions to calculate the minimap's internal height
+  let main_canvas_width = 1200
+  let main_canvas_height = 800
+  let minimap_height = Math.round(minimap_width * (main_canvas_height / main_canvas_width))
+
+  // Set the minimap's drawing surface to match the calculated dimensions
+  minimap.width = minimap_width
+  minimap.height = minimap_height
+
+  // Now, calculate the scale based on the background, but use the
+  // minimap's and background's dimensions for the ratios.
+  let bg_width = App.bg_width // 2000
+  let bg_height = App.bg_height // 2000
+  let scaleX = minimap_width / bg_width
+  let scaleY = minimap_height / bg_height
+
   context.clearRect(0, 0, minimap.width, minimap.height)
 
-  if ((App.ship !== undefined) && App.ship.visible) {
-    let x = App.ship.x * scale
-    let y = App.ship.y * scale
-    let radius = App.dot_radius
+  // Draw the main canvas's visible area on the minimap
+  // This rectangle will show what part of the world is currently visible
+  let visibleX = App.background.canvas.x * scaleX
+  let visibleY = App.background.canvas.y * scaleY
+  let visibleWidth = main_canvas_width * scaleX
+  let visibleHeight = main_canvas_height * scaleY
 
+  context.beginPath()
+  context.rect(visibleX, visibleY, visibleWidth, visibleHeight)
+  context.strokeStyle = `#FFFFFF`
+  context.lineWidth = 2
+  context.stroke()
+
+  // Ship dot
+  if ((App.ship !== undefined) && App.ship.visible) {
+    let x = App.ship.x * scaleX
+    let y = App.ship.y * scaleY
+    let radius = App.dot_radius * scaleX
     context.beginPath()
     context.arc(x, y, radius, 0, 2 * Math.PI, false)
     context.fillStyle = `#3399FF`
@@ -1111,13 +1134,14 @@ App.update_minimap = () => {
     context.stroke()
   }
 
+  // Enemy dots
   for (let ship of App.enemy_ships) {
     let enemy = ship.container
 
     if (enemy.visible) {
-      let x = enemy.x * scale
-      let y = enemy.y * scale
-      let radius = App.dot_radius
+      let x = enemy.x * scaleX
+      let y = enemy.y * scaleY
+      let radius = App.dot_radius * scaleX
 
       context.beginPath()
       context.arc(x, y, radius, 0, 2 * Math.PI, false)
@@ -1129,15 +1153,15 @@ App.update_minimap = () => {
     }
   }
 
-  // Show green dots for placed images
+  // Placed images
   for (let image of App.images) {
     let imgWidth = image.image?.width || 0
     let imgHeight = image.image?.height || 0
-    let scaleX = image.scaleX || 1
-    let scaleY = image.scaleY || 1
-    let x = (image.x + (imgWidth * scaleX / 2)) * scale
-    let y = (image.y + (imgHeight * scaleY / 2)) * scale
-    let radius = App.dot_radius_small
+    let scaleX_img = image.scaleX || 1
+    let scaleY_img = image.scaleY || 1
+    let x = (image.x + (imgWidth * scaleX_img / 2)) * scaleX
+    let y = (image.y + (imgHeight * scaleY_img / 2)) * scaleY
+    let radius = App.dot_radius_small * scaleX
 
     context.beginPath()
     context.arc(x, y, radius, 0, 2 * Math.PI, false)
