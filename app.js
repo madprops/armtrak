@@ -54,7 +54,7 @@ function bundle_main() {
   let files = fs.readdirSync(main_dir)
 
   let contents = [
-    `const App = {}`
+    `const App = {}`,
   ]
 
   for (let file of files) {

@@ -33,21 +33,16 @@ App.activate_key_detection = () => {
   })
 
   $(document).keyup(function(e) {
-    let code = e.keyCode ? e.keyCode : e.which
-
-    if (code === 37) {
+    if (e.key === `ArrowLeft`) {
       App.left_arrow = false
     }
-
-    if (code === 38) {
+    else if (e.key === `ArrowUp`) {
       App.up_arrow = false
     }
-
-    if (code === 39) {
+    else if (e.key === `ArrowRight`) {
       App.right_arrow = false
     }
-
-    if (code === 40) {
+    else if (e.key === `ArrowDown`) {
       App.down_arrow = false
     }
   })

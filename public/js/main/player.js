@@ -105,8 +105,6 @@ App.move = () => {
     App.turn_right()
     return true
   }
-
-  App.reset_arrows()
 }
 
 App.reset_arrows = () => {
