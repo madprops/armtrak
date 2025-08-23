@@ -7,8 +7,11 @@ class EnemyShip {
 
 App.update_ships = (data) => {
   for (let item of data.ships) {
-    if (item.id === App.ship.id) {
+    if (App.ship && (App.ship.id === item.id)) {
+      App.ship.x = item.x
+      App.ship.y = item.y
       App.ship_image.rotation = item.rotation
+      App.move_background(item.x, item.y)
     }
     else {
       let enemy = App.get_enemy_ship_or_create(item)
@@ -131,37 +134,6 @@ App.create_enemy_ship = (enemy, x, y, model) => {
     label.x = App.ship_width / 2
     label.y = App.ship_height
   }
-}
-
-App.move_ship = () => {
-  let velocities = App.get_vector_velocities(App.ship, App.ship.speed)
-  let vx = velocities[0]
-  let vy = velocities[1]
-
-  App.ship.x += vx
-  App.ship.y += vy
-
-  if (App.ship.x <= 0) {
-    App.ship.x = App.bg_width
-    App.move_background(App.ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY)
-  }
-  else if (App.ship.x >= App.bg_width) {
-    App.ship.x = 0
-    App.move_background(App.ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY)
-  }
-  else if (App.ship.y <= 0) {
-    App.ship.y = App.bg_height
-    App.move_background(App.background.regX, App.ship.y - (App.background.canvas.height / 2) + (App.ship_height / 2))
-  }
-  else if (App.ship.y >= App.bg_height) {
-    App.ship.y = 0
-    App.move_background(App.background.regX, App.ship.y - (App.background.canvas.height / 2) + (App.ship_height / 2))
-  }
-  else {
-    App.move_background(App.background.regX + vx, App.background.regY + vy)
-  }
-
-  App.check_safe_zone()
 }
 
 App.check_enemy_collision = (laser) => {

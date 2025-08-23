@@ -44,9 +44,5 @@ App.on_join = (data) => {
 }
 
 App.move = () => {
-  if (App.ship.visible) {
-    App.move_ship()
-  }
-
   App.move_lasers()
 }

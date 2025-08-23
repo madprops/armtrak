@@ -28,9 +28,6 @@ const SAFE_ZONE_WIDTH = 150
 const SAFE_ZONE_HEIGHT = 150
 const ROTATION_STEP = 3
 
-// Time
-let CLOCK = Date.now()
-
 // Lasers
 LASER_STEP = 1
 LAST_FIRED_MIN = 300
@@ -119,7 +116,6 @@ module.exports = (io, App) => {
 
   App.update_simulation = () => {
     App.move()
-    App.clockwork()
   }
 
   App.emit_game_state = () => {
@@ -154,6 +150,13 @@ module.exports = (io, App) => {
     for (let ship of App.ships) {
       if (ship.visible) {
         App.move_ship(ship)
+      }
+
+      if (ship.up_arrow) {
+        App.increase_speed(ship)
+      }
+      else {
+        App.reduce_speed(ship)
       }
 
       if (ship.left_arrow) {
@@ -213,21 +216,6 @@ module.exports = (io, App) => {
     }
   }
 
-  App.clockwork = () => {
-    if ((Date.now() - CLOCK) >= 200) {
-      for (let ship of App.ships) {
-        if (ship.up_arrow) {
-          App.increase_ship_speed(ship)
-        }
-        else {
-          App.reduce_ship_speed(ship)
-        }
-      }
-
-      CLOCK = Date.now()
-    }
-  }
-
   App.get_random_coords = () => {
     let x = App.get_random_int(10, BG_WIDTH - 10)
     let y = App.get_random_int(10, BG_HEIGHT - 10)
@@ -260,7 +248,7 @@ module.exports = (io, App) => {
     ship.right_arrow = data.right_arrow
   }
 
-  App.reduce_ship_speed = (ship) => {
+  App.reduce_speed = (ship) => {
     ship.speed -= SPEED_STEP
 
     if (ship.speed < 0) {
@@ -268,7 +256,7 @@ module.exports = (io, App) => {
     }
   }
 
-  App.increase_ship_speed = (ship) => {
+  App.increase_speed = (ship) => {
     if (ship.speed < ship.max_speed) {
       ship.speed += ship.max_speed * 0.10
     }

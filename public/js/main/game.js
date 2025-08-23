@@ -1,5 +1,4 @@
 const UPDATE_FPS = 30
-let CLOCK = Date.now()
 
 App.prepare_game = () => {
   App.setup_explosions()
@@ -64,25 +63,9 @@ App.get_username = () => {
   }
 }
 
-App.clockwork = () => {
-  if ((Date.now() - CLOCK) >= 200) {
-    if (App.ship) {
-      if (App.up_arrow) {
-        App.increase_ship_speed()
-      }
-      else {
-        App.reduce_ship_speed()
-      }
-    }
-
-    CLOCK = Date.now()
-  }
-}
-
 App.game_loop = () => {
   if (App.ship) {
     App.move()
-    App.clockwork()
     App.background.update()
   }
 
