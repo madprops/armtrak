@@ -716,10 +716,6 @@ module.exports = (io, App) => {
       })
     }
 
-    if (App.sound) {
-      new Audio(`/audio/laser.ogg`).play()
-    }
-
     ship.last_fired = Date.now()
     App.lasers.push(lasers)
   }
