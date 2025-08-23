@@ -47,6 +47,8 @@ App.activate_key_detection = () => {
     else if (e.key === `ArrowDown`) {
       App.down_arrow = false
     }
+
+    App.activity = true
   })
 }
 
@@ -70,4 +72,12 @@ App.setup_focus = () => {
   document.addEventListener(`blur`, () => {
     App.reset_arrows()
   })
+}
+
+App.reset_arrows = () => {
+  App.left_arrow = false
+  App.right_arrow = false
+  App.up_arrow = false
+  App.down_arrow = false
+  App.activity = true
 }

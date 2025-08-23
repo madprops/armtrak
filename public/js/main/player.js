@@ -34,13 +34,6 @@ App.turn_right = () => {
   App.ship_image.rotation += 3
 }
 
-App.reset_arrows = () => {
-  App.left_arrow = false
-  App.right_arrow = false
-  App.up_arrow = false
-  App.down_arrow = false
-}
-
 App.on_join = (data) => {
   App.username = data.username
   App.youtube = data.youtube
