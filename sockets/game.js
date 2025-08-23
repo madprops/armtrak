@@ -419,264 +419,300 @@ module.exports = (io, App) => {
     }
 
     let lasers = []
+    let x_1 = App.ship_x
+    let y_1 = App.ship_y
+    let x_2 = App.ship.x + x
+    let y_2 = App.ship.y + y
+    let x_3 = App.ship.x - x
+    let y_3 = App.ship.y - y
 
     if (ship.laser_level === 1) {
+      let speed = 4
+      let max_distance = 100
+
       lasers.push({
-        speed: 4,
-        max_distance: 100,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x,
-        y: App.ship.y,
+        x: x_1,
+        y: y_1,
       })
     }
 
     if (ship.laser_level === 2) {
+      let speed = 4
+      let max_distance = 105
+
       lasers.push({
-        speed: 4.1,
-        max_distance: 105,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x,
-        y: App.ship.y,
+        x: x_1,
+        y: y_1,
       })
     }
 
     if (ship.laser_level === 3) {
+      let speed = 4.2
+      let max_distance = 110
+
       lasers.push({
-        speed: 4.2,
-        max_distance: 110,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 4.2,
-        max_distance: 110,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
     }
 
     if (ship.laser_level === 4) {
+      let speed = 4.2
+      let max_distance = 110
+
       lasers.push({
-        speed: 4.2,
-        max_distance: 110,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 4.2,
-        max_distance: 110,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
     }
 
     if (ship.laser_level === 5) {
+      let speed = 4.4
+      let max_distance = 115
+
       lasers.push({
-        speed: 4.4,
-        max_distance: 115,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 4.4,
-        max_distance: 115,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
     }
 
     if (ship.laser_level === 6) {
+      let speed = 4.4
+      let max_distance = 115
+
       lasers.push({
-        speed: 4.4,
-        max_distance: 115,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 4.4,
-        max_distance: 115,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
 
       lasers.push({
-        speed: 4.4,
-        max_distance: 115,
+        speed,
+        max_distance,
         rotation: ship.rotation + 15,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 4.4,
-        max_distance: 115,
+        speed,
+        max_distance,
         rotation: ship.rotation - 15,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
     }
 
     if (ship.laser_level === 7) {
+      let speed = 4.5
+      let max_distance = 120
+
       lasers.push({
-        speed: 4.5,
-        max_distance: 120,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 4.5,
-        max_distance: 120,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
 
       lasers.push({
-        speed: 4.5,
-        max_distance: 120,
+        speed,
+        max_distance,
         rotation: ship.rotation + 15,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 4.5,
-        max_distance: 120,
+        speed,
+        max_distance,
         rotation: ship.rotation - 15,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
     }
 
     if (ship.laser_level === 8) {
+      let speed = 4.7
+      let max_distance = 125
+
       lasers.push({
-        speed: 4.7,
-        max_distance: 125,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 4.7,
-        max_distance: 125,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
 
       lasers.push({
-        speed: 4.7,
-        max_distance: 125,
+        speed,
+        max_distance,
         rotation: ship.rotation + 15,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 4.7,
-        max_distance: 125,
+        speed,
+        max_distance,
         rotation: ship.rotation - 15,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
     }
 
     if (ship.laser_level === 9) {
+      let speed = 4.8
+      let max_distance = 130
+
       lasers.push({
-        speed: 4.8,
-        max_distance: 130,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 4.8,
-        max_distance: 130,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
 
       lasers.push({
-        speed: 4.8,
-        max_distance: 130,
+        speed,
+        max_distance,
         rotation: ship.rotation + 15,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 4.8,
-        max_distance: 130,
+        speed,
+        max_distance,
         rotation: ship.rotation - 15,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
     }
 
     if (ship.laser_level === 10) {
+      let speed = 5
+      let max_distance = 120
+
       lasers.push({
-        speed: 5,
-        max_distance: 120,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 5,
-        max_distance: 120,
+        speed,
+        max_distance,
         rotation: ship.rotation,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
 
       lasers.push({
-        speed: 5,
-        max_distance: 120,
+        speed,
+        max_distance,
         rotation: ship.rotation + 15,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 5,
-        max_distance: 120,
+        speed,
+        max_distance,
         rotation: ship.rotation - 15,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
 
       lasers.push({
-        speed: 5,
-        max_distance: 120,
+        speed,
+        max_distance,
         rotation: ship.rotation + 30,
-        x: App.ship.x + x,
-        y: App.ship.y + y,
+        x: x_2,
+        y: y_2,
       })
 
       lasers.push({
-        speed: 5,
-        max_distance: 120,
+        speed,
+        max_distance,
         rotation: ship.rotation - 30,
-        x: App.ship.x - x,
-        y: App.ship.y - y,
+        x: x_3,
+        y: y_3,
       })
     }
 
