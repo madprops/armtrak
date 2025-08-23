@@ -6,23 +6,23 @@ class EnemyShip {
 }
 
 App.update_enemy_ships = (data) => {
-  for (let data of data.ships) {
-    let enemy = App.get_enemy_ship_or_create(data)
+  for (let ship of data.ships) {
+    let enemy = App.get_enemy_ship_or_create(ship)
 
     if (enemy) {
-      enemy.container.x = data.x
-      enemy.container.y = data.y
-      enemy.container.visible = data.visible
+      enemy.container.x = ship.x
+      enemy.container.y = ship.y
+      enemy.container.visible = ship.visible
 
-      if (enemy.container.model !== data.model) {
+      if (enemy.container.model !== ship.model) {
         let image = new Image()
-        image.src = `img/nave` + data.model + `.png`
+        image.src = `img/nave` + ship.model + `.png`
         enemy.container.children[0].image = image
       }
 
-      enemy.container.model = data.model
-      enemy.container.model = data.model
-      enemy.container.children[0].rotation = data.rotation
+      enemy.container.model = ship.model
+      enemy.container.model = ship.model
+      enemy.container.children[0].rotation = ship.rotation
     }
   }
 }
@@ -79,6 +79,7 @@ App.create_ship = (data) => {
   let label = App.create_label(App.username)
   App.ship.addChild(label)
   App.add_to_background(App.ship)
+  App.z_order()
 
   image.onload = function() {
     App.ship_width = image.width

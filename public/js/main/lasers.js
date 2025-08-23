@@ -208,3 +208,89 @@ App.fire_enemy_laser = (data) => {
     new Audio(`/audio/laser.ogg`).play()
   }
 }
+
+App.move_lasers = () => {
+  for (let [i, laser] of App.lasers.entries()) {
+    if (laser.distance < laser.max_distance) {
+      laser.x += laser.vx
+      laser.y += laser.vy
+      laser.distance += 1
+
+      if (laser.x <= 0) {
+        laser.x = App.bg_width
+      }
+      else if (laser.x >= App.bg_width) {
+        laser.x = 0
+      }
+      else if (laser.y <= 0) {
+        laser.y = App.bg_height
+      }
+      else if (laser.y >= App.bg_height) {
+        laser.y = 0
+      }
+
+      let enemy = App.check_enemy_collision(laser)
+
+      function check_col() {
+        let x1 = Math.pow((laser.x + (App.laser_width / 2)) - (App.bg_width / 2), 2)
+        let x2 = Math.pow((laser.y + (App.laser_height / 2)) - (App.bg_height / 2), 2)
+        let x3 = Math.pow(App.safe_zone_radius, 2)
+        return x1 + x2 < x3
+      }
+
+      if (enemy) {
+        App.lasers.splice(i, 1)
+        i -= 1
+        App.background.removeChild(laser)
+      }
+      else if (check_col()) {
+        App.lasers.splice(i, 1)
+        i -= 1
+        App.background.removeChild(laser)
+      }
+    }
+    else {
+      App.lasers.splice(i, 1)
+      i -= 1
+      App.background.removeChild(laser)
+    }
+  }
+
+  for (let [i, enemy_laser] of App.enemy_lasers.entries()) {
+    if (enemy_laser.distance < enemy_laser.max_distance) {
+      enemy_laser.x += enemy_laser.vx
+      enemy_laser.y += enemy_laser.vy
+      enemy_laser.distance += 1
+
+      if (enemy_laser.x <= 0) {
+        enemy_laser.x = App.bg_width
+      }
+      else if (enemy_laser.x >= App.bg_width) {
+        enemy_laser.x = 0
+      }
+      else if (enemy_laser.y <= 0) {
+        enemy_laser.y = App.bg_height
+      }
+      else if (enemy_laser.y >= App.bg_height) {
+        enemy_laser.y = 0
+      }
+
+      if ((Math.pow((enemy_laser.x + (App.laser_width / 2)) - App.bg_width / 2, 2) + Math.pow((enemy_laser.y + (App.laser_height / 2)) - App.bg_height / 2, 2)) < Math.pow(App.safe_zone_radius, 2)) {
+        App.enemy_lasers.splice(i, 1)
+        i -= 1
+        App.background.removeChild(enemy_laser)
+      }
+      else if (App.check_ship_collision(enemy_laser)) {
+        App.ship_hit(enemy_laser)
+        App.enemy_lasers.splice(i, 1)
+        i -= 1
+        App.background.removeChild(enemy_laser)
+      }
+    }
+    else {
+      App.enemy_lasers.splice(i, 1)
+      i -= 1
+      App.background.removeChild(enemy_laser)
+    }
+  }
+}

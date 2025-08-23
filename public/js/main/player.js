@@ -41,3 +41,21 @@ App.on_join = (data) => {
   App.greet(data.username)
   App.show_intro()
 }
+
+App.move = () => {
+  if (App.ship.visible) {
+    App.move_ship()
+  }
+
+  App.move_lasers()
+
+  if (App.left_arrow) {
+    App.turn_left()
+    return true
+  }
+
+  if (App.right_arrow) {
+    App.turn_right()
+    return true
+  }
+}

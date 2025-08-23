@@ -1,4 +1,5 @@
 const UPDATE_FPS = 30
+let CLOCK = Date.now()
 
 App.prepare_game = () => {
   App.setup_explosions()
@@ -11,6 +12,7 @@ App.prepare_game = () => {
   App.show_safe_zone()
   App.start_socket()
   App.do_game_update()
+  App.game_loop()
 }
 
 App.do_game_update = () => {
@@ -62,73 +64,27 @@ App.get_username = () => {
   }
 }
 
-App.start_socket = () => {
-  App.socket = io() // Connects to same origin by default
-  // Or if you need to specify the server:
-  // socket = io(`http://armtrak.net:3000`)
+App.clockwork = () => {
+  if ((Date.now() - CLOCK) >= 200) {
+    if (App.ship) {
+      if (App.up_arrow) {
+        App.increase_ship_speed()
+      }
+      else {
+        App.reduce_ship_speed()
+      }
+    }
 
-  App.get_username()
+    CLOCK = Date.now()
+  }
+}
 
-  App.socket.on(`update`, (data) => {
-    if (data.type === `chat_msg`) {
-      App.update_chat(data.username, data.msg)
-    }
-    else if (data.type === `joined`) {
-      App.greet(data.username)
-    }
-    else if (data.type === `already`) {
-      App.already_playing(data)
-    }
-    else if (data.type === `on_join`) {
-      App.on_join(data)
-    }
-    else if (data.type === `youtube_result`) {
-      App.youtube = data
-      App.play_youtube()
-    }
-    else if (data.type === `youtube_error`) {
-      App.chat_announce(`YouTube search failed: ` + data.message)
-    }
-    else if (data.type === `image_result`) {
-      App.on_image_result(data)
-    }
-    else if (data.type === `image_error`) {
-      App.chat_announce(`Image search failed: ` + data.message)
-    }
-    else if (data.type === `chat_announcement`) {
-      App.chat_announce(data.msg)
-    }
-    else if (data.type === `ship_updates`) {
-      App.update_enemy_ships(data)
-    }
-    else if (data.type === `laser`) {
-      App.fire_enemy_laser(data)
-    }
-    else if (data.type === `success`) {
-      App.chat_announce(data.message)
-    }
-    else if (data.type === `error`) {
-      App.chat_announce(data.message)
-    }
-    else if (data.type === `destroyed`) {
-      App.on_destroyed(data)
-    }
-    else if (data.type === `respawn`) {
-      App.on_respawn(data)
-    }
-    else if (data.type === `image_placed`) {
-      App.image_placed(data)
-    }
-    else if (data.type === `connection_lost`) {
-      window.location = `/`
-    }
-    else if (data.type === `disconnection`) {
-      App.on_disconnection(data)
-    }
-    else if (data.type === `kicked`) {
-      App.on_kicked()
-    }
-  })
+App.game_loop = () => {
+  if (App.ship) {
+    App.move()
+    App.clockwork()
+    App.background.update()
+  }
 
-  App.socket.emit(`adduser`, { username: App.username })
+  setTimeout(App.game_loop, 1000 / 60)
 }
