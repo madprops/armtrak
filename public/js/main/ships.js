@@ -11,7 +11,7 @@ App.update_ships = (data) => {
       App.ship_image.rotation = item.rotation
     }
     else {
-      let enemy = App.get_enemy_ship_or_create(ship)
+      let enemy = App.get_enemy_ship_or_create(item)
 
       if (enemy) {
         enemy.container.x = item.x
@@ -71,6 +71,7 @@ App.create_ship = (data) => {
   App.ship_image = new createjs.Bitmap(image)
   App.ship.addChild(App.ship_image)
 
+  App.ship.id = data.id
   App.ship.x = data.x
   App.ship.y = data.y
   App.ship.speed = data.speed

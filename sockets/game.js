@@ -123,23 +123,25 @@ module.exports = (io, App) => {
   }
 
   App.emit_game_state = () => {
-    let game_state = {
-      ships: {},
-    }
+    let ships = []
 
     for (let ship_id in App.ships) {
       let ship = App.ships[ship_id]
 
-      game_state.ships[ship_id] = {
+      ships.push({
+        id: ship.id,
         x: ship.x,
         y: ship.y,
         rotation: ship.rotation,
         visible: ship.visible,
         model: ship.model,
-      }
+      })
     }
 
-    io.sockets.emit(`update_ships`, game_state)
+    io.sockets.emit(`update`, {
+      type: `update_ships`,
+      ships,
+    })
   }
 
   App.move = () => {
