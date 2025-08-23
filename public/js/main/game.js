@@ -8,9 +8,9 @@ App.prepare_game = () => {
   App.setup_clicks()
   App.setup_focus()
   App.create_background()
-  // App.show_safe_zone()
-  // App.start_socket()
-  // App.do_game_update()
+  App.show_safe_zone()
+  App.start_socket()
+  App.do_game_update()
 }
 
 App.do_game_update = () => {

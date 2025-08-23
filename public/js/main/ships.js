@@ -74,12 +74,11 @@ App.create_ship = (data) => {
   App.ship.max_speed = data.max_speed
   App.ship.laser_level = data.laser_level
   App.ship.model = data.model
+  App.ship.visible = true
 
   let label = App.create_label(App.username)
   App.ship.addChild(label)
-
-  App.background.addChild(App.ship)
-  App.z_order()
+  App.add_to_background(App.ship)
 
   image.onload = function() {
     App.ship_width = image.width

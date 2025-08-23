@@ -38,20 +38,38 @@ App.create_background = () => {
 
   App.background.regX = 0
   App.background.regY = 0
-  App.background.addChild(star_field)
+  App.add_to_background(star_field)
+}
+
+App.update_background = () => {
+  App.background.update()
+}
+
+App.add_to_background = (what, update = true) => {
+  App.background.addChild(what)
+
+  if (update) {
+    App.z_order()
+    App.update_background()
+  }
 }
 
 App.move_background = (x, y) => {
   App.background.regX = x
   App.background.regY = y
+  App.update_background()
 }
 
 App.z_order = () => {
-  App.background.setChildIndex(App.safe_zone, App.background.getNumChildren() - 1)
+  if (App.safe_zone) {
+    App.background.setChildIndex(App.safe_zone, App.background.getNumChildren() - 1)
+  }
 
   for (let ship of App.enemy_ships) {
     App.background.setChildIndex(ship.container, App.background.getNumChildren() - 1)
   }
 
-  App.background.setChildIndex(App.ship, App.background.getNumChildren() - 1)
+  if (App.ship) {
+    App.background.setChildIndex(App.ship, App.background.getNumChildren() - 1)
+  }
 }
