@@ -3,15 +3,14 @@ const UPDATE_FPS = 30
 App.prepare_game = () => {
   App.setup_explosions()
   App.setup_lasers()
-  App.get_username()
   App.start_chat()
-  App.start_socket()
   App.activate_key_detection()
   App.setup_clicks()
   App.setup_focus()
   App.create_background()
-  App.show_safe_zone()
-  App.do_game_update()
+  // App.show_safe_zone()
+  // App.start_socket()
+  // App.do_game_update()
 }
 
 App.do_game_update = () => {
@@ -67,6 +66,8 @@ App.start_socket = () => {
   App.socket = io() // Connects to same origin by default
   // Or if you need to specify the server:
   // socket = io(`http://armtrak.net:3000`)
+
+  App.get_username()
 
   App.socket.on(`update`, (data) => {
     if (data.type === `chat_msg`) {

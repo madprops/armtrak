@@ -80,14 +80,7 @@ module.exports = (io, App) => {
   App.lasers = []
 
   App.create_ship = (socket) => {
-    socket.ak_ship = new Ship(
-      socket.id,
-      data.x,
-      data.y,
-      data.rotation,
-      data.model,
-    )
-
+    socket.ak_ship = new Ship()
     App.ships.push(socket.ak_ship)
   }
 
@@ -126,7 +119,6 @@ module.exports = (io, App) => {
   App.update_simulation = () => {
     App.move()
     App.clockwork()
-    App.background.update()
   }
 
   App.emit_game_state = () => {
@@ -141,8 +133,8 @@ module.exports = (io, App) => {
         x: ship.x,
         y: ship.y,
         rotation: ship.rotation,
-        visible: App.ship.visible,
-        model: App.ship.model,
+        visible: ship.visible,
+        model: ship.model,
       }
     }
 
@@ -158,7 +150,7 @@ module.exports = (io, App) => {
   App.move_ships = () => {
     for (let ship of App.ships) {
       if (ship.visible) {
-        App.move_ship()
+        App.move_ship(ship)
       }
 
       if (ship.left_arrow) {
@@ -184,12 +176,7 @@ module.exports = (io, App) => {
         return x1 + x2 < x3
       }
 
-      if (enemy) {
-        App.lasers.splice(i, 1)
-        i -= 1
-        App.background.removeChild(laser)
-      }
-      else if (check_col()) {
+      if (enemy || check_col()) {
         App.lasers.splice(i, 1)
         i -= 1
       }
@@ -333,8 +320,7 @@ module.exports = (io, App) => {
     ship.laser_level += LASER_UPGRADE_STEP
   }
 
-  App.check_safe_zone = (socket) => {
-    let ship = socket.ak_ship
+  App.check_safe_zone = (ship) => {
     let num_1 = (ship.x + (SHIP_WIDTH / 2)) - (BG_WIDTH / 2)
     let num_2 = (ship.y + (SHIP_HEIGHT / 2)) - (BG_HEIGHT / 2)
     let radius = App.safe_zone_radius
@@ -347,9 +333,8 @@ module.exports = (io, App) => {
     }
   }
 
-  App.move_ship = (socket) => {
-    let ship = socket.ak_ship
-    let velocities = App.get_vector_velocities(ship, ship.speed)
+  App.move_ship = (ship) => {
+    let velocities = App.get_vector_velocities(ship)
     let vx = velocities[0]
     let vy = velocities[1]
 
@@ -358,25 +343,18 @@ module.exports = (io, App) => {
 
     if (ship.x <= 0) {
       ship.x = BG_WIDTH
-      App.move_background(ship.x - (App.background.canvas.width / 2) + (SHIP_WIDTH / 2), App.background.regY)
     }
     else if (ship.x >= BG_WIDTH) {
       ship.x = 0
-      App.move_background(ship.x - (App.background.canvas.width / 2) + (SHIP_WIDTH / 2), App.background.regY)
     }
     else if (ship.y <= 0) {
       ship.y = BG_HEIGHT
-      App.move_background(App.background.regX, ship.y - (App.background.canvas.height / 2) + (SHIP_HEIGHT / 2))
     }
     else if (ship.y >= BG_HEIGHT) {
       ship.y = 0
-      App.move_background(App.background.regX, ship.y - (App.background.canvas.height / 2) + (SHIP_HEIGHT / 2))
-    }
-    else {
-      App.move_background(App.background.regX + vx, App.background.regY + vy)
     }
 
-    App.check_safe_zone(socket)
+    App.check_safe_zone(ship)
   }
 
   App.setup_safe_zone = () => {
@@ -419,12 +397,12 @@ module.exports = (io, App) => {
     }
 
     let lasers = []
-    let x_1 = App.ship_x
-    let y_1 = App.ship_y
-    let x_2 = App.ship.x + x
-    let y_2 = App.ship.y + y
-    let x_3 = App.ship.x - x
-    let y_3 = App.ship.y - y
+    let x_1 = ship.x
+    let y_1 = ship.y
+    let x_2 = ship.x + x
+    let y_2 = ship.y + y
+    let x_3 = ship.x - x
+    let y_3 = ship.y - y
 
     if (ship.laser_level === 1) {
       let speed = 4
@@ -718,5 +696,86 @@ module.exports = (io, App) => {
 
     ship.last_fired = Date.now()
     App.lasers.push(lasers)
+  }
+
+  App.get_vector_velocities = (ship) => {
+    let direction = App.get_direction(ship)
+    let speed = ship.speed
+    let angle
+    let x, y
+
+    if (direction === 0) {
+      x = 0
+      y = -speed
+      return [x, y]
+    }
+
+    if (direction === 90) {
+      x = speed
+      y = 0
+      return [x, y]
+    }
+
+    if (direction === 180) {
+      x = 0
+      y = speed
+      return [x, y]
+    }
+
+    if (direction === 270) {
+      x = -speed
+      y = 0
+      return [x, y]
+    }
+
+    if ((direction > 0) && (direction < 90)) {
+      angle = App.to_radians(90 - direction)
+      x = Math.cos(angle) * speed
+      y = - Math.sin(angle) * speed
+      return [x, y]
+    }
+
+    if ((direction > 90) && (direction < 180)) {
+      angle = App.to_radians(direction - 90)
+      x = Math.cos(angle) * speed
+      y = Math.sin(angle) * speed
+      return [x, y]
+    }
+
+    if ((direction >= 181) && (direction <= 269)) {
+      angle = App.to_radians(270 - direction)
+      x = - Math.cos(angle) * speed
+      y = Math.sin(angle) * speed
+      return [x, y]
+    }
+
+    if ((direction > 270) && (direction < 360)) {
+      angle = App.to_radians(direction - 270)
+      x = - Math.cos(angle) * speed
+      y = - Math.sin(angle) * speed
+      return [x, y]
+    }
+  }
+
+  App.get_direction = (ship) => {
+    let direction = ((ship.rotation / 360) % 1) * 360
+
+    if (direction < 0) {
+      direction = 360 - Math.abs(direction)
+    }
+
+    if (direction >= 360) {
+      direction = 0
+    }
+
+    return direction
+  }
+
+  App.turn_left = (ship) => {
+    ship.rotation -= 3
+  }
+
+  App.turn_right = (ship) => {
+    ship.rotation += 3
   }
 }

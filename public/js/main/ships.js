@@ -59,12 +59,13 @@ App.remove_enemy = (uname) => {
 }
 
 App.create_ship = (data) => {
+  App.ship = new createjs.Container()
+
   let image = new Image()
-  image.src = `img/nave${data.model}.png`
+  image.src = `/img/nave${data.model}.png`
   App.ship_image = new createjs.Bitmap(image)
   App.ship.addChild(App.ship_image)
 
-  App.ship = new createjs.Container()
   App.ship.x = data.x
   App.ship.y = data.y
   App.ship.speed = data.speed
@@ -84,8 +85,8 @@ App.create_ship = (data) => {
     App.ship_width = image.width
     App.ship_height = image.height
 
-    let bg_coords_1 = coords[0] - (App.background.canvas.width / 2) + (App.ship_width / 2)
-    let bg_coords_2 = coords[1] - (App.background.canvas.height / 2) + (App.ship_height / 2)
+    let bg_coords_1 = data.x - (App.background.canvas.width / 2) + (App.ship_width / 2)
+    let bg_coords_2 = data.y - (App.background.canvas.height / 2) + (App.ship_height / 2)
     App.move_background(bg_coords_1, bg_coords_2)
 
     App.ship_image.regX = App.ship_width / 2

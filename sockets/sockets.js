@@ -25,12 +25,12 @@ module.exports = (io, App) => {
         type: `on_join`,
         username: socket.ak_username,
         youtube: App.read_file(`youtube`),
+        ship: socket.ak_ship,
       })
 
       socket.broadcast.emit(`update`, {
         type: `joined`,
         username: socket.ak_username,
-        ship: socket.ak_ship,
       })
 
       if (App.images.length) {
@@ -53,7 +53,7 @@ module.exports = (io, App) => {
 
     socket.on(`ship_update`, (data) => {
       if (socket.ak_username !== undefined) {
-        App.update_ship(socket, data)
+        App.ship_update(socket, data)
       }
     })
 

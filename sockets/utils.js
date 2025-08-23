@@ -80,4 +80,8 @@ module.exports = (io, App) => {
   App.get_random_int = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
+
+  App.to_radians = (degrees) => {
+    return degrees * (Math.PI / 180)
+  }
 }

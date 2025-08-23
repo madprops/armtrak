@@ -20,7 +20,6 @@ App.create_background = () => {
     }
 
     star_field.graphics.beginFill(color)
-
       .drawPolyStar(
         Math.random() * App.bg_width,
         Math.random() * App.bg_height,
@@ -39,7 +38,6 @@ App.create_background = () => {
 
   App.background.regX = 0
   App.background.regY = 0
-
   App.background.addChild(star_field)
 }
 
