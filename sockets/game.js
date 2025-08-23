@@ -26,6 +26,7 @@ const LASER_WIDTH = 24
 const LASER_HEIGHT = 24
 const SAFE_ZONE_WIDTH = 150
 const SAFE_ZONE_HEIGHT = 150
+const ROTATION_STEP = 3
 
 // Time
 let CLOCK = Date.now()
@@ -138,7 +139,7 @@ module.exports = (io, App) => {
       }
     }
 
-    io.sockets.emit(`ship_updates`, game_state)
+    io.sockets.emit(`update_ships`, game_state)
   }
 
   App.move = () => {
@@ -397,6 +398,13 @@ module.exports = (io, App) => {
     }
 
     let lasers = []
+
+    let d = App.get_direction(ship)
+    d = App.to_radians(d)
+
+    let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
+    let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
+
     let x_1 = ship.x
     let y_1 = ship.y
     let x_2 = ship.x + x
@@ -696,6 +704,11 @@ module.exports = (io, App) => {
 
     ship.last_fired = Date.now()
     App.lasers.push(lasers)
+
+    io.sockets.emit(`update`, {
+      type: `laser`,
+      lasers,
+    })
   }
 
   App.get_vector_velocities = (ship) => {
@@ -772,10 +785,10 @@ module.exports = (io, App) => {
   }
 
   App.turn_left = (ship) => {
-    ship.rotation -= 3
+    ship.rotation -= ROTATION_STEP
   }
 
   App.turn_right = (ship) => {
-    ship.rotation += 3
+    ship.rotation += ROTATION_STEP
   }
 }

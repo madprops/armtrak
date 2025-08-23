@@ -32,6 +32,7 @@ App.turn_left = () => {
 
 App.turn_right = () => {
   App.ship_image.rotation += 3
+  console.log(App.ship_image.rotation)
 }
 
 App.on_join = (data) => {
@@ -48,14 +49,4 @@ App.move = () => {
   }
 
   App.move_lasers()
-
-  if (App.left_arrow) {
-    App.turn_left()
-    return true
-  }
-
-  if (App.right_arrow) {
-    App.turn_right()
-    return true
-  }
 }

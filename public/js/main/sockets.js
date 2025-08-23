@@ -32,11 +32,11 @@ App.start_socket = () => {
     else if (data.type === `chat_announcement`) {
       App.chat_announce(data.msg)
     }
-    else if (data.type === `ship_updates`) {
-      App.update_enemy_ships(data)
+    else if (data.type === `update_ships`) {
+      App.update_ships(data)
     }
     else if (data.type === `laser`) {
-      App.fire_enemy_laser(data)
+      App.create_lasers(data)
     }
     else if (data.type === `success`) {
       App.chat_announce(data.message)

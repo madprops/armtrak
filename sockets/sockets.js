@@ -59,7 +59,7 @@ module.exports = (io, App) => {
 
     socket.on(`fire_laser`, (data) => {
       if (socket.ak_username !== undefined) {
-        App.fire_laser(data)
+        App.fire_laser(socket)
       }
     })
 

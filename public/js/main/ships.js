@@ -5,24 +5,29 @@ class EnemyShip {
   }
 }
 
-App.update_enemy_ships = (data) => {
-  for (let ship of data.ships) {
-    let enemy = App.get_enemy_ship_or_create(ship)
+App.update_ships = (data) => {
+  for (let item of data.ships) {
+    if (item.id === App.ship.id) {
+      App.ship_image.rotation = item.rotation
+    }
+    else {
+      let enemy = App.get_enemy_ship_or_create(ship)
 
-    if (enemy) {
-      enemy.container.x = ship.x
-      enemy.container.y = ship.y
-      enemy.container.visible = ship.visible
+      if (enemy) {
+        enemy.container.x = item.x
+        enemy.container.y = item.y
+        enemy.container.visible = item.visible
 
-      if (enemy.container.model !== ship.model) {
-        let image = new Image()
-        image.src = `img/nave` + ship.model + `.png`
-        enemy.container.children[0].image = image
+        if (enemy.container.model !== item.model) {
+          let image = new Image()
+          image.src = `img/nave` + item.model + `.png`
+          enemy.container.children[0].image = image
+        }
+
+        enemy.container.model = item.model
+        enemy.container.model = item.model
+        enemy.container.children[0].rotation = item.rotation
       }
-
-      enemy.container.model = ship.model
-      enemy.container.model = ship.model
-      enemy.container.children[0].rotation = ship.rotation
     }
   }
 }
