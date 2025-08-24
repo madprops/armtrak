@@ -109,8 +109,7 @@ App.copy_obj = (from, to, exclude = []) => {
       return
     }
 
-    if (from.hasOwnProperty(key)) {
-      to[key] = from[key]
-    }
-  })
+  if (Object.prototype.hasOwnProperty.call(from, key)) {
+    to[key] = from[key];
+  }})
 }

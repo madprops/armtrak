@@ -31,8 +31,8 @@ const ROTATION_STEP = 3
 const RESPAWN_TIME = 5 * 1000
 
 // Lasers
-LASER_STEP = 1
-LAST_FIRED_MIN = 300
+const LASER_STEP = 1
+const LAST_FIRED_MIN = 300
 
 module.exports = (io, App) => {
   class Ship {
@@ -73,7 +73,7 @@ module.exports = (io, App) => {
       let obj = {}
 
       for (let key in this) {
-        if (this.hasOwnProperty(key) && !exclude.includes(key)) {
+        if (Object.prototype.hasOwnProperty.call(this, key) && !exclude.includes(key)) {
           obj[key] = this[key]
         }
       }
@@ -102,7 +102,7 @@ module.exports = (io, App) => {
       let obj = {}
 
       for (let key in this) {
-        if (this.hasOwnProperty(key) && !exclude.includes(key)) {
+        if (Object.prototype.hasOwnProperty.call(this, key) && !exclude.includes(key)) {
           obj[key] = this[key]
         }
       }
@@ -212,7 +212,7 @@ module.exports = (io, App) => {
   App.check_lasers = () => {
     for (let ship of App.ships) {
       for (let laser_group of App.lasers) {
-        for (let laser of laser_group) {
+        for (let [i, laser] of laser_group.entries()) {
           if (laser.ship === ship) {
             continue
           }
@@ -238,7 +238,7 @@ module.exports = (io, App) => {
 
   App.move_lasers = () => {
     for (let laser_group of App.lasers) {
-      for ([i, laser] of laser_group.entries()) {
+      for (let [i, laser] of laser_group.entries()) {
         if (laser.distance < laser.max_distance) {
           laser.x += laser.vx
           laser.y += laser.vy

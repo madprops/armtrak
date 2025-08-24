@@ -13,7 +13,7 @@ module.exports = (io, App) => {
   let sockets_dir = path.join(__dirname, `../sockets`)
 
   fs.readdirSync(sockets_dir).forEach(file => {
-    if (file !== `main.js` && file.endsWith(`.js`)) {
+    if ((file !== `main.js`) && file.endsWith(`.js`)) {
       require(path.join(sockets_dir, file))(io, App)
     }
   })

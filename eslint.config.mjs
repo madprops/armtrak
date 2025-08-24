@@ -98,6 +98,7 @@ export default [
         createjs: "readable",
         "$": "readable",
         io: "readable",
+        setImmediate: "readable",
       }
     }
   }
