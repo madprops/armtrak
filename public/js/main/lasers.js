@@ -154,7 +154,6 @@ App.move_lasers = () => {
         App.background.removeChild(enemy_laser)
       }
       else if (App.check_ship_collision(enemy_laser)) {
-        App.ship_hit(enemy_laser)
         App.enemy_lasers.splice(i, 1)
         i -= 1
         App.background.removeChild(enemy_laser)

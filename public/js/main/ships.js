@@ -8,6 +8,7 @@ class EnemyShip {
 App.on_update_ships = (data) => {
   if (App.update_ships(data)) {
     App.update_minimap()
+    App.update_hud()
   }
 }
 
@@ -217,17 +218,6 @@ App.check_ship_collision = (laser) => {
   }
 
   return false
-}
-
-App.ship_hit = (laser) => {
-  if (App.ship.visible) {
-    App.ship.health -= App.laser_hit
-    App.update_hud()
-
-    if (App.ship.health <= 0) {
-      App.destroyed(laser)
-    }
-  }
 }
 
 App.show_explosion = (x, y) => {

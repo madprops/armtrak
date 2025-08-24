@@ -9,7 +9,7 @@ const NETWORK_TICK_RATE = 20 // How many times to send updates per second
 const MS_PER_TICK = 1000 / NETWORK_TICK_RATE // 50ms
 
 // Ship
-const MIN_MAX_HEALTH = 10
+const MIN_MAX_HEALTH = 100
 const MAX_MAX_HEALTH = 200
 const MIN_MAX_SPEED = 1.5
 const MAX_MAX_SPEED = 2.5
@@ -267,6 +267,7 @@ module.exports = (io, App) => {
 
   App.ship_hit = (ship, laser) => {
     if (ship.visible) {
+      console.log(ship.health)
       ship.health -= LASER_HIT
 
       if (ship.health <= 0) {
