@@ -155,7 +155,7 @@ App.create_enemy_ship = (enemy, x, y, model) => {
   enemy_ship.x = x
   enemy_ship.y = y
   enemy_ship.model = model
-  enemy.image = enemy_ship
+  enemy.image = enemy_image
   enemy_ship.addChild(enemy_image)
 
   let label = App.create_label(enemy.username)
@@ -165,12 +165,12 @@ App.create_enemy_ship = (enemy, x, y, model) => {
   App.add_to_background(enemy_ship)
 
   image.onload = function() {
-    enemy_image.regX = App.ship_width / 2
-    enemy_image.regY = App.ship_height / 2
-    enemy_image.x = App.ship_width / 2
-    enemy_image.y = App.ship_height / 2
-    label.x = App.ship_width / 2
-    label.y = App.ship_height
+    enemy_image.regX = image.width / 2
+    enemy_image.regY = image.height / 2
+    enemy_image.x = image.width / 2
+    enemy_image.y = image.height / 2
+    label.x = image.width / 2
+    label.y = image.height
   }
 }
 
