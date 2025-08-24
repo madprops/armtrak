@@ -16,7 +16,8 @@ const MAX_MAX_SPEED = 2.5
 const MAX_LASER_LEVEL = 10
 const MIN_LASER_LEVEL = 1
 const NUM_MODELS = 15
-const SPEED_STEP = 0.2
+const SPEED_STEP = 0.1
+const SPEED_STEP_REDUCE = 0.033
 const HEALTH_UPGRADE_STEP = 10
 const SPEED_UPGRADE_STEP = 0.1
 const LASER_UPGRADE_STEP = 1
@@ -322,7 +323,7 @@ module.exports = (io, App) => {
   }
 
   App.reduce_speed = (ship) => {
-    ship.speed -= SPEED_STEP
+    ship.speed -= SPEED_STEP_REDUCE
 
     if (ship.speed < 0) {
       ship.speed = 0
@@ -331,7 +332,7 @@ module.exports = (io, App) => {
 
   App.increase_speed = (ship) => {
     if (ship.speed < ship.max_speed) {
-      ship.speed += ship.max_speed * 0.10
+      ship.speed += ship.max_speed * SPEED_STEP
     }
   }
 
