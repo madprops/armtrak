@@ -8,10 +8,29 @@ class EnemyShip {
 App.update_ships = (data) => {
   for (let item of data.ships) {
     if (App.ship && (App.ship.id === item.id)) {
+      App.ship_image.rotation = item.rotation
+
+      let diff_x = item.x - App.ship.x
+      let diff_y = item.y - App.ship.y
+
       App.ship.x = item.x
       App.ship.y = item.y
-      App.ship_image.rotation = item.rotation
-      App.move_background(item.x, item.y)
+
+      if (App.ship.x <= 0) {
+        App.move_background(App.ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY)
+      }
+      else if (App.ship.x >= App.bg_width) {
+        App.move_background(App.ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY)
+      }
+      else if (App.ship.y <= 0) {
+        App.move_background(App.background.regX, App.ship.y - (App.background.canvas.height / 2) + (App.ship_height / 2))
+      }
+      else if (App.ship.y >= App.bg_height) {
+        App.move_background(App.background.regX, App.ship.y - (App.background.canvas.height / 2) + (App.ship_height / 2))
+      }
+      else {
+        App.move_background(App.background.regX + diff_x, App.background.regY + diff_y)
+      }
     }
     else {
       let enemy = App.get_enemy_ship_or_create(item)

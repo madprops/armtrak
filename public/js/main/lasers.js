@@ -12,8 +12,8 @@ App.create_lasers = (data) => {
   for (let item of data.lasers) {
     let laser_image = new createjs.Bitmap(App.laser_img)
     let laser = new createjs.Container()
-    laser.x = item.x
-    laser.y = item.y
+    laser.x = data.x
+    laser.y = data.y
     laser.distance = 0
     let laser_width = App.laser_img.width
     let laser_height = App.laser_img.height

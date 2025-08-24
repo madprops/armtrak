@@ -11,8 +11,8 @@ const MS_PER_TICK = 1000 / NETWORK_TICK_RATE; // 50ms
 // Ship
 const MIN_MAX_HEALTH = 10
 const MAX_MAX_HEALTH = 200
-const MIN_MAX_SPEED = 2
-const MAX_MAX_SPEED = 3
+const MIN_MAX_SPEED = 1.5
+const MAX_MAX_SPEED = 2.5
 const MAX_LASER_LEVEL = 10
 const MIN_LASER_LEVEL = 1
 const NUM_MODELS = 15
@@ -58,6 +58,8 @@ module.exports = (io, App) => {
       this.laser_level = MIN_LASER_LEVEL
       this.in_safe_zone = false
       this.last_fired = now
+      this.vx = 0
+      this.vy = 0
 
       Ship.id += 1
     }
@@ -131,6 +133,8 @@ module.exports = (io, App) => {
         rotation: ship.rotation,
         visible: ship.visible,
         model: ship.model,
+        vx: ship.vx,
+        vy: ship.vy,
       })
     }
 
@@ -345,6 +349,9 @@ module.exports = (io, App) => {
       ship.y = 0
     }
 
+    ship.vx = vx
+    ship.vy = vy
+
     App.check_safe_zone(ship)
   }
 
@@ -362,10 +369,10 @@ module.exports = (io, App) => {
       }
 
       if (ship.container.visible) {
-        let x1 = ship.container.x - App.ship_width / 4
-        let x2 = ship.container.x + App.ship_width / 4
-        let y1 = ship.container.y - App.ship_height / 4
-        let y2 = ship.container.y + App.ship_height / 4
+        let x1 = ship.container.x - SHIP_WIDTH / 4
+        let x2 = ship.container.x + SHIP_WIDTH / 4
+        let y1 = ship.container.y - SHIP_HEIGHT / 4
+        let y2 = ship.container.y + SHIP_HEIGHT / 4
 
         if (((laser.x >= x1) && (laser.x <= x2)) && ((laser.y >= y1) && (laser.y <= y2))) {
           return ship
@@ -392,8 +399,8 @@ module.exports = (io, App) => {
     let d = App.get_direction(ship)
     d = App.to_radians(d)
 
-    let x = (App.ship_width / 2 * 0.6) * Math.cos(d)
-    let y = (App.ship_width / 2 * 0.6) * Math.sin(d)
+    let x = (SHIP_WIDTH / 2 * 0.6) * Math.cos(d)
+    let y = (SHIP_WIDTH / 2 * 0.6) * Math.sin(d)
 
     let x_1 = ship.x
     let y_1 = ship.y
@@ -697,6 +704,8 @@ module.exports = (io, App) => {
 
     io.sockets.emit(`update`, {
       type: `laser`,
+      x: ship.x,
+      y: ship.y,
       lasers,
     })
   }
