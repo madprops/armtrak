@@ -117,6 +117,15 @@ module.exports = (io, App) => {
     App.ships.push(socket.ak_ship)
   }
 
+  App.remove_ship = (socket) => {
+    for (let [i, ship] of App.ships.entries()) {
+      if (ship.username === socket.ak_username) {
+        App.ships.splice(i, 1)
+        return
+      }
+    }
+  }
+
   App.start_game = () => {
     App.setup_safe_zone()
     App.start_game_loop()

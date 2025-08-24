@@ -47,6 +47,11 @@ App.update_background = () => {
 
 App.add_to_background = (what, update = true) => {
   App.background.addChild(what)
+
+  if (update) {
+    App.z_order()
+    App.update_minimap()
+  }
 }
 
 App.move_background = (x, y) => {

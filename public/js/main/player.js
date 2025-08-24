@@ -39,6 +39,7 @@ App.on_join = (data) => {
   App.username = data.username
   App.youtube = data.youtube
   App.create_ship(data.ship)
+  App.update_minimap()
   App.greet(data.username)
   App.show_intro()
 }

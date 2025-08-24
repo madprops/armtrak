@@ -55,6 +55,7 @@ App.update_ships = (data) => {
           continue
         }
 
+        changed = true
         enemy.container.x = item.x
         enemy.container.y = item.y
         enemy.container.visible = item.visible
@@ -128,7 +129,6 @@ App.create_ship = (data) => {
   let label = App.create_label(App.username)
   App.ship.addChild(label)
   App.add_to_background(App.ship)
-  App.z_order()
 
   image.onload = function() {
     App.ship_width = image.width
@@ -162,9 +162,8 @@ App.create_enemy_ship = (enemy, x, y, model) => {
   let label = App.create_label(enemy.username)
   enemy_ship.addChild(label)
 
-  App.background.addChild(enemy_ship)
   enemy.container = enemy_ship
-  App.z_order()
+  App.add_to_background(enemy_ship)
 
   image.onload = function() {
     enemy_image.regX = App.ship_width / 2

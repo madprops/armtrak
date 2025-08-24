@@ -51,9 +51,8 @@ App.image_placed = (data) => {
   image.x = data.x
   image.y = data.y
   App.setup_image(image)
-  App.background.addChild(image)
-  App.z_order()
   App.push_image(image)
+  App.add_to_background(image)
 
   if (!data.silent) {
     App.chat_announce(`${App.image_icon} ${data.title} (${data.username})`)

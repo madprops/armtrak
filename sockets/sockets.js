@@ -138,8 +138,7 @@ module.exports = (io, App) => {
 
     socket.on(`disconnect`, () => {
       if (socket.ak_username !== undefined) {
-        App.remove_username(socket.ak_username)
-        App.remove_score(socket.ak_username)
+        App.remove_ship(socket)
 
         socket.broadcast.emit(`update`, {
           type: `disconnection`,

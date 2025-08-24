@@ -10,6 +10,7 @@ App.setup_lasers = () => {
 
 App.create_lasers = (data) => {
   for (let item of data.lasers) {
+    console.log(item)
     let laser_image = new createjs.Bitmap(App.laser_img)
     let laser = new createjs.Container()
     laser.x = data.x
