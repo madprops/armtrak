@@ -5,7 +5,15 @@ class EnemyShip {
   }
 }
 
+App.on_update_ships = (data) => {
+  if (App.update_ships(data)) {
+    App.update_minimap()
+  }
+}
+
 App.update_ships = (data) => {
+  let changed = false
+
   for (let item of data.ships) {
     if (App.ship && (App.ship.id === item.id)) {
       App.ship_image.rotation = item.rotation
@@ -15,6 +23,12 @@ App.update_ships = (data) => {
 
       App.ship.x = item.x
       App.ship.y = item.y
+
+      if ((diff_x === 0) && (diff_y === 0)) {
+        continue
+      }
+
+      changed = true
 
       if (App.ship.x <= 0) {
         App.move_background(App.ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY)
@@ -36,6 +50,11 @@ App.update_ships = (data) => {
       let enemy = App.get_enemy_ship_or_create(item)
 
       if (enemy) {
+        if ((enemy.container.x === item.x) &&
+        (enemy.container.y === item.y)) {
+          continue
+        }
+
         enemy.container.x = item.x
         enemy.container.y = item.y
         enemy.container.visible = item.visible
@@ -52,6 +71,8 @@ App.update_ships = (data) => {
       }
     }
   }
+
+  return changed
 }
 
 App.get_enemy_ship_or_create = (data) => {

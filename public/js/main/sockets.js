@@ -33,7 +33,7 @@ App.start_socket = () => {
       App.chat_announce(data.msg)
     }
     else if (data.type === `update_ships`) {
-      App.update_ships(data)
+      App.on_update_ships(data)
     }
     else if (data.type === `laser`) {
       App.create_lasers(data)
