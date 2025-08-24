@@ -278,6 +278,7 @@ module.exports = (io, App) => {
   App.destroyed = (ship, laser) => {
     ship.visible = false
     laser.ship.kills += 1
+    App.upgrade(laser.ship)
 
     io.sockets.emit(`update`, {
       type: `destroyed`,
@@ -354,21 +355,31 @@ module.exports = (io, App) => {
     }
 
     let num = nums.sort(function(){return 0.5 - Math.random()})[0]
+    let what
 
     if (num === 1) {
       App.increase_laser_level(ship)
-      return true
+      what = `laser`
     }
-
-    if (num === 2) {
+    else if (num === 2) {
       App.increase_max_health(ship)
-      return true
+      what = `health`
+    }
+    else if (num === 3) {
+      App.increase_max_speed(ship)
+      what = `speed`
     }
 
-    if (num === 3) {
-      App.increase_max_speed(ship)
-      return true
+    let socket = App.get_socket_by_username(ship.username)
+
+    if (socket) {
+      socket.emit(`update`, {
+        type: `upgrade`,
+        what,
+      })
     }
+
+    return true
   }
 
   App.increase_max_health = (ship) => {

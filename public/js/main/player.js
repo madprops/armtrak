@@ -1,7 +1,8 @@
 App.update_hud = () => {
   let health = App.padnum(App.ship.health, 3)
   $(`#health`).html(`Health: ` + health + `/` + App.ship.max_health)
-  $(`#max_speed`).html(`Max Speed: ` + (Math.round((App.ship.max_speed - 1) * 10) / 10))
+  $(`#max_speed`).html(`Max Speed: ` + App.format_value(App.ship.max_speed))
+  $(`#laser_level`).html(`Laser Level: ` + App.ship.laser_level)
 }
 
 App.on_respawn = (data) => {
@@ -45,4 +46,8 @@ App.on_join = (data) => {
 
 App.move = () => {
   App.move_lasers()
+}
+
+App.on_upgrade = (data) => {
+  App.chat_announce(`👽 Upgraded ${data.what}`)
 }

@@ -236,14 +236,11 @@ App.show_explosion = (x, y) => {
 
 App.on_destroyed = (data) => {
   if (data.destroyed_ship === App.username) {
-    App.upgrade()
     App.ship.health += App.laser_hit
 
     if (App.ship.health > App.ship.max_health) {
       App.ship.health = App.ship.max_health
     }
-
-    App.update_hud()
   }
 
   let kills = ``
@@ -256,6 +253,7 @@ App.on_destroyed = (data) => {
   let u2 = data.destroyed_ship.username
   App.show_explosion(data.destroyed_ship.x, data.destroyed_ship.y)
   App.chat_announce(`💥 ${u1} destroyed ${u2}${kills}`)
+  App.update_hud()
 }
 
 App.create_label = (username) => {

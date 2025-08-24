@@ -114,3 +114,7 @@ App.copy_obj = (from, to, exclude = []) => {
     }
   })
 }
+
+App.format_value = (value, adjustment = 1, precision = 1) => {
+  return Math.round((value - adjustment) * Math.pow(10, precision)) / Math.pow(10, precision)
+}

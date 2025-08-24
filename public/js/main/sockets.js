@@ -50,6 +50,9 @@ App.start_socket = () => {
     else if (data.type === `respawn`) {
       App.on_respawn(data)
     }
+    else if (data.type === `upgrade`) {
+      App.on_upgrade(data)
+    }
     else if (data.type === `image_placed`) {
       App.image_placed(data)
     }
