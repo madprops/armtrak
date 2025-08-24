@@ -5,7 +5,7 @@ App.update_hud = () => {
 }
 
 App.on_respawn = (data) => {
-  App.ship = data.ship
+  App.copy_obj(data.ship, App.ship)
   let coords_1 = App.ship.x - App.background.canvas.width / 2
   let coords_2 = App.ship.y - App.background.canvas.height / 2
   App.move_background(coords_1, coords_2)

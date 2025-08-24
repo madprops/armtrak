@@ -102,3 +102,11 @@ App.clean_string = (s) => {
 App.padnum = (num, amount = 3) => {
   return String(num).padStart(amount, `0`)
 }
+
+App.copy_obj = (from, to) => {
+  Object.keys(to).forEach(key => {
+    if (from.hasOwnProperty(key)) {
+      to[key] = from[key]
+    }
+  })
+}
