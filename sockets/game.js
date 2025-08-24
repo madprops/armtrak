@@ -65,6 +65,19 @@ module.exports = (io, App) => {
 
       Ship.id += 1
     }
+
+    to_obj() {
+      let exclude = [`laser`]
+      let obj = {}
+
+      for (let key in this) {
+        if (this.hasOwnProperty(key) && !exclude.includes(key)) {
+          obj[key] = this[key]
+        }
+      }
+
+      return obj
+    }
   }
 
   class Laser {
@@ -80,6 +93,19 @@ module.exports = (io, App) => {
       let velocities = App.get_vector_velocities(this)
       this.vx = velocities[0]
       this.vy = velocities[1]
+    }
+
+    to_obj() {
+      let exclude = [`ship`]
+      let obj = {}
+
+      for (let key in this) {
+        if (this.hasOwnProperty(key) && !exclude.includes(key)) {
+          obj[key] = this[key]
+        }
+      }
+
+      return obj
     }
   }
 
@@ -132,17 +158,7 @@ module.exports = (io, App) => {
 
     for (let ship_id in App.ships) {
       let ship = App.ships[ship_id]
-
-      ships.push({
-        id: ship.id,
-        x: ship.x,
-        y: ship.y,
-        rotation: ship.rotation,
-        visible: ship.visible,
-        model: ship.model,
-        vx: ship.vx,
-        vy: ship.vy,
-      })
+      ships.push(ship.to_obj())
     }
 
     io.sockets.emit(`update`, {
@@ -248,9 +264,7 @@ module.exports = (io, App) => {
 
   App.destroyed = (ship, laser) => {
     ship.visible = false
-    ship.kills = 0
     laser.ship.kills += 1
-    ship.model = App.get_random_int(1, 15)
 
     io.sockets.emit(`update`, {
       type: `destroyed`,
@@ -279,9 +293,14 @@ module.exports = (io, App) => {
       ship.health = ship.max_health
       ship.max_speed = MIN_MAX_SPEED
       ship.laser_level = MIN_LASER_LEVEL
+      ship.model = App.get_random_int(1, 15)
+      ship.kills = 0
       ship.visible = true
 
-      socket.emit(`update`, {type: `respawn`, ship})
+      socket.emit(`update`, {
+        type: `respawn`,
+        ship: ship.to_obj(),
+      })
     }, 5000)
   }
 
@@ -774,11 +793,17 @@ module.exports = (io, App) => {
     ship.last_fired = Date.now()
     App.lasers.push(lasers)
 
+    let laser_objs = []
+
+    for (let laser of lasers) {
+      laser_objs.push(laser.to_obj())
+    }
+
     io.sockets.emit(`update`, {
       type: `laser`,
       x: ship.x,
       y: ship.y,
-      lasers,
+      lasers: laser_objs,
     })
   }
 
