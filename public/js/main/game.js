@@ -38,7 +38,7 @@ App.setup_explosions = () => {
   App.explosion_image.onload = () => {
     App.explosion_sheet = new createjs.SpriteSheet({
       images: [App.explosion_image],
-      frames: { width: 96, height: 96, regX: 0, regY: 0 },
+      frames: {width: 96, height: 96, regX: 0, regY: 0},
       animations: {
         explode: [0, 71, false],
       },

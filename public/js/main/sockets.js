@@ -64,5 +64,5 @@ App.start_socket = () => {
     }
   })
 
-  App.socket.emit(`adduser`, { username: App.username })
+  App.socket.emit(`adduser`, {username: App.username})
 }

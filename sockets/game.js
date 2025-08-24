@@ -267,7 +267,6 @@ module.exports = (io, App) => {
 
   App.ship_hit = (ship, laser) => {
     if (ship.visible) {
-
       ship.health -= LASER_HIT
 
       if (ship.health <= 0) {
