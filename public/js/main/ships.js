@@ -190,23 +190,6 @@ App.create_enemy_ship = (enemy, x, y, model) => {
   }
 }
 
-App.check_enemy_collision = (laser) => {
-  for (let ship of App.enemy_ships) {
-    if (ship.container.visible) {
-      let x1 = ship.container.x - App.ship_width / 4
-      let x2 = ship.container.x + App.ship_width / 4
-      let y1 = ship.container.y - App.ship_height / 4
-      let y2 = ship.container.y + App.ship_height / 4
-
-      if (((laser.x >= x1) && (laser.x <= x2)) && ((laser.y >= y1) && (laser.y <= y2))) {
-        return ship
-      }
-    }
-  }
-
-  return false
-}
-
 App.check_ship_collision = (laser) => {
   if (App.ship.visible) {
     let x1 = App.ship.x - (App.ship_width / 4)

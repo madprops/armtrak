@@ -86,6 +86,7 @@ module.exports = (io, App) => {
   class Laser {
     constructor(ship, speed, max_distance, rotation, x, y) {
       this.ship = ship
+      this.username = ship.username
       this.speed = speed
       this.max_distance = max_distance
       this.rotation = rotation
