@@ -84,4 +84,14 @@ module.exports = (io, App) => {
   App.to_radians = (degrees) => {
     return degrees * (Math.PI / 180)
   }
+
+  App.get_socket_by_username = (username) => {
+    for (let [id, socket] of io.sockets.sockets) {
+      if (socket.ak_username === username) {
+        return socket
+      }
+    }
+
+    return null
+  }
 }

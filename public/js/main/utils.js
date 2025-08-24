@@ -103,8 +103,12 @@ App.padnum = (num, amount = 3) => {
   return String(num).padStart(amount, `0`)
 }
 
-App.copy_obj = (from, to) => {
+App.copy_obj = (from, to, exclude = []) => {
   Object.keys(to).forEach(key => {
+    if (exclude.includes(key)) {
+      return
+    }
+
     if (from.hasOwnProperty(key)) {
       to[key] = from[key]
     }

@@ -3,10 +3,10 @@ const BG_HEIGHT = 2000
 const BG_WIDTH = 2000
 
 // Network
-const SIMULATION_RATE = 60; // How many times to run physics per second
-const MS_PER_UPDATE = 1000 / SIMULATION_RATE; // ~16.67ms
-const NETWORK_TICK_RATE = 20; // How many times to send updates per second
-const MS_PER_TICK = 1000 / NETWORK_TICK_RATE; // 50ms
+const SIMULATION_RATE = 60 // How many times to run physics per second
+const MS_PER_UPDATE = 1000 / SIMULATION_RATE // ~16.67ms
+const NETWORK_TICK_RATE = 20 // How many times to send updates per second
+const MS_PER_TICK = 1000 / NETWORK_TICK_RATE // 50ms
 
 // Ship
 const MIN_MAX_HEALTH = 10
@@ -24,9 +24,11 @@ const SHIP_WIDTH = 24
 const SHIP_HEIGHT = 24
 const LASER_WIDTH = 24
 const LASER_HEIGHT = 24
+const LASER_HIT = 20
 const SAFE_ZONE_WIDTH = 150
 const SAFE_ZONE_HEIGHT = 150
 const ROTATION_STEP = 3
+const RESPAWN_TIME = 5 * 1000
 
 // Lasers
 LASER_STEP = 1
@@ -209,24 +211,26 @@ module.exports = (io, App) => {
 
   App.check_lasers = () => {
     for (let ship of App.ships) {
-      for (let laser of App.lasers) {
-        if (laser.ship === ship) {
-          continue
-        }
+      for (let laser_group of App.lasers) {
+        for (let laser of laser_group) {
+          if (laser.ship === ship) {
+            continue
+          }
 
-        let enemy = App.check_enemy_collision(ship, laser)
+          let enemy = App.check_enemy_collision(ship, laser)
 
-        function check_col() {
-          let x1 = Math.pow((laser.x + (LASER_WIDTH / 2)) - (BG_WIDTH / 2), 2)
-          let x2 = Math.pow((laser.y + (LASER_HEIGHT / 2)) - (BG_HEIGHT / 2), 2)
-          let x3 = Math.pow(App.safe_zone_radius, 2)
-          return x1 + x2 < x3
-        }
+          function check_col() {
+            let x1 = Math.pow((laser.x + (LASER_WIDTH / 2)) - (BG_WIDTH / 2), 2)
+            let x2 = Math.pow((laser.y + (LASER_HEIGHT / 2)) - (BG_HEIGHT / 2), 2)
+            let x3 = Math.pow(App.safe_zone_radius, 2)
+            return x1 + x2 < x3
+          }
 
-        if (enemy || check_col()) {
-          App.ship_hit(ship, enemy_laser)
-          App.lasers.splice(i, 1)
-          i -= 1
+          if (enemy || check_col()) {
+            App.ship_hit(ship, laser)
+            App.lasers.splice(i, 1)
+            i -= 1
+          }
         }
       }
     }
@@ -263,7 +267,7 @@ module.exports = (io, App) => {
 
   App.ship_hit = (ship, laser) => {
     if (ship.visible) {
-      ship.health -= App.laser_hit
+      ship.health -= LASER_HIT
 
       if (ship.health <= 0) {
         App.destroyed(ship, laser)
@@ -277,12 +281,12 @@ module.exports = (io, App) => {
 
     io.sockets.emit(`update`, {
       type: `destroyed`,
-      destroyer_ship: laser.ship.username,
-      destroyed_ship: ship.username,
+      destroyer_ship: laser.ship.to_obj(),
+      destroyed_ship: ship.to_obj(),
       kills: laser.ship.kills,
     })
 
-    App.respawn()
+    App.respawn(ship)
   }
 
   App.get_random_coords = () => {
@@ -291,9 +295,8 @@ module.exports = (io, App) => {
     return [x, y]
   }
 
-  App.respawn = (socket) => {
+  App.respawn = (ship) => {
     setTimeout(function() {
-      let ship = socket.ak_ship
       let coords = App.get_random_coords()
 
       ship.x = coords[0]
@@ -305,12 +308,7 @@ module.exports = (io, App) => {
       ship.model = App.get_random_int(1, 15)
       ship.kills = 0
       ship.visible = true
-
-      socket.emit(`update`, {
-        type: `respawn`,
-        ship: ship.to_obj(),
-      })
-    }, 5000)
+    }, RESPAWN_TIME)
   }
 
   App.ship_update = (socket, data) => {

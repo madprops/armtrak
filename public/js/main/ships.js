@@ -16,17 +16,23 @@ App.update_ships = (data) => {
 
   for (let item of data.ships) {
     if (App.ship && (App.ship.id === item.id)) {
+      if (!item.visible) {
+        App.ship.visible = false
+        continue
+      }
+
       let diff_x = item.x - App.ship.x
       let diff_y = item.y - App.ship.y
 
       if ((diff_x === 0) && (diff_y === 0) &&
       (App.ship_image.rotation === item.rotation)) {
-        continue
+        if (App.ship.visible) {
+          continue
+        }
       }
 
       changed = true
-      App.ship.x = item.x
-      App.ship.y = item.y
+      App.copy_obj(item, App.ship, [`rotation`])
       App.ship_image.rotation = item.rotation
 
       if (App.ship.x <= 0) {
@@ -49,16 +55,23 @@ App.update_ships = (data) => {
       let enemy = App.get_enemy_ship_or_create(item)
 
       if (enemy) {
+        if (!item.visible) {
+          enemy.container.visible = false
+          continue
+        }
+
         if ((enemy.container.x === item.x) &&
         (enemy.container.y === item.y) &&
         (enemy.image.rotation === item.rotation)) {
-          continue
+          if (enemy.container.visible) {
+            continue
+          }
         }
 
         changed = true
         enemy.container.x = item.x
         enemy.container.y = item.y
-        enemy.container.visible = item.visible
+        enemy.container.visible = true
 
         if (enemy.container.model !== item.model) {
           let image = new Image()
@@ -217,34 +230,6 @@ App.ship_hit = (laser) => {
   }
 }
 
-App.destroyed = (laser) => {
-  App.ship.visible = false
-  App.show_explosion(App.ship.x, App.ship.y)
-  App.socket.emit(`destroyed`, {destroyed_by:laser.username})
-  let image = new Image()
-  let num = App.get_random_int(1, 15)
-  image.src = `img/nave` + num + `.png`
-  App.ship_image.image = image
-  App.ship.model = num
-  App.respawn()
-}
-
-App.enemy_destroyed = (data) => {
-  if (data.destroyed_by === App.username) {
-    App.upgrade()
-    App.ship.health += App.laser_hit
-
-    if (App.ship.health > App.ship.max_health) {
-      App.ship.health = App.ship.max_health
-    }
-
-    App.update_hud()
-  }
-
-  let enemy = App.get_enemy_ship(data.username)
-  App.show_explosion(enemy.container.x, enemy.container.y)
-}
-
 App.show_explosion = (x, y) => {
   let explosion_animation = new createjs.Sprite(App.explosion_sheet)
   explosion_animation.gotoAndPlay(`explode`)
@@ -260,8 +245,15 @@ App.show_explosion = (x, y) => {
 }
 
 App.on_destroyed = (data) => {
-  if (data.username !== App.username) {
-    App.enemy_destroyed(data)
+  if (data.destroyed_ship === App.username) {
+    App.upgrade()
+    App.ship.health += App.laser_hit
+
+    if (App.ship.health > App.ship.max_health) {
+      App.ship.health = App.ship.max_health
+    }
+
+    App.update_hud()
   }
 
   let kills = ``
@@ -270,6 +262,7 @@ App.on_destroyed = (data) => {
     kills = `<br>(` + data.kills + ` kills in a row)`
   }
 
+  App.show_explosion(data.destroyed_ship.x, data.destroyed_ship.y)
   App.chat_announce(`💥 ${data.destroyer_ship} destroyed ${data.destroyed_ship}${kills}`)
 }
 

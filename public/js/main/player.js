@@ -32,7 +32,6 @@ App.turn_left = () => {
 
 App.turn_right = () => {
   App.ship_image.rotation += 3
-  console.log(App.ship_image.rotation)
 }
 
 App.on_join = (data) => {
