@@ -36,11 +36,12 @@ module.exports = (io, App) => {
   class Ship {
     static id = 1
 
-    constructor() {
+    constructor(username) {
       let coords = App.get_random_coords()
       let model = App.get_random_int(1, NUM_MODELS)
       let now = Date.now()
 
+      this.username = username
       this.id = Ship.id
       this.x = coords[0]
       this.y = coords[1]
@@ -58,6 +59,7 @@ module.exports = (io, App) => {
       this.laser_level = MIN_LASER_LEVEL
       this.in_safe_zone = false
       this.last_fired = now
+      this.kills = 0
       this.vx = 0
       this.vy = 0
 
@@ -74,6 +76,10 @@ module.exports = (io, App) => {
       this.x = x
       this.y = y
       this.distance = 0
+
+      let velocities = App.get_vector_velocities(this)
+      this.vx = velocities[0]
+      this.vy = velocities[1]
     }
   }
 
@@ -81,7 +87,7 @@ module.exports = (io, App) => {
   App.lasers = []
 
   App.create_ship = (socket) => {
-    socket.ak_ship = new Ship()
+    socket.ak_ship = new Ship(socket.ak_username)
     App.ships.push(socket.ak_ship)
   }
 
@@ -193,6 +199,7 @@ module.exports = (io, App) => {
         }
 
         if (enemy || check_col()) {
+          App.ship_hit(ship, enemy_laser)
           App.lasers.splice(i, 1)
           i -= 1
         }
@@ -227,6 +234,32 @@ module.exports = (io, App) => {
         }
       }
     }
+  }
+
+  App.ship_hit = (ship, laser) => {
+    if (ship.visible) {
+      ship.health -= App.laser_hit
+
+      if (ship.health <= 0) {
+        App.destroyed(ship, laser)
+      }
+    }
+  }
+
+  App.destroyed = (ship, laser) => {
+    ship.visible = false
+    ship.kills = 0
+    laser.ship.kills += 1
+    ship.model = App.get_random_int(1, 15)
+
+    io.sockets.emit(`update`, {
+      type: `destroyed`,
+      destroyer_ship: laser.ship.username,
+      destroyed_ship: ship.username,
+      kills: laser.ship.kills,
+    })
+
+    App.respawn()
   }
 
   App.get_random_coords = () => {
@@ -377,11 +410,11 @@ module.exports = (io, App) => {
         continue
       }
 
-      if (ship.container.visible) {
-        let x1 = ship.container.x - SHIP_WIDTH / 4
-        let x2 = ship.container.x + SHIP_WIDTH / 4
-        let y1 = ship.container.y - SHIP_HEIGHT / 4
-        let y2 = ship.container.y + SHIP_HEIGHT / 4
+      if (ship.visible) {
+        let x1 = ship.x - SHIP_WIDTH / 4
+        let x2 = ship.x + SHIP_WIDTH / 4
+        let y1 = ship.y - SHIP_HEIGHT / 4
+        let y2 = ship.y + SHIP_HEIGHT / 4
 
         if (((laser.x >= x1) && (laser.x <= x2)) && ((laser.y >= y1) && (laser.y <= y2))) {
           return ship
