@@ -16,19 +16,18 @@ App.update_ships = (data) => {
 
   for (let item of data.ships) {
     if (App.ship && (App.ship.id === item.id)) {
-      App.ship_image.rotation = item.rotation
-
       let diff_x = item.x - App.ship.x
       let diff_y = item.y - App.ship.y
 
-      App.ship.x = item.x
-      App.ship.y = item.y
-
-      if ((diff_x === 0) && (diff_y === 0)) {
+      if ((diff_x === 0) && (diff_y === 0) &&
+      (App.ship_image.rotation === item.rotation)) {
         continue
       }
 
       changed = true
+      App.ship.x = item.x
+      App.ship.y = item.y
+      App.ship_image.rotation = item.rotation
 
       if (App.ship.x <= 0) {
         App.move_background(App.ship.x - (App.background.canvas.width / 2) + (App.ship_width / 2), App.background.regY)
@@ -51,7 +50,8 @@ App.update_ships = (data) => {
 
       if (enemy) {
         if ((enemy.container.x === item.x) &&
-        (enemy.container.y === item.y)) {
+        (enemy.container.y === item.y) &&
+        (enemy.image.rotation === item.rotation)) {
           continue
         }
 
@@ -67,8 +67,7 @@ App.update_ships = (data) => {
         }
 
         enemy.container.model = item.model
-        enemy.container.model = item.model
-        enemy.container.children[0].rotation = item.rotation
+        enemy.image.rotation = item.rotation
       }
     }
   }
@@ -156,7 +155,7 @@ App.create_enemy_ship = (enemy, x, y, model) => {
   enemy_ship.x = x
   enemy_ship.y = y
   enemy_ship.model = model
-
+  enemy.image = enemy_ship
   enemy_ship.addChild(enemy_image)
 
   let label = App.create_label(enemy.username)
