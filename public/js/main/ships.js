@@ -252,8 +252,10 @@ App.on_destroyed = (data) => {
     kills = `<br>(` + data.kills + ` kills in a row)`
   }
 
+  let u1 = data.destroyer_ship.username
+  let u2 = data.destroyed_ship.username
   App.show_explosion(data.destroyed_ship.x, data.destroyed_ship.y)
-  App.chat_announce(`💥 ${data.destroyer_ship} destroyed ${data.destroyed_ship}${kills}`)
+  App.chat_announce(`💥 ${u1} destroyed ${u2}${kills}`)
 }
 
 App.create_label = (username) => {

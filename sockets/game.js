@@ -217,12 +217,12 @@ module.exports = (io, App) => {
             continue
           }
 
-          let enemy = App.check_enemy_collision(ship, laser)
+          let enemy = App.check_enemy_collision(laser)
 
           function check_col() {
             let x1 = Math.pow((laser.x + (LASER_WIDTH / 2)) - (BG_WIDTH / 2), 2)
             let x2 = Math.pow((laser.y + (LASER_HEIGHT / 2)) - (BG_HEIGHT / 2), 2)
-            let x3 = Math.pow(App.safe_zone_radius, 2)
+            let x3 = Math.pow(App.safe_zone.radius, 2)
             return x1 + x2 < x3
           }
 
@@ -267,7 +267,7 @@ module.exports = (io, App) => {
 
   App.ship_hit = (ship, laser) => {
     if (ship.visible) {
-      console.log(ship.health)
+
       ship.health -= LASER_HIT
 
       if (ship.health <= 0) {
@@ -387,7 +387,7 @@ module.exports = (io, App) => {
   App.check_safe_zone = (ship) => {
     let num_1 = (ship.x + (SHIP_WIDTH / 2)) - (BG_WIDTH / 2)
     let num_2 = (ship.y + (SHIP_HEIGHT / 2)) - (BG_HEIGHT / 2)
-    let radius = App.safe_zone_radius
+    let radius = App.safe_zone.radius
 
     if ((Math.pow(num_1, 2) + Math.pow(num_2, 2)) < Math.pow(radius, 2)) {
       ship.in_safe_zone = true
@@ -431,9 +431,9 @@ module.exports = (io, App) => {
     App.safe_zone.radius = SAFE_ZONE_HEIGHT / 2
   }
 
-  App.check_enemy_collision = (oship, laser) => {
+  App.check_enemy_collision = (laser) => {
     for (let ship of App.ships) {
-      if (ship === oship) {
+      if (laser.ship === ship) {
         continue
       }
 
@@ -449,7 +449,7 @@ module.exports = (io, App) => {
       }
     }
 
-    return false
+    return null
   }
 
   App.fire_laser = (socket) => {
