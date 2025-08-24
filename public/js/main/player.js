@@ -1,4 +1,8 @@
 App.update_hud = () => {
+  if (!App.ship) {
+    return
+  }
+
   let health = App.padnum(App.ship.health, 3)
   $(`#health`).html(`Health: ` + health + `/` + App.ship.max_health)
   $(`#max_speed`).html(`Max Speed: ` + App.format_value(App.ship.max_speed))
@@ -10,7 +14,6 @@ App.on_respawn = (data) => {
   let coords_1 = App.ship.x - App.background.canvas.width / 2
   let coords_2 = App.ship.y - App.background.canvas.height / 2
   App.move_background(coords_1, coords_2)
-  App.update_hud()
 }
 
 App.reduce_ship_speed = () => {
@@ -50,4 +53,5 @@ App.move = () => {
 
 App.on_upgrade = (data) => {
   App.chat_announce(`👽 Upgraded ${data.what}`)
+  App.copy_ship(data.ship)
 }

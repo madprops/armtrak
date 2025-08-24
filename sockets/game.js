@@ -376,6 +376,7 @@ module.exports = (io, App) => {
       socket.emit(`update`, {
         type: `upgrade`,
         what,
+        ship: ship.to_obj(),
       })
     }
 

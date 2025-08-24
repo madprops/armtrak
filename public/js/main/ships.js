@@ -8,8 +8,9 @@ class EnemyShip {
 App.on_update_ships = (data) => {
   if (App.update_ships(data)) {
     App.update_minimap()
-    App.update_hud()
   }
+
+  App.update_hud()
 }
 
 App.update_ships = (data) => {
@@ -17,13 +18,15 @@ App.update_ships = (data) => {
 
   for (let item of data.ships) {
     if (App.ship && (App.ship.id === item.id)) {
+      let diff_x = item.x - App.ship.x
+      let diff_y = item.y - App.ship.y
+
+      App.copy_ship(item)
+
       if (!item.visible) {
         App.ship.visible = false
         continue
       }
-
-      let diff_x = item.x - App.ship.x
-      let diff_y = item.y - App.ship.y
 
       if ((diff_x === 0) && (diff_y === 0) &&
       (App.ship_image.rotation === item.rotation)) {
@@ -33,7 +36,6 @@ App.update_ships = (data) => {
       }
 
       changed = true
-      App.copy_obj(item, App.ship, [`rotation`])
       App.ship_image.rotation = item.rotation
 
       if (App.ship.x <= 0) {
@@ -253,7 +255,6 @@ App.on_destroyed = (data) => {
   let u2 = data.destroyed_ship.username
   App.show_explosion(data.destroyed_ship.x, data.destroyed_ship.y)
   App.chat_announce(`💥 ${u1} destroyed ${u2}${kills}`)
-  App.update_hud()
 }
 
 App.create_label = (username) => {
@@ -261,4 +262,8 @@ App.create_label = (username) => {
   label.textAlign = `center`
   label.shadow = new createjs.Shadow(`#000000`, 0, 0, 5)
   return label
+}
+
+App.copy_ship = (src) => {
+  App.copy_obj(src, App.ship, [`rotation`])
 }
