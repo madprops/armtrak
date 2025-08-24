@@ -32,6 +32,8 @@ App.create_lasers = (data) => {
     laser.max_distance = item.max_distance
     App.lasers.push(laser)
   }
+
+  App.laser_sound()
 }
 
 App.fire_laser = () => {
@@ -71,6 +73,10 @@ App.fire_enemy_laser = (data) => {
     App.create_enemy_laser(laser)
   }
 
+  App.laser_sound()
+}
+
+App.laser_sound = () => {
   if (App.sound) {
     new Audio(`/audio/laser.ogg`).play()
   }
