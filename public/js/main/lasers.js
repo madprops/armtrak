@@ -151,14 +151,21 @@ App.move_lasers = () => {
   }
 }
 
-App.on_laser_hit = (data) => {
+App.remove_laser = (id) => {
   for (let [i, laser] of App.lasers.entries()) {
-    if (laser.id === data.laser.id) {
+    if (laser.id === id) {
       App.background.removeChild(laser.container)
       App.lasers.splice(i, 1)
       break
     }
   }
+}
 
+App.on_laser_hit = (data) => {
+  App.remove_laser(data.laser.id)
   App.play_audio(`hit`)
+}
+
+App.on_laser_hit_safe_zone = (data) => {
+  App.remove_laser(data.laser.id)
 }

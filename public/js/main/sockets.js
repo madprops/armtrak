@@ -41,6 +41,9 @@ App.start_socket = () => {
     else if (data.type === `laser_hit`) {
       App.on_laser_hit(data)
     }
+    else if (data.type === `laser_hit_safe_zone`) {
+      App.on_laser_hit_safe_zone(data)
+    }
     else if (data.type === `success`) {
       App.chat_announce(data.message)
     }

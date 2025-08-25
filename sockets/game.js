@@ -24,6 +24,8 @@ const LASER_UPGRADE_STEP = 1
 const SHIP_WIDTH = 24
 const SHIP_HEIGHT = 24
 const LASER_HIT = 20
+const LASER_WIDTH = 24
+const LASER_HEIGHT = 24
 const SAFE_ZONE_WIDTH = 150
 const SAFE_ZONE_HEIGHT = 150
 const ROTATION_STEP = 3
@@ -226,23 +228,42 @@ module.exports = (io, App) => {
     }
   }
 
+  App.safe_zone_hit = (laser) => {
+    let dx = laser.x - (App.safe_zone.x + App.safe_zone.radius)
+    let dy = laser.y - (App.safe_zone.y + App.safe_zone.radius)
+    let distance_squared = dx * dx + dy * dy
+    console.log(distance_squared)
+
+    if (distance_squared <= Math.pow(App.safe_zone.radius, 2)) {
+      return true
+    }
+
+    return false
+  }
+
   App.check_lasers = () => {
     for (let ship of App.ships) {
       for (let laser_group of App.lasers) {
         for (let [i, laser] of laser_group.entries()) {
-          if (laser.ship === ship) {
-            continue
-          }
+          let ship_hit = App.check_enemy_collision(laser)
 
-          let hit = App.check_enemy_collision(laser)
-
-          if (hit) {
+          if (ship_hit) {
             App.ship_hit(ship, laser)
             App.lasers.splice(i, 1)
+            i -= 1
 
             io.sockets.emit(`update`, {
               type: `laser_hit`,
-              ship_hit: ship.to_obj(),
+              ship_hit: ship_hit.to_obj(),
+              laser: laser.to_obj(),
+            })
+          }
+          else if (App.safe_zone_hit(laser)) {
+            App.lasers.splice(i, 1)
+            i += 1
+
+            io.sockets.emit(`update`, {
+              type: `laser_hit_safe_zone`,
               laser: laser.to_obj(),
             })
           }
