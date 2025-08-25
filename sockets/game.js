@@ -232,7 +232,6 @@ module.exports = (io, App) => {
     let dx = laser.x - (App.safe_zone.x + App.safe_zone.radius)
     let dy = laser.y - (App.safe_zone.y + App.safe_zone.radius)
     let distance_squared = dx * dx + dy * dy
-    console.log(distance_squared)
 
     if (distance_squared <= Math.pow(App.safe_zone.radius, 2)) {
       return true
