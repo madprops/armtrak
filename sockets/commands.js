@@ -11,6 +11,22 @@ module.exports = (io, App) => {
         App.read_file(`image_scraper`)
         console.log(App.image_scraper || `No scraper set`)
       }
+      else if (cmd === `clear_images`) {
+        App.images = []
+        App.write_file(`images`, JSON.stringify(App.images))
+
+        io.sockets.emit(`update`, {
+          type: `clear_images`,
+        })
+      }
+      else if (cmd === `stop_youtube`) {
+        App.youtube = undefined
+        App.write_file(`youtube`, ``)
+
+        io.sockets.emit(`update`, {
+          type: `stop_youtube`,
+        })
+      }
     }
     else if (cmd.startsWith(`kick `)) {
       let username = split[1].trim()

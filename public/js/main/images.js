@@ -105,3 +105,13 @@ App.check_image = (msg) => {
 App.img_search = (q) => {
   App.socket.emit(`image_search`, {query: q})
 }
+
+App.clear_images = () => {
+  App.images = []
+
+  for (let image of App.images) {
+    App.background.removeChild(image)
+  }
+
+  App.images = []
+}

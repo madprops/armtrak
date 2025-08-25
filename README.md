@@ -71,3 +71,15 @@ Used to kick players.
 There is still no ban mechanism in place.
 
 And there are no special/admin accounts.
+
+---
+
+`clear_images` with no arguments.
+
+Clears and removes all the images.
+
+---
+
+`stop_youtube` with no arguments.
+
+Clears and stops the youtube.

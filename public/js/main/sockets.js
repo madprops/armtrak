@@ -4,6 +4,16 @@ App.start_socket = () => {
   App.get_username()
 
   App.socket.on(`update`, (data) => {
+    if (![
+      `chat_announcement`,
+      `update_ships`,
+      `laser_fired`,
+      `laser_hit`,
+      `laser_hit_safe_zone`,
+    ].includes(data.type)) {
+      console.log(data.type)
+    }
+
     if (data.type === `chat_msg`) {
       App.update_chat(data.username, data.msg)
     }
@@ -70,6 +80,12 @@ App.start_socket = () => {
     }
     else if (data.type === `kicked`) {
       App.on_kicked()
+    }
+    else if (data.type === `clear_images`) {
+      App.clear_images()
+    }
+    else if (data.type === `stop_youtube`) {
+      App.stop_youtube()
     }
   })
 

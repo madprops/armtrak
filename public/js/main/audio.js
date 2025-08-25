@@ -20,6 +20,12 @@ App.play_youtube = () => {
   App.chat_announce(`${App.radio_icon} ${data.title} (${data.username})`)
 }
 
+App.stop_youtube = () => {
+  App.youtube = undefined
+  App.loaded_youtube = undefined
+  DOM.el(`#yt_player`).src = ``
+}
+
 App.check_yt = (msg) => {
   if (msg.startsWith(`yt `)) {
     let q = msg.split(`yt `)[1].trim()
