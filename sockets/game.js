@@ -241,32 +241,30 @@ module.exports = (io, App) => {
   }
 
   App.check_lasers = () => {
-    for (let ship of App.ships) {
-      for (let laser_group of App.lasers) {
-        for (let [i, laser] of laser_group.entries()) {
-          if (App.safe_zone_hit(laser)) {
+    for (let laser_group of App.lasers) {
+      for (let [i, laser] of laser_group.entries()) {
+        if (App.safe_zone_hit(laser)) {
+          App.lasers.splice(i, 1)
+          i += 1
+
+          io.sockets.emit(`update`, {
+            type: `laser_hit_safe_zone`,
+            laser: laser.to_obj(),
+          })
+        }
+        else {
+          let ship_hit = App.check_enemy_collision(laser)
+
+          if (ship_hit) {
+            App.ship_hit(ship_hit, laser)
             App.lasers.splice(i, 1)
-            i += 1
+            i -= 1
 
             io.sockets.emit(`update`, {
-              type: `laser_hit_safe_zone`,
+              type: `laser_hit`,
+              ship_hit: ship_hit.to_obj(),
               laser: laser.to_obj(),
             })
-          }
-          else {
-            let ship_hit = App.check_enemy_collision(laser)
-
-            if (ship_hit) {
-              App.ship_hit(ship_hit, laser)
-              App.lasers.splice(i, 1)
-              i -= 1
-
-              io.sockets.emit(`update`, {
-                type: `laser_hit`,
-                ship_hit: ship_hit.to_obj(),
-                laser: laser.to_obj(),
-              })
-            }
           }
         }
       }
