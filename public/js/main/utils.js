@@ -124,7 +124,8 @@ App.play_audio = (what) => {
     return
   }
 
-  let audio = new Audio(`/audio/${what}.mp3`)
+  let ext = `mp3`
+  let audio = new Audio(`/audio/${what}.${ext}`)
 
   DOM.ev(audio, `ended`, () => {
     for (let [i, item] of App.audios.entries()) {
@@ -134,6 +135,15 @@ App.play_audio = (what) => {
       }
     }
   })
+
+  if (what === `explosion`) {
+    for (let [i, item] of App.audios.entries()) {
+      if (item.src.includes(`hit.${ext}`)) {
+        App.audios.splice(i, 1)
+        i -= 1;
+      }
+    }
+  }
 
   App.audios.push(audio)
   audio.play()

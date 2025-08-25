@@ -447,7 +447,6 @@ module.exports = (io, App) => {
     ship.vx = vx
     ship.vy = vy
     ship.update_box()
-
     App.check_safe_zone(ship)
   }
 
