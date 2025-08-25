@@ -106,8 +106,6 @@ App.img_search = (q) => {
 }
 
 App.clear_images = () => {
-  App.images = []
-
   for (let image of App.images) {
     App.remove_from_background(image, false)
   }
