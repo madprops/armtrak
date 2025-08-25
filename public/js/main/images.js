@@ -63,8 +63,7 @@ App.push_image = (image) => {
   App.images.push(image)
 
   if (App.images.length > App.max_images) {
-    App.background.removeChild(App.images[0])
-    App.images.splice(0, 1)
+    App.remove_from_background(App.images[0], false)
   }
 }
 
@@ -110,8 +109,9 @@ App.clear_images = () => {
   App.images = []
 
   for (let image of App.images) {
-    App.background.removeChild(image)
+    App.remove_from_background(image, false)
   }
 
+  App.refresh_background()
   App.images = []
 }

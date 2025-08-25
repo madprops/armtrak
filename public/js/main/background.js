@@ -45,12 +45,24 @@ App.update_background = () => {
   App.background.update()
 }
 
-App.add_to_background = (what, update = true) => {
+App.refresh_background = () => {
+  App.z_order()
+  App.update_minimap()
+}
+
+App.add_to_background = (what, refresh = true) => {
   App.background.addChild(what)
 
-  if (update) {
-    App.z_order()
-    App.update_minimap()
+  if (refresh) {
+    App.refresh_background()
+  }
+}
+
+App.remove_from_background = (what, refresh = true) {
+    App.background.removeChild(what)
+
+  if (refresh) {
+    App.refresh_background()
   }
 }
 
