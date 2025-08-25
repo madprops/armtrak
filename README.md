@@ -1,9 +1,3 @@
-## Currently under development as I'm moving logic to the server
-
-Don't install from `main` branch right now.
-
----
-
 ## Installation
 
 >npm install
