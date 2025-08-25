@@ -139,6 +139,7 @@ App.play_audio = (what) => {
   if (what === `explosion`) {
     for (let [i, item] of App.audios.entries()) {
       if (item.src.includes(`hit.${ext}`)) {
+        item.pause()
         App.audios.splice(i, 1)
         i -= 1;
       }
