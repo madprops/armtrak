@@ -110,6 +110,6 @@ App.clear_images = () => {
     App.remove_from_background(image, false)
   }
 
-  App.refresh_background()
   App.images = []
+  App.refresh_background()
 }
