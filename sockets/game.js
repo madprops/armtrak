@@ -86,8 +86,8 @@ module.exports = (io, App) => {
 
     update_box = function() {
       let num = 4
-      let nw = SHIP_WIDTH / num
-      let nh = SHIP_HEIGHT / num
+      let nw = this.width / num
+      let nh = this.height / num
 
       this.box = {
         x1: this.x - nw,
@@ -508,8 +508,8 @@ module.exports = (io, App) => {
     let d = App.get_direction(ship)
     d = App.to_radians(d)
 
-    let x = (SHIP_WIDTH / 2 * 0.6) * Math.cos(d)
-    let y = (SHIP_WIDTH / 2 * 0.6) * Math.sin(d)
+    let x = (ship.width / 2 * 0.6) * Math.cos(d)
+    let y = (ship.width / 2 * 0.6) * Math.sin(d)
 
     let x_1 = ship.x
     let y_1 = ship.y
