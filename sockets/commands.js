@@ -13,7 +13,7 @@ module.exports = (io, App) => {
       }
       else if (cmd === `clear_images`) {
         App.images = []
-        App.write_file(`images`, JSON.stringify(App.images))
+        App.write_file(`images`, ``)
 
         io.sockets.emit(`update`, {
           type: `clear_images`,
