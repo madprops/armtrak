@@ -141,7 +141,7 @@ App.play_audio = (what) => {
       if (item.src.includes(`hit.${ext}`)) {
         item.pause()
         App.audios.splice(i, 1)
-        i -= 1;
+        i -= 1
       }
     }
   }
