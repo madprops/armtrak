@@ -248,7 +248,7 @@ module.exports = (io, App) => {
           let ship_hit = App.check_enemy_collision(laser)
 
           if (ship_hit) {
-            App.ship_hit(ship, laser)
+            App.ship_hit(ship_hit, laser)
             App.lasers.splice(i, 1)
             i -= 1
 
