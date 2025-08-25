@@ -121,7 +121,7 @@ App.format_value = (value, adjustment = 1, precision = 1) => {
 
 App.audio_context = new (window.AudioContext || window.webkitAudioContext)()
 App.audio_buffers = {}
-App.max_audios = 3
+App.max_audios = 5
 
 App.load_audio = async (what) => {
   if (App.audio_buffers[what]) {
