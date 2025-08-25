@@ -65,6 +65,8 @@ module.exports = (io, App) => {
       this.kills = 0
       this.vx = 0
       this.vy = 0
+      this.width = SHIP_WIDTH
+      this.height = SHIP_HEIGHT
 
       Ship.id += 1
     }
@@ -109,10 +111,15 @@ module.exports = (io, App) => {
       this.x = x
       this.y = y
       this.distance = 0
+      this.in_safe_zone = false
 
       let velocities = App.get_vector_velocities(this)
       this.vx = velocities[0]
       this.vy = velocities[1]
+
+      this.width = LASER_WIDTH
+      this.height = LASER_HEIGHT
+
       Laser.id += 1
     }
 
@@ -228,22 +235,12 @@ module.exports = (io, App) => {
     }
   }
 
-  App.safe_zone_hit = (laser) => {
-    let dx = laser.x - (App.safe_zone.x + App.safe_zone.radius)
-    let dy = laser.y - (App.safe_zone.y + App.safe_zone.radius)
-    let distance_squared = dx * dx + dy * dy
-
-    if (distance_squared <= Math.pow(App.safe_zone.radius, 2)) {
-      return true
-    }
-
-    return false
-  }
-
   App.check_lasers = () => {
     for (let laser_group of App.lasers) {
       for (let [i, laser] of laser_group.entries()) {
-        if (App.safe_zone_hit(laser)) {
+        App.check_safe_zone(laser)
+
+        if (laser.in_safe_zone) {
           App.lasers.splice(i, 1)
           i += 1
 
@@ -430,16 +427,16 @@ module.exports = (io, App) => {
     ship.laser_level += LASER_UPGRADE_STEP
   }
 
-  App.check_safe_zone = (ship) => {
-    let num_1 = (ship.x + (SHIP_WIDTH / 2)) - (BG_WIDTH / 2)
-    let num_2 = (ship.y + (SHIP_HEIGHT / 2)) - (BG_HEIGHT / 2)
+  App.check_safe_zone = (obj) => {
+    let num_1 = (obj.x + (obj.width / 2)) - (BG_WIDTH / 2)
+    let num_2 = (obj.y + (obj.height / 2)) - (BG_HEIGHT / 2)
     let radius = App.safe_zone.radius
 
     if ((Math.pow(num_1, 2) + Math.pow(num_2, 2)) < Math.pow(radius, 2)) {
-      ship.in_safe_zone = true
+      obj.in_safe_zone = true
     }
     else {
-      ship.in_safe_zone = false
+      obj.in_safe_zone = false
     }
   }
 
