@@ -58,7 +58,7 @@ App.add_to_background = (what, refresh = true) => {
   }
 }
 
-App.remove_from_background = (what, refresh = true) {
+App.remove_from_background = (what, refresh = true) => {
     App.background.removeChild(what)
 
   if (refresh) {
