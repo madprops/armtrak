@@ -30,6 +30,7 @@ App.create_lasers = (data) => {
     let velocities = App.get_vector_velocities(container, item.speed)
     laser.vx = velocities[0]
     laser.vy = velocities[1]
+    laser.id = item.id
     laser.username = data.username
 
     laser.max_distance = item.max_distance
@@ -81,7 +82,7 @@ App.fire_enemy_laser = (data) => {
 
 App.laser_sound = () => {
   if (App.sound) {
-    new Audio(`/audio/laser.ogg`).play()
+    App.play_audio(`laser`)
   }
 }
 
@@ -103,21 +104,6 @@ App.move_lasers = () => {
       }
       else if (laser.container.y >= App.bg_height) {
         laser.container.y = 0
-      }
-
-      let enemy = App.check_enemy_collision(laser)
-
-      function check_col() {
-        let x1 = Math.pow((laser.container.x + (App.laser_width / 2)) - (App.bg_width / 2), 2)
-        let x2 = Math.pow((laser.container.y + (App.laser_height / 2)) - (App.bg_height / 2), 2)
-        let x3 = Math.pow(App.safe_zone_radius, 2)
-        return x1 + x2 < x3
-      }
-
-      if (enemy || check_col()) {
-        App.lasers.splice(i, 1)
-        i -= 1
-        App.background.removeChild(laser.container)
       }
     }
     else {
@@ -165,27 +151,14 @@ App.move_lasers = () => {
   }
 }
 
-App.check_enemy_collision = (laser) => {
-  if (laser.username === App.username) {
-    return
-  }
-
-  for (let ship of App.enemy_ships) {
-    if (ship.username === laser.username) {
-      continue
-    }
-
-    if (ship.container.visible) {
-      let x1 = ship.container.x - App.ship_width / 4
-      let x2 = ship.container.x + App.ship_width / 4
-      let y1 = ship.container.y - App.ship_height / 4
-      let y2 = ship.container.y + App.ship_height / 4
-
-      if (((laser.x >= x1) && (laser.x <= x2)) && ((laser.y >= y1) && (laser.y <= y2))) {
-        return ship
-      }
+App.on_laser_hit = (data) => {
+  for (let [i, laser] of App.lasers.entries()) {
+    if (laser.id === data.laser.id) {
+      App.background.removeChild(laser.container)
+      App.lasers.splice(i, 1)
+      break
     }
   }
 
-  return false
+  App.play_audio(`hit`)
 }

@@ -215,7 +215,7 @@ App.show_explosion = (x, y) => {
   App.background.addChild(explosion_animation)
 
   if (App.sound) {
-    new Audio(`/audio/explosion.ogg`).play()
+    App.play_audio(`explosion`)
   }
 }
 

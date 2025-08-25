@@ -118,3 +118,23 @@ App.copy_obj = (from, to, exclude = []) => {
 App.format_value = (value, adjustment = 1, precision = 1) => {
   return Math.round((value - adjustment) * Math.pow(10, precision)) / Math.pow(10, precision)
 }
+
+App.play_audio = (what) => {
+  if (App.audios.length >= 3) {
+    return
+  }
+
+  let audio = new Audio(`/audio/${what}.mp3`)
+
+  DOM.ev(audio, `ended`, () => {
+    for (let [i, item] of App.audios.entries()) {
+      if (item === audio) {
+        App.audios.splice(i, 1)
+        break
+      }
+    }
+  })
+
+  App.audios.push(audio)
+  audio.play()
+}

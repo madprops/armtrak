@@ -23,8 +23,6 @@ const SPEED_UPGRADE_STEP = 0.1
 const LASER_UPGRADE_STEP = 1
 const SHIP_WIDTH = 24
 const SHIP_HEIGHT = 24
-const LASER_WIDTH = 24
-const LASER_HEIGHT = 24
 const LASER_HIT = 20
 const SAFE_ZONE_WIDTH = 150
 const SAFE_ZONE_HEIGHT = 150
@@ -44,8 +42,8 @@ module.exports = (io, App) => {
       let model = App.get_random_int(1, NUM_MODELS)
       let now = Date.now()
 
-      this.username = username
       this.id = Ship.id
+      this.username = username
       this.x = coords[0]
       this.y = coords[1]
       this.speed = 0
@@ -81,10 +79,26 @@ module.exports = (io, App) => {
 
       return obj
     }
+
+    update_box = function() {
+      let num = 4
+      let nw = SHIP_WIDTH / num
+      let nh = SHIP_HEIGHT / num
+
+      this.box = {
+        x1: this.x - nw,
+        x2: this.x + nw,
+        y1: this.y - nh,
+        y2: this.y + nh,
+      }
+    }
   }
 
   class Laser {
+    static id = 1
+
     constructor(ship, speed, max_distance, rotation, x, y) {
+      this.id = Laser.id
       this.ship = ship
       this.username = ship.username
       this.speed = speed
@@ -97,6 +111,7 @@ module.exports = (io, App) => {
       let velocities = App.get_vector_velocities(this)
       this.vx = velocities[0]
       this.vy = velocities[1]
+      Laser.id += 1
     }
 
     to_obj() {
@@ -219,19 +234,17 @@ module.exports = (io, App) => {
             continue
           }
 
-          let enemy = App.check_enemy_collision(laser)
+          let hit = App.check_enemy_collision(laser)
 
-          function check_col() {
-            let x1 = Math.pow((laser.x + (LASER_WIDTH / 2)) - (BG_WIDTH / 2), 2)
-            let x2 = Math.pow((laser.y + (LASER_HEIGHT / 2)) - (BG_HEIGHT / 2), 2)
-            let x3 = Math.pow(App.safe_zone.radius, 2)
-            return x1 + x2 < x3
-          }
-
-          if (enemy || check_col()) {
+          if (hit) {
             App.ship_hit(ship, laser)
             App.lasers.splice(i, 1)
-            i -= 1
+
+            io.sockets.emit(`update`, {
+              type: `laser_hit`,
+              ship_hit: ship.to_obj(),
+              laser: laser.to_obj(),
+            })
           }
         }
       }
@@ -433,6 +446,7 @@ module.exports = (io, App) => {
 
     ship.vx = vx
     ship.vy = vy
+    ship.update_box()
 
     App.check_safe_zone(ship)
   }
@@ -451,12 +465,9 @@ module.exports = (io, App) => {
       }
 
       if (ship.visible) {
-        let x1 = ship.x - SHIP_WIDTH / 4
-        let x2 = ship.x + SHIP_WIDTH / 4
-        let y1 = ship.y - SHIP_HEIGHT / 4
-        let y2 = ship.y + SHIP_HEIGHT / 4
+        let {x1, x2, y1, y2} = ship.box
 
-        if (((laser.x >= x1) && (laser.x <= x2)) && ((laser.y >= y1) && (laser.y <= y2))) {
+        if ((laser.x >= x1) && (laser.x <= x2) && (laser.y >= y1) && (laser.y <= y2)) {
           return ship
         }
       }
@@ -821,7 +832,7 @@ module.exports = (io, App) => {
     }
 
     io.sockets.emit(`update`, {
-      type: `laser`,
+      type: `laser_fired`,
       x: ship.x,
       y: ship.y,
       lasers: laser_objs,
