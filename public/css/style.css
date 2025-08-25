@@ -103,6 +103,11 @@ body, html {
 	overflow-y: auto;
 	background-color: rgb(46, 47, 49);
 	color: white;
+	scrollbar-width: none; /* Firefox */
+}
+
+#chat_area::-webkit-scrollbar {
+	display: none; /* Chrome, Safari, and Edge */
 }
 
 #chat_input {

@@ -4,8 +4,10 @@ App.yt_search = (q) => {
 
 App.send_to_chat = () => {
   let send = true
-  let msg = App.clean_string($(`#chat_input`).val())
-  $(`#chat_input`).val(``)
+  let input = DOM.el(`#chat_input`)
+  let msg = App.clean_string(input.value)
+  input.value = ``
+  input.focus()
 
   if (App.check_yt(msg)) {
     send = false
@@ -29,12 +31,14 @@ App.send_to_chat = () => {
 }
 
 App.goto_bottom = () => {
-  $(`#chat_area`).scrollTop($(`#chat_area`)[0].scrollHeight)
+  DOM.el(`#chat_area`).scrollTop = DOM.el(`#chat_area`).scrollHeight
 }
 
 App.start_chat = () => {
-  $(`#chat_area`).append(`<div class="clear">&nbsp;</div>`)
-  $(`#chat_input`).focus()
+  let clear = DOM.create(`div`, `clear`)
+  clear.innerHTML = `&nbsp;`
+  DOM.el(`#chat_area`).append(clear)
+  DOM.el(`#chat_input`).focus()
   App.goto_bottom()
 }
 
@@ -44,13 +48,13 @@ App.chat_urlize = (msg) => {
 
 App.chat_announce = (msg) => {
   let fmt = App.format_announcement_msg(msg)
-  $(`#chat_area`).append(fmt)
+  DOM.el(`#chat_area`).append(fmt)
   App.goto_bottom()
 }
 
 App.update_chat = (uname, msg) => {
   let fmt = App.format_msg(uname, msg)
-  $(`#chat_area`).append(fmt)
+  DOM.el(`#chat_area`).append(fmt)
   App.goto_bottom()
 }
 
@@ -68,11 +72,15 @@ App.greet = (username) => {
 
 App.format_msg = (uname, msg) => {
   let s = App.chat_urlize(App.clean_string(msg))
-  return `<div class="chat_message"><b>${uname}:</b>&nbsp;&nbsp;${s}</div><div>&nbsp;</div>`
+  let el = DOM.create(`div`)
+  el.innerHTML = `<div class="chat_message"><b>${uname}:</b>&nbsp;&nbsp;${s}</div><div>&nbsp;</div>`
+  return el
 }
 
 App.format_announcement_msg = (msg) => {
-  return `<div class="chat_announcement">${msg}</div> <div>&nbsp;</div>`
+  let el = DOM.create(`div`)
+  el.innerHTML = `<div class="chat_announcement">${msg}</div><div>&nbsp;</div>`
+  return el
 }
 
 App.on_kicked = () => {
@@ -94,4 +102,8 @@ App.show_intro = () => {
   App.chat_announce(`Place an image on the map (visible to everyone) with "img something" or by pasting an image url`)
   App.chat_announce(`Play a youtube song (for everyone) by searching it with "yt name of song", or pasting a youtube url`)
   App.chat_announce(`Upgrade your ship by destroying other players`)
+}
+
+App.clear_chat_input = () => {
+  DOM.el(`#chat_input`).value = ``
 }

@@ -5,7 +5,7 @@ App.play_yt = (id) => {
     }
 
     App.loaded_youtube = id
-    $(`#yt_player`).attr(`src`, `https://www.youtube.com/embed/` + id + `?&autoplay=1&enablejsapi=1&version=3`)
+    DOM.el(`#yt_player`).src = `https://www.youtube.com/embed/${id}?&autoplay=1&enablejsapi=1&version=3`
   }
 }
 
@@ -44,25 +44,28 @@ App.check_yt = (msg) => {
 
 App.toggle_sound = () => {
   App.sound = !App.sound
+  let toggle = DOM.el(`#sound_toggle`)
 
   if (App.sound) {
-    $(`#sound_toggle`).html(`Turn Off Sound`)
+    toggle.textContent = `Turn Off Sound`
   }
   else {
-    $(`#sound_toggle`).html(`Turn On Sound`)
+    toggle.textContent = `Turn On Sound`
   }
 }
 
 App.toggle_music = () => {
   App.music = !App.music
+  let toggle = DOM.el(`#music_toggle`)
+  let player = DOM.el(`#yt_player`)
 
   if (App.music) {
-    $(`#music_toggle`).html(`Turn Off Music`)
+    toggle.textContent = `Turn Off Music`
     App.play_youtube()
   }
   else {
-    $(`#music_toggle`).html(`Turn On Music`)
-    $(`#yt_player`).attr(`src`, ``)
+    toggle.textContent = `Turn On Music`
+    player.src = ``
     App.loaded_youtube = null
   }
 }

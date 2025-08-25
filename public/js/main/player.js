@@ -4,9 +4,9 @@ App.update_hud = () => {
   }
 
   let health = App.padnum(App.ship.health, 3)
-  $(`#health`).html(`Health: ` + health + `/` + App.ship.max_health)
-  $(`#max_speed`).html(`Max Speed: ` + App.format_value(App.ship.max_speed))
-  $(`#laser_level`).html(`Laser Level: ` + App.ship.laser_level)
+  DOM.el(`#health`).innerText = `Health: ` + health + `/` + App.ship.max_health
+  DOM.el(`#max_speed`).innerText = `Max Speed: ` + App.format_value(App.ship.max_speed)
+  DOM.el(`#laser_level`).innerText = `Laser Level: ` + App.ship.laser_level
 }
 
 App.on_respawn = (data) => {

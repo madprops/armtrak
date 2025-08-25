@@ -1,10 +1,11 @@
 App.activate_key_detection = () => {
-  $(`#canvas`).click(function() {
-    $(`#chat_input`).blur()
+  DOM.ev(`#canvas`, `click`, () => {
+    DOM.el(`#chat_input`).blur()
   })
 
-  $(document).keydown(function(e) {
-    $(`#chat_input`).focus()
+  DOM.ev(document, `keydown`, (e) => {
+    let input = DOM.el(`#chat_input`)
+    input.focus()
 
     if (e.key === `Enter`) {
       App.send_to_chat()
@@ -24,17 +25,20 @@ App.activate_key_detection = () => {
       App.down_arrow = true
     }
     else if (e.key === ` `) {
-      if ($(`#chat_input`).val().trim() === ``) {
-        $(`#chat_input`).val(``)
+      if (input.value.trim() === ``) {
+        input.value = ``
         App.fire_laser()
         e.preventDefault()
       }
+    }
+    else if (e.key === `Escape`) {
+      App.clear_chat_input()
     }
 
     App.activity = true
   })
 
-  $(document).keyup(function(e) {
+  DOM.ev(document, `keyup`, (e) => {
     if (e.key === `ArrowLeft`) {
       App.left_arrow = false
     }
@@ -53,7 +57,7 @@ App.activate_key_detection = () => {
 }
 
 App.setup_clicks = () => {
-  document.addEventListener(`click`, () => {
+  DOM.ev(document, `click`, () => {
     setTimeout(() => {
       App.play_youtube()
     }, 500)

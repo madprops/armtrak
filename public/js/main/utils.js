@@ -119,33 +119,53 @@ App.format_value = (value, adjustment = 1, precision = 1) => {
   return Math.round((value - adjustment) * Math.pow(10, precision)) / Math.pow(10, precision)
 }
 
-App.play_audio = (what) => {
-  if (App.audios.length >= 3) {
-    return
+App.audio_context = new (window.AudioContext || window.webkitAudioContext)()
+App.audio_buffers = {}
+App.max_audios = 3
+
+App.load_audio = async (what) => {
+  if (App.audio_buffers[what]) {
+    return App.audio_buffers[what]
   }
 
   let ext = `mp3`
-  let audio = new Audio(`/audio/${what}.${ext}`)
+  let response = await fetch(`/audio/${what}.${ext}`)
+  let array_buffer = await response.arrayBuffer()
+  let audio_buffer = await App.audio_context.decodeAudioData(array_buffer)
 
-  DOM.ev(audio, `ended`, () => {
+  App.audio_buffers[what] = audio_buffer
+  return audio_buffer
+}
+
+App.play_audio = async (what) => {
+  if (what === `explosion`) {
+    for (let source of App.audios) {
+      source.stop()
+    }
+
+    App.audios = []
+  }
+  else if (App.audios.length >= App.max_audios) {
+    return
+  }
+
+  let audio_buffer = await App.load_audio(what)
+  let source = App.audio_context.createBufferSource()
+  source.buffer = audio_buffer
+
+  let gain_node = App.audio_context.createGain()
+  source.connect(gain_node)
+  gain_node.connect(App.audio_context.destination)
+
+  source.onended = () => {
     for (let [i, item] of App.audios.entries()) {
-      if (item === audio) {
+      if (item === source) {
         App.audios.splice(i, 1)
         break
       }
     }
-  })
-
-  if (what === `explosion`) {
-    for (let [i, item] of App.audios.entries()) {
-      if (item.src.includes(`hit.${ext}`)) {
-        item.pause()
-        App.audios.splice(i, 1)
-        i -= 1
-      }
-    }
   }
 
-  App.audios.push(audio)
-  audio.play()
+  App.audios.push(source)
+  source.start(0)
 }
